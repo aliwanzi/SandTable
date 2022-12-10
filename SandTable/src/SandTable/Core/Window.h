@@ -15,20 +15,6 @@ namespace SandTable
 		int MajorVersion;
 		int MinorVersion;
 		int Samples;
-		union
-		{
-			struct
-			{
-				unsigned int    Fullscreen : 1;
-				unsigned int    Vsync : 1;
-				unsigned int    Cursor : 1;
-				unsigned int    Stereo : 1;
-				unsigned int    Debug : 1;
-				unsigned int    Robust : 1;
-			};
-			unsigned int        All;
-		} UnionFlags;
-
 		WindowProps(const std::string& sTitle = "SandTable", int iWidth = 1280, int iHeight = 720, int Samples = 0)
 			: Title(sTitle),
 			Width(iWidth),
@@ -37,7 +23,6 @@ namespace SandTable
 			MinorVersion(3),
 			Samples(Samples)
 		{
-			UnionFlags.Debug = 1;
 		}
 	};
 

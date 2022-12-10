@@ -1,10 +1,10 @@
-#include "..\..\SandTable\src\SandTable\Core\Application.h"
 #include <SandTable.h>
 
 class SandBoxLayer :public SandTable::Layer
 {
 public:
 	SandBoxLayer() :Layer("SandBox") {}
+	~SandBoxLayer() {}
 	void OnUpdate()override
 	{
 		LOG_DEV_INFO("SandBoxLayer::OnUpdate");
@@ -13,19 +13,28 @@ public:
 	{
 		LOG_DEV_INFO(event);
 	}
+	void OnAttach()override
+	{
+
+	}
+	void OnDetach() override
+	{
+
+	}
+
 };
 
 class SandBox :public SandTable::Application
 {
 public:
-	SandBox() {}
 	~SandBox() {}
 };
 
-std::shared_ptr<SandTable::Application> SandTable::Application ::CreateApplication()
+void SandTable::Application::CreateApplication()
 {
-	static std::shared_ptr<Application> spSandBox(new Application());
+	auto spSandBox = Application::GetApplication();
 	auto spSandBoxLayer = std::make_shared<SandBoxLayer>();
+	//auto spImGuiLayer = std::make_shared<ImGuiLayer>();
 	spSandBox->PushLayer(spSandBoxLayer);
-	return spSandBox;
+	//spSandBox->PushLayer(spImGuiLayer);
 }

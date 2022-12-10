@@ -100,24 +100,14 @@ namespace SandTable
 		glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, windowPorps.MajorVersion);
 		glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, windowPorps.MinorVersion);
 
-		if (windowPorps.UnionFlags.Debug)
-		{
-			glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GL_TRUE);
-		}
-
-		if (windowPorps.UnionFlags.Robust)
-		{
-			glfwWindowHint(GLFW_CONTEXT_ROBUSTNESS, GLFW_LOSE_CONTEXT_ON_RESET);
-		}
-
 		glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 		glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 		glfwWindowHint(GLFW_SAMPLES, windowPorps.Samples);
-		glfwWindowHint(GLFW_STEREO, windowPorps.UnionFlags.Stereo ? GL_TRUE : GL_FALSE);
 
 		m_pGLFWWindow = glfwCreateWindow(windowPorps.Width,
 			windowPorps.Height, windowPorps.Title.c_str(), nullptr, nullptr);
 		SAND_TABLE_ASSERT(m_pGLFWWindow, "Failed to creat GLFW window");
+		glfwSetErrorCallback(GLFWErrorCallback);
 
 		glfwMakeContextCurrent(m_pGLFWWindow);
 		glfwSetWindowUserPointer(m_pGLFWWindow, &m_windowCallBack);
@@ -212,36 +202,13 @@ namespace SandTable
 				pWindowCallBack.EventCallback(event);
 			});
 
-		if (!windowPorps.UnionFlags.Cursor)
-		{
-			glfwSetInputMode(m_pGLFWWindow, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
-		}
-
 		bInit = gl3wInit();
 		SAND_TABLE_ASSERT(!bInit, "Failed to initialize GLFW");
 
 		LOG_DEV_INFO("OpenGL Info:");
-
 		LOG_DEV_INFO("Vendor: {0}", glGetString(GL_VENDOR));
 		LOG_DEV_INFO("Renderer:{0}", glGetString(GL_RENDERER));
 		LOG_DEV_INFO("Version: {0}", glGetString(GL_VERSION));
-
-		if (windowPorps.UnionFlags.Debug)
-		{
-			if (gl3wIsSupported(4, 3))
-			{
-				glEnable(GL_DEBUG_OUTPUT);
-				glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
-				glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DEBUG_SEVERITY_NOTIFICATION, 0, NULL, GL_FALSE);
-				glDebugMessageCallback((GLDEBUGPROC)OnDebug, this);
-				glfwSetErrorCallback(GLFWErrorCallback);
-			}
-			else if (IsExtensionSupported("GL_ARB_debug_output"))
-			{
-				glDebugMessageCallbackARB((GLDEBUGPROC)OnDebug, this);
-				glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS_ARB);
-			}
-		}
 	}
 
 	void WindowsWindow::Shutdown()

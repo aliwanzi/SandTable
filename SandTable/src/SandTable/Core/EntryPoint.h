@@ -6,9 +6,9 @@
 
 int main()
 {
-	SandTable::Logger::Init();
 	LOG_DEV_WARN("Initialize Log!");
-	auto spApplication = SandTable::Application::CreateApplication();
+	SandTable::Application::CreateApplication();
+	auto spApplication = SandTable::Application::GetApplication();
 	spApplication->Run();
 }
 

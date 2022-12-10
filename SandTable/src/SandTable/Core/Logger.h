@@ -9,9 +9,12 @@ namespace SandTable
 	class SAND_TABLE_API Logger
 	{
 	public:
-		static void Init();
-		static std::shared_ptr<spdlog::logger>& GetLogger();
+		static std::shared_ptr<spdlog::logger> GetLogger();
 	private:
+		Logger()=delete;
+		Logger(const Logger&) = delete;
+		Logger& operator=(const Logger&) = delete;
+
 		static std::shared_ptr<spdlog::logger> m_spLogger;
 	};
 }
