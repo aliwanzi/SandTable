@@ -14,6 +14,7 @@ outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
 IncludeDir = {}
 IncludeDir["GLFW"] = "SandTable/vendor/GLFW/include"
 IncludeDir["GL3W"] = "SandTable/vendor/GL3W/include"
+IncludeDir["ImGui"] = "SandTable/vendor/imgui/include"
 
 include "SandTable/vendor/GLFW"
 include "SandTable/vendor/GL3W"
@@ -40,13 +41,15 @@ project "SandTable"
 		"%{prj.name}/src",
 		"%{prj.name}/vendor/spdlog/include",
 		"%{IncludeDir.GLFW}",
-		"%{IncludeDir.GL3W}"
+		"%{IncludeDir.GL3W}",
+		"%{IncludeDir.ImGui}"
 	}
 
 	links
 	{
 		"GLFW",
 		"GL3W",
+		"ImGui",
 		"opengl32.lib"
 	}
 
@@ -68,14 +71,17 @@ project "SandTable"
 	
 	filter "configurations:Degug"
 		defines "SAND_TABLE_DEBUG"
+		buildoptions "/MDd"
 		symbols "On"
 
 	filter "configurations:Release"
 		defines "SAND_TABLE_RELEASE"
+		buildoptions "/MDd"
 		optimize "On"
 
 	filter "configurations:Dist"
 		defines "SAND_TABLE_DIST"
+		buildoptions "/MDd"
 		optimize "On"
 
 
@@ -115,12 +121,15 @@ project "SandBox"
 
 	filter "configurations:Degug"
 		defines "SAND_TABLE_DEBUG"
+		buildoptions "/MDd"
 		symbols "On"
 
 	filter "configurations:Release"
 		defines "SAND_TABLE_RELEASE"
+		buildoptions "/MDd"
 		optimize "On"
 
 	filter "configurations:Dist"
 		defines "SAND_TABLE_DIST"
+		buildoptions "/MDd"
 		optimize "On"
