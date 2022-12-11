@@ -11,7 +11,7 @@ namespace SandTable
 	public:
 		static std::shared_ptr<spdlog::logger> GetLogger();
 	private:
-		Logger()=delete;
+		Logger() = delete;
 		Logger(const Logger&) = delete;
 		Logger& operator=(const Logger&) = delete;
 

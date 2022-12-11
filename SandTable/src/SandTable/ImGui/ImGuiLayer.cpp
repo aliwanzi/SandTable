@@ -47,7 +47,7 @@ namespace SandTable
 	void ImGuiLayer::OnDetach()
 	{
         ImGui_ImplOpenGL3_Shutdown();
-        //ImGui_ImplGlfw_Shutdown();
+        ImGui_ImplGlfw_Shutdown();
         ImGui::DestroyContext();
 	}
 
