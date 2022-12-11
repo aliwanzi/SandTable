@@ -1,12 +1,10 @@
 #include "pch.h"
 #include "Application.h"
 #include "SandTable/Events/ApplicationEvent.h"
-#include "GL/gl3w.h"
+#include "GLFW/glfw3.h"
 
 namespace SandTable
 {
-#define BIND_EVENT_FUN(x) std::bind(&x, this, std::placeholders::_1)
-
 	std::shared_ptr<Application> Application::m_spApplication = nullptr;
 
 	Application::Application():m_bRunning(true)
@@ -14,6 +12,56 @@ namespace SandTable
 		m_upWindow = std::unique_ptr<Window>(Window::Create());
 		m_upWindow->SetEventCallback(BIND_EVENT_FUN(Application::OnEvent));
 		m_spLayerStack = std::make_unique<LayerStack>();
+	}
+
+	bool Application::OnMouseButtonPressedEvent(MouseButtonPressedEvent& event)
+	{
+		return false;
+	}
+
+	bool Application::OnMouseButtonReleasedEvent(MouseButtonReleasedEvent& event)
+	{
+		return false;
+	}
+
+	bool Application::OnMouseMovedEvent(MouseMovedEvent& event)
+	{
+		return false;
+	}
+
+	bool Application::OnMouseScrolledEvent(MouseScrolledEvent& event)
+	{
+		return false;
+	}
+
+	bool Application::OnKeyPressedEvent(KeyPressedEvent& event)
+	{
+		if (event.GetKeyCode() == GLFW_KEY_ESCAPE)
+		{
+			m_bRunning = false;
+		}
+		return true;
+	}
+
+	bool Application::OnKeyReleasedEvent(KeyReleasedEvent& event)
+	{
+		return false;
+	}
+
+	bool Application::OnKyeTypedEvent(KeyEvent& event)
+	{
+		return false;
+	}
+
+	bool Application::OnWindowResizedEvent(WindowResizedEvent& event)
+	{
+		return false;
+	}
+
+	bool Application::OnWindowClosedEvent(WindowCloseEvent& e)
+	{
+		m_bRunning = false;
+		return true;
 	}
 
 	Application::~Application()
@@ -27,24 +75,31 @@ namespace SandTable
 		{
 			glClearColor(1, 0, 1, 1);
 			glClear(GL_COLOR_BUFFER_BIT);
-			m_upWindow->OnUpdate();
 			const auto& listLayers = m_spLayerStack->GetLayers();
 			for (auto iter = listLayers.begin(); iter != listLayers.end(); iter++)
 			{
 				(*iter)->OnUpdate();
 			}
-		}		
+			m_upWindow->OnUpdate();
+		}
 	}
 
-	void Application::OnEvent(Event& e)
+	void Application::OnEvent(Event& event)
 	{
-		EventDispatcher dispatcher(e);
-		dispatcher.Dispatch<WindowCloseEvent>(BIND_EVENT_FUN(Application::OnWindowClosed));
+		EventDispatcher dispatcher(event);
+		dispatcher.Dispatch<MouseButtonPressedEvent>(BIND_EVENT_FUN(Application::OnMouseButtonPressedEvent));
+		dispatcher.Dispatch<MouseButtonReleasedEvent>(BIND_EVENT_FUN(Application::OnMouseButtonReleasedEvent));
+		dispatcher.Dispatch<MouseMovedEvent>(BIND_EVENT_FUN(Application::OnMouseMovedEvent));
+		dispatcher.Dispatch<MouseScrolledEvent>(BIND_EVENT_FUN(Application::OnMouseScrolledEvent));
+		dispatcher.Dispatch<KeyPressedEvent>(BIND_EVENT_FUN(Application::OnKeyPressedEvent));
+		dispatcher.Dispatch<KeyReleasedEvent>(BIND_EVENT_FUN(Application::OnKeyReleasedEvent));
+		dispatcher.Dispatch<WindowResizedEvent>(BIND_EVENT_FUN(Application::OnWindowResizedEvent));
+
 		const auto& listLayers = m_spLayerStack->GetLayers();
 		for (auto iter = listLayers.begin(); iter != listLayers.end(); iter++)
 		{
-			(*iter)->OnEvent(e);
-			if (e.Handle())
+			(*iter)->OnEvent(event);
+			if (event.Handle())
 			{
 				break;
 			}
@@ -73,10 +128,9 @@ namespace SandTable
 		return m_upWindow->GetWindowHeight();
 	}
 
-	bool Application::OnWindowClosed(WindowCloseEvent& e)
+	const std::unique_ptr<Window>& Application::GetWindow() const
 	{
-		m_bRunning = false;
-		return true;
+		return m_upWindow;
 	}
 
 	std::shared_ptr<Application> Application::GetApplication()

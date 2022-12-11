@@ -1,5 +1,7 @@
 #include "pch.h"
+#include "PlatForm/OpenGL/imgui.h"
 #include "PlatForm/OpenGL/imgui_impl_opengl3.h"
+#include "PlatForm/OpenGL/imgui_impl_glfw.h"
 #include "SandTable/Core/Application.h"
 #include "ImGuiLayer.h"
 #include "GLFW/glfw3.h"
@@ -33,10 +35,13 @@ namespace SandTable
         io.BackendPlatformName = "imgui_impl_glfw";
 
         //// Setup Platform/Renderer bindings
-        //auto glfwWindow = Application::GetApplication()->GetWindow();
+        const auto& upWindow = Application::GetApplication()->GetWindow();
+        SAND_TABLE_ASSERT(upWindow, "ImGuiLayer get window failed");
+        auto glfwWindow = static_cast<GLFWwindow*>(upWindow->GetNativeWindow());
+        SAND_TABLE_ASSERT(glfwWindow, "ImGuiLayer get glfwWindow failed");
 
         //// Setup Platform/Renderer bindings
-        //ImGui_ImplGlfw_InitForOpenGL(glfwWindow, true);
+        ImGui_ImplGlfw_InitForOpenGL(glfwWindow, true);
         ImGui_ImplOpenGL3_Init("#version 410");
 	}
 
@@ -49,17 +54,8 @@ namespace SandTable
 
 	void ImGuiLayer::OnUpdate()
 	{
-        ImGuiIO& io = ImGui::GetIO();
-        auto& spApplication = Application::GetApplication();
-        SAND_TABLE_ASSERT(spApplication, "Application in imgui is null");
-        io.DisplaySize = ImVec2(spApplication->GetWindowWidth(), spApplication->GetWindowHeight());
-
-        float fTime = static_cast<float>(glfwGetTime());
-        io.DeltaTime = m_fTime > 0.f ? (fTime - m_fTime) : (1.0 / 60.f);
-        m_fTime = fTime;
-
         ImGui_ImplOpenGL3_NewFrame();
-        //ImGui_ImplGlfw_NewFrame();
+        ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
 
         if (m_bShowDemoWindow)
@@ -71,5 +67,7 @@ namespace SandTable
 
 	void ImGuiLayer::OnEvent(Event& event)
 	{
+
+
 	}
 }

@@ -19,6 +19,7 @@ namespace SandTable
 		inline void SetEventCallback(const EventCallbackFn& eventCallBack) override;
 		void SetVSync(bool bEnabled) override;
 		bool IsVSync() const override;
+		void* GetNativeWindow()const override;
 	private:
 		virtual void Init(const WindowProps& windowPorps);
 		virtual void Shutdown();

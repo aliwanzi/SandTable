@@ -87,6 +87,11 @@ namespace SandTable
 		return false;
 	}
 
+	void* WindowsWindow::GetNativeWindow() const
+	{
+		return m_pGLFWWindow;
+	}
+
 	void WindowsWindow::Init(const WindowProps& windowPorps)
 	{
 		LOG_DEV_INFO("Creating window {0} ({1}, {2})", 
@@ -120,7 +125,7 @@ namespace SandTable
 				pWindowCallBack.Width = width;
 				pWindowCallBack.Height = height;
 
-				WindowResizeEvent event(width, height);
+				WindowResizedEvent event(width, height);
 				pWindowCallBack.EventCallback(event);
 			});
 
@@ -198,7 +203,7 @@ namespace SandTable
 			{
 				auto& pWindowCallBack = *(WindowCallBack*)glfwGetWindowUserPointer(window);
 
-				MouseMoveEvent event(static_cast<float>(xPos), static_cast<float>(yPos));
+				MouseMovedEvent event(static_cast<float>(xPos), static_cast<float>(yPos));
 				pWindowCallBack.EventCallback(event);
 			});
 

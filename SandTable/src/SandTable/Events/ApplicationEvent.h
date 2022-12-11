@@ -3,10 +3,10 @@
 
 namespace SandTable
 {
-	class WindowResizeEvent :public Event
+	class WindowResizedEvent :public Event
 	{
 	public:
-		WindowResizeEvent(unsigned int uiWidth, unsigned int uiHeight);
+		WindowResizedEvent(unsigned int uiWidth, unsigned int uiHeight);
 		inline unsigned int GetWidth()const;
 		inline unsigned int GetHeight()const;
 		std::string ToString() const override;

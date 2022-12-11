@@ -13,20 +13,30 @@ namespace SandTable
 
 		virtual ~Application();
 		void Run();
-		void OnEvent(Event& e);
+		void OnEvent(Event& event);
 		void PushLayer(std::shared_ptr<Layer> spLayer);
 		void PushOverlay(std::shared_ptr<Layer> spLayer);
 		int GetWindowWidth() const;
 		int GetWindowHeight() const;
+		const std::unique_ptr<Window>& GetWindow()const;
 
 		static std::shared_ptr<Application> GetApplication();
-
-		
 	private:
 		Application();
 		Application(Application&) = delete;
 		Application& operator=(const Application&) = delete;
-		bool OnWindowClosed(WindowCloseEvent& e);
+	private:
+		bool OnMouseButtonPressedEvent(MouseButtonPressedEvent& event);
+		bool OnMouseButtonReleasedEvent(MouseButtonReleasedEvent& event);
+		bool OnMouseMovedEvent(MouseMovedEvent& event);
+		bool OnMouseScrolledEvent(MouseScrolledEvent& event);
+
+		bool OnKeyPressedEvent(KeyPressedEvent& event);
+		bool OnKeyReleasedEvent(KeyReleasedEvent& event);
+		bool OnKyeTypedEvent(KeyEvent& event);
+
+		bool OnWindowResizedEvent(WindowResizedEvent& event);
+		bool OnWindowClosedEvent(WindowCloseEvent& e);
 	private:
 		std::unique_ptr<Window> m_upWindow;
 		bool m_bRunning;

@@ -3,20 +3,20 @@
 
 namespace SandTable
 {
-	MouseMoveEvent::MouseMoveEvent(float fMouseX, float fMouseY) :
+	MouseMovedEvent::MouseMovedEvent(float fMouseX, float fMouseY) :
 		m_fMouseX(fMouseX), m_fMouseY(fMouseY)
 	{
 
 	}
-	float MouseMoveEvent::GetMouseX() const
+	float MouseMovedEvent::GetMouseX() const
 	{
 		return m_fMouseX;
 	}
-	float MouseMoveEvent::GetMouseY() const
+	float MouseMovedEvent::GetMouseY() const
 	{
 		return m_fMouseY;
 	}
-	std::string MouseMoveEvent::ToString() const
+	std::string MouseMovedEvent::ToString() const
 	{
 		std::stringstream ss;
 		ss << "MouseMoved: " << m_fMouseX << " , " << m_fMouseY;
@@ -71,6 +71,10 @@ namespace SandTable
 		std::stringstream ss;
 		ss << "MouseButtonRelease: " << m_uiMouseCode;
 		return ss.str();;
+	}
+	MouseCode MouseButtonEvent::GetMouseButton() const
+	{
+		return m_uiMouseCode;
 	}
 }
 

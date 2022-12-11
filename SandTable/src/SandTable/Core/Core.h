@@ -17,5 +17,6 @@
 
 #endif // SAND_TABLE_ENABLE_ASSERTS
 
-
 #define BIT(x) (1<<x)
+
+#define BIND_EVENT_FUN(x) std::bind(&x, this, std::placeholders::_1)

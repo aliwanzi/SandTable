@@ -4,10 +4,10 @@
 
 namespace SandTable
 {
-	class MouseMoveEvent :public Event
+	class MouseMovedEvent :public Event
 	{
 	public:
-		MouseMoveEvent(float fMouseX, float fMouseY);
+		MouseMovedEvent(float fMouseX, float fMouseY);
 		float GetMouseX() const;
 		float GetMouseY() const;
 		std::string ToString()const override;
@@ -35,7 +35,8 @@ namespace SandTable
 	class MouseButtonEvent :public Event
 	{
 	public:
-		EVENT_CLASS_CATEGORY(EventCategoryMouse | EventCategoryInput | EventCategoryMouseButton)
+		EVENT_CLASS_CATEGORY(EventCategoryMouse | EventCategoryInput | EventCategoryMouseButton);
+		MouseCode GetMouseButton()const;
 	protected:
 		MouseButtonEvent(MouseCode uiMouseCode);
 		MouseCode m_uiMouseCode;

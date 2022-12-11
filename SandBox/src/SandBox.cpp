@@ -34,7 +34,7 @@ void SandTable::Application::CreateApplication()
 {
 	auto spSandBox = Application::GetApplication();
 	auto spSandBoxLayer = std::make_shared<SandBoxLayer>();
-	//auto spImGuiLayer = std::make_shared<ImGuiLayer>();
+	auto spImGuiLayer = std::make_shared<ImGuiLayer>();
 	spSandBox->PushLayer(spSandBoxLayer);
-	//spSandBox->PushLayer(spImGuiLayer);
+	spSandBox->PushLayer(spImGuiLayer);
 }
