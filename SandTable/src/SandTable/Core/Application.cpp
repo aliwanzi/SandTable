@@ -73,7 +73,7 @@ namespace SandTable
 	{
 		while (m_bRunning)
 		{
-			glClearColor(1, 0, 1, 1);
+			glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 			glClear(GL_COLOR_BUFFER_BIT);
 			const auto& listLayers = m_spLayerStack->GetLayers();
 			for (auto iter = listLayers.begin(); iter != listLayers.end(); iter++)

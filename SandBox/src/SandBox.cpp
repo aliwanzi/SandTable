@@ -7,7 +7,7 @@ public:
 	~SandBoxLayer() {}
 	void OnUpdate()override
 	{
-		LOG_DEV_INFO("SandBoxLayer::OnUpdate");
+		//LOG_DEV_INFO("SandBoxLayer::OnUpdate");
 	}
 	void OnEvent(SandTable::Event& event) override
 	{
