@@ -9,10 +9,12 @@ namespace SandTable
 	public:
 		ImGuiLayer();
 		~ImGuiLayer();
-		void OnAttach() override;
-		void OnDetach() override;
-		void OnUpdate() override;
-		void OnEvent(Event& event) override;
+		virtual void OnAttach() override;
+		virtual void OnDetach() override;
+		virtual void OnImGuiRender() override;
+
+		void BeginNewFrame();
+		void EndNewFrame();
 	private:
 		bool m_bShowDemoWindow;
 		float m_fTime;

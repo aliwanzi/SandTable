@@ -13,12 +13,12 @@ namespace SandTable
 
 	void LayerStack::PushLayer(std::shared_ptr<Layer> spLayer)
 	{
-		m_listLayers.push_back(spLayer);
+		m_listLayers.emplace_front(spLayer);
 	}
 
 	void LayerStack::PushOverlay(std::shared_ptr<Layer> spLayer)
 	{
-		m_listLayers.push_back(spLayer);
+		m_listLayers.emplace_back(spLayer);
 	}
 
 	void LayerStack::PopLayer(std::shared_ptr<Layer> spLayer)

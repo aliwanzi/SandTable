@@ -1,13 +1,13 @@
 #include "pch.h"
-#include "PlatForm/OpenGL/imgui_impl_opengl3.h"
-#include "PlatForm/OpenGL/imgui_impl_glfw.h"
 #include "SandTable/Core/Application.h"
 #include "ImGuiLayer.h"
 #include "GLFW/glfw3.h"
+#include "examples/imgui_impl_glfw.h"
+#include "examples/imgui_impl_opengl3.h"
 
 namespace SandTable
 {
-	ImGuiLayer::ImGuiLayer():Layer("ImguiLayer"), m_bShowDemoWindow(true)
+	ImGuiLayer::ImGuiLayer():Layer("ImguiLayer"), m_bShowDemoWindow(true),m_fTime(0.f)
 	{
 
 	}
@@ -18,20 +18,28 @@ namespace SandTable
 
 	void ImGuiLayer::OnAttach()
 	{
-        IMGUI_CHECKVERSION();
-        ImGui::CreateContext();
-        // Setup Dear ImGui style
-        ImGui::StyleColorsDark();
+		// Setup Dear ImGui context
+		IMGUI_CHECKVERSION();
+		ImGui::CreateContext();
+		ImGuiIO& io = ImGui::GetIO(); (void)io;
+		io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;       // Enable Keyboard Controls
+		//io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
+		io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;           // Enable Docking
+		io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;         // Enable Multi-Viewport / Platform Windows
+		//io.ConfigFlags |= ImGuiConfigFlags_ViewportsNoTaskBarIcons;
+		//io.ConfigFlags |= ImGuiConfigFlags_ViewportsNoMerge;
 
-        // Setup back-end capabilities flags
-        ImGuiIO& io = ImGui::GetIO();
-        io.BackendFlags |= ImGuiBackendFlags_HasMouseCursors;         // We can honor GetMouseCursor() values (optional)
-        io.BackendFlags |= ImGuiBackendFlags_HasSetMousePos;          // We can honor io.WantSetMousePos requests (optional, rarely used)
-        io.BackendFlags |= ImGuiBackendFlags_PlatformHasViewports;    // We can create multi-viewports on the Platform side (optional)
-#if GLFW_HAS_MOUSE_PASSTHROUGH || (GLFW_HAS_WINDOW_HOVERED && defined(_WIN32))
-        io.BackendFlags |= ImGuiBackendFlags_HasMouseHoveredViewport; // We can set io.MouseHoveredViewport correctly (optional, not easy)
-#endif
-        io.BackendPlatformName = "imgui_impl_glfw";
+		// Setup Dear ImGui style
+		ImGui::StyleColorsDark();
+		//ImGui::StyleColorsClassic();
+
+		// When viewports are enabled we tweak WindowRounding/WindowBg so platform windows can look identical to regular ones.
+		ImGuiStyle& style = ImGui::GetStyle();
+		if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
+		{
+			style.WindowRounding = 0.0f;
+			style.Colors[ImGuiCol_WindowBg].w = 1.0f;
+		}
 
         //// Setup Platform/Renderer bindings
         const auto& upWindow = Application::GetApplication()->GetWindow();
@@ -51,22 +59,33 @@ namespace SandTable
         ImGui::DestroyContext();
 	}
 
-	void ImGuiLayer::OnUpdate()
-	{
+
+    void ImGuiLayer::OnImGuiRender()
+    {
+		if (m_bShowDemoWindow)
+			ImGui::ShowDemoWindow(&m_bShowDemoWindow);
+    }
+
+    void ImGuiLayer::BeginNewFrame()
+    {
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
+    }
 
-        if (m_bShowDemoWindow)
-            ImGui::ShowDemoWindow(&m_bShowDemoWindow);
+    void ImGuiLayer::EndNewFrame()
+    {
+		// Rendering
+		ImGui::Render();
+		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
-        ImGui::Render();
-        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-	}
-
-	void ImGuiLayer::OnEvent(Event& event)
-	{
-
-
-	}
+		ImGuiIO& io = ImGui::GetIO();
+		if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
+		{
+			GLFWwindow* backup_current_context = glfwGetCurrentContext();
+			ImGui::UpdatePlatformWindows();
+			ImGui::RenderPlatformWindowsDefault();
+			glfwMakeContextCurrent(backup_current_context);
+		}
+    }
 }

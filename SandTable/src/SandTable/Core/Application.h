@@ -2,6 +2,7 @@
 #include "Core.h"
 #include "Window.h"
 #include "LayerStack.h"
+#include "SandTable/ImGui/ImGuiLayer.h"
 
 namespace SandTable
 {
@@ -22,6 +23,7 @@ namespace SandTable
 
 		static std::shared_ptr<Application> GetApplication();
 	private:
+		void Init();
 		Application();
 		Application(Application&) = delete;
 		Application& operator=(const Application&) = delete;
@@ -38,10 +40,12 @@ namespace SandTable
 		bool OnWindowResizedEvent(WindowResizedEvent& event);
 		bool OnWindowClosedEvent(WindowCloseEvent& e);
 	private:
-		std::unique_ptr<Window> m_upWindow;
 		bool m_bRunning;
 
+		std::unique_ptr<Window> m_upWindow;
 		std::shared_ptr<LayerStack> m_spLayerStack;
+		std::shared_ptr<ImGuiLayer> m_spImGuiLayer;
+
 		static std::shared_ptr<Application> m_spApplication;
 	};
 }

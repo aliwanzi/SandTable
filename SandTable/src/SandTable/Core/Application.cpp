@@ -8,11 +8,17 @@ namespace SandTable
 {
 	std::shared_ptr<Application> Application::m_spApplication = nullptr;
 
-	Application::Application():m_bRunning(true)
+	Application::Application() :m_bRunning(true)
 	{
 		m_upWindow = std::unique_ptr<Window>(Window::Create());
 		m_upWindow->SetEventCallback(BIND_EVENT_FUN(Application::OnEvent));
-		m_spLayerStack = std::make_unique<LayerStack>();
+	}
+
+	void Application::Init()
+	{
+		m_spLayerStack = std::make_shared<LayerStack>();
+		m_spImGuiLayer = std::make_shared<ImGuiLayer>();
+		PushOverlay(m_spImGuiLayer);
 	}
 
 	bool Application::OnMouseButtonPressedEvent(MouseButtonPressedEvent& event)
@@ -76,12 +82,20 @@ namespace SandTable
 		{
 			glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 			glClear(GL_COLOR_BUFFER_BIT);
+
 			const auto& listLayers = m_spLayerStack->GetLayers();
 			for (auto iter = listLayers.begin(); iter != listLayers.end(); iter++)
 			{
 				(*iter)->OnUpdate();
 			}
-			LOG_DEV_ERROR("{0},{1}", Input::GetMouseXPos(), Input::GetMouseYPos());
+
+			m_spImGuiLayer->BeginNewFrame();
+			for (auto iter = listLayers.begin(); iter != listLayers.end(); iter++)
+			{
+				(*iter)->OnImGuiRender();
+			}
+			m_spImGuiLayer->EndNewFrame();
+
 			m_upWindow->OnUpdate();
 		}
 	}
@@ -137,9 +151,10 @@ namespace SandTable
 
 	std::shared_ptr<Application> Application::GetApplication()
 	{
-		if (!m_spApplication)
+		if (m_spApplication == nullptr)
 		{
 			m_spApplication = std::shared_ptr<Application>(new Application());
+			m_spApplication->Init();
 		}
 		return m_spApplication;
 	}

@@ -23,7 +23,7 @@ include "SandTable/vendor/imgui"
 
 project "SandTable"
 	location "SandTable"
-	kind "SharedLib"
+	kind "StaticLib"
 	language "C++"
 
 	targetdir("bin/" .. outputdir .. "/%{prj.name}")
@@ -108,6 +108,7 @@ project "SandBox"
 	{
 		"SandTable/vendor/spdlog/include",
 		"SandTable/src",
+		"SandTable/vendor",
 		"%{IncludeDir.glm}"
 	}
 
