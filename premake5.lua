@@ -15,6 +15,7 @@ IncludeDir = {}
 IncludeDir["GLFW"] = "SandTable/vendor/GLFW/include"
 IncludeDir["GL3W"] = "SandTable/vendor/GL3W/include"
 IncludeDir["ImGui"] = "SandTable/vendor/imgui"
+IncludeDir["glm"] = "SandTable/vendor/glm"
 
 include "SandTable/vendor/GLFW"
 include "SandTable/vendor/GL3W"
@@ -34,7 +35,9 @@ project "SandTable"
 	files
 	{
 		"%{prj.name}/src/**.h",
-		"%{prj.name}/src/**.cpp"
+		"%{prj.name}/src/**.cpp",
+		"%{prj.name}/vendor/glm/glm/**.hpp",
+		"%{prj.name}/vendor/glm/glm/**.inl"
 	}
 	
 	includedirs 
@@ -43,7 +46,8 @@ project "SandTable"
 		"%{prj.name}/vendor/spdlog/include",
 		"%{IncludeDir.GLFW}",
 		"%{IncludeDir.GL3W}",
-		"%{IncludeDir.ImGui}"
+		"%{IncludeDir.ImGui}",
+		"%{IncludeDir.glm}"
 	}
 
 	links
@@ -103,7 +107,8 @@ project "SandBox"
 	includedirs
 	{
 		"SandTable/vendor/spdlog/include",
-		"SandTable/src"
+		"SandTable/src",
+		"%{IncludeDir.glm}"
 	}
 
 	links

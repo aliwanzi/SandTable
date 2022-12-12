@@ -1,0 +1,58 @@
+#include "pch.h"
+#include "WindowsInput.h"
+#include "SandTable/Core/Application.h"
+#include "GLFW/glfw3.h"
+
+namespace SandTable
+{
+	std::shared_ptr<Input> Input::m_spInput = std::shared_ptr<WindowsInput>(new WindowsInput());
+
+	bool WindowsInput::IsKeyPressedImpl(KeyCode keyCode)
+	{
+		const auto& upWindow = Application::GetApplication()->GetWindow();
+		SAND_TABLE_ASSERT(upWindow, "WindowsInput get window failed");
+		auto glfwWindow = static_cast<GLFWwindow*>(upWindow->GetNativeWindow());
+		SAND_TABLE_ASSERT(glfwWindow, "WindowsInput get glfwWindow failed");
+
+		auto state = glfwGetKey(glfwWindow, keyCode);
+		return state == GLFW_PRESS || state == GLFW_REPEAT;
+	}
+
+	bool WindowsInput::IsMouseButtonPressedImpl(MouseCode mouseCode)
+	{
+		double dXPos(0.0), dYPos(0.0);
+		const auto& upWindow = Application::GetApplication()->GetWindow();
+		SAND_TABLE_ASSERT(upWindow, "WindowsInput get window failed");
+		auto glfwWindow = static_cast<GLFWwindow*>(upWindow->GetNativeWindow());
+		SAND_TABLE_ASSERT(glfwWindow, "WindowsInput get glfwWindow failed");
+
+		auto state = glfwGetMouseButton(glfwWindow, mouseCode);
+		return state == GLFW_PRESS || state == GLFW_REPEAT;
+	}
+
+	glm::vec2 WindowsInput::GetMousePosImpl()
+	{
+		const auto& upWindow = Application::GetApplication()->GetWindow();
+		SAND_TABLE_ASSERT(upWindow, "WindowsInput get window failed");
+		auto glfwWindow = static_cast<GLFWwindow*>(upWindow->GetNativeWindow());
+		SAND_TABLE_ASSERT(glfwWindow, "WindowsInput get glfwWindow failed");
+
+		double dXPos(0.0), dYPos(0.0);
+		glfwGetCursorPos(glfwWindow, &dXPos, &dYPos);
+		return glm::vec2(dXPos, dYPos);
+	}
+
+	float WindowsInput::GetMouseXPosImpl()
+	{
+		auto vec2Pos = GetMousePosImpl();
+		return vec2Pos.x;
+	}
+
+	float WindowsInput::GetMouseYPosImpl()
+	{
+		auto vec2Pos = GetMousePosImpl();
+		return vec2Pos.y;
+	}
+}
+
+

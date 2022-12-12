@@ -2,6 +2,7 @@
 #include "Application.h"
 #include "SandTable/Events/ApplicationEvent.h"
 #include "GLFW/glfw3.h"
+#include "Input.h"
 
 namespace SandTable
 {
@@ -80,6 +81,7 @@ namespace SandTable
 			{
 				(*iter)->OnUpdate();
 			}
+			LOG_DEV_ERROR("{0},{1}", Input::GetMouseXPos(), Input::GetMouseYPos());
 			m_upWindow->OnUpdate();
 		}
 	}
