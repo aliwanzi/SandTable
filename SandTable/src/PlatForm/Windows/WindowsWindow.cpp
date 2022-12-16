@@ -2,9 +2,11 @@
 #define GL_GLEXT_PROTOTYPES
 #include "GL/gl3w.h"
 #include "WindowsWindow.h"
+#include "PlatForm/OpenGL/OpenGLContext.h"
 
 namespace SandTable
 {
+	std::shared_ptr<Context> WindowsWindow::m_spContext = nullptr;
 	namespace
 	{
 		void OnDebug(GLenum source, GLenum type, GLuint id, GLenum severity,
@@ -58,7 +60,7 @@ namespace SandTable
 	void WindowsWindow::OnUpdate()
 	{
 		glfwPollEvents();
-		glfwSwapBuffers(m_pGLFWWindow);
+		m_spContext->SwapBuffers();
 	}
 
 	inline unsigned int WindowsWindow::GetWindowWidth() const
@@ -112,9 +114,10 @@ namespace SandTable
 		m_pGLFWWindow = glfwCreateWindow(windowPorps.Width,
 			windowPorps.Height, windowPorps.Title.c_str(), nullptr, nullptr);
 		SAND_TABLE_ASSERT(m_pGLFWWindow, "Failed to creat GLFW window");
-		glfwSetErrorCallback(GLFWErrorCallback);
+		m_spContext = std::shared_ptr<OpenGLContext>(new OpenGLContext(m_pGLFWWindow));
+		m_spContext->Init();
 
-		glfwMakeContextCurrent(m_pGLFWWindow);
+		glfwSetErrorCallback(GLFWErrorCallback);
 		glfwSetWindowUserPointer(m_pGLFWWindow, &m_windowCallBack);
 		SetVSync(true);
 
@@ -206,14 +209,6 @@ namespace SandTable
 				MouseMovedEvent event(static_cast<float>(xPos), static_cast<float>(yPos));
 				pWindowCallBack.EventCallback(event);
 			});
-
-		bInit = gl3wInit();
-		SAND_TABLE_ASSERT(!bInit, "Failed to initialize GLFW");
-
-		LOG_DEV_INFO("OpenGL Info:");
-		LOG_DEV_INFO("Vendor: {0}", glGetString(GL_VENDOR));
-		LOG_DEV_INFO("Renderer:{0}", glGetString(GL_RENDERER));
-		LOG_DEV_INFO("Version: {0}", glGetString(GL_VERSION));
 	}
 
 	void WindowsWindow::Shutdown()

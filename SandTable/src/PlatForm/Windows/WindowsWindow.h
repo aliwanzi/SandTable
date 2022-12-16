@@ -1,6 +1,6 @@
 #include "SandTable/Core/Window.h"
-
 #include <GLFW/glfw3.h>
+#include "SandTable/Render/Context.h"
 
 namespace SandTable
 {
@@ -24,6 +24,7 @@ namespace SandTable
 		virtual void Init(const WindowProps& windowPorps);
 		virtual void Shutdown();
 	private:
+		static std::shared_ptr<Context> m_spContext;
 		GLFWwindow* m_pGLFWWindow;
 
 		struct WindowCallBack
