@@ -25,6 +25,8 @@ project "SandTable"
 	location "SandTable"
 	kind "StaticLib"
 	language "C++"
+	cppdialect "C++17"
+	staticruntime "on"
 
 	targetdir("bin/" .. outputdir .. "/%{prj.name}")
 	objdir("bin-int/" .. outputdir .. "/%{prj.name}")
@@ -59,8 +61,6 @@ project "SandTable"
 	}
 
 	filter "system:windows"
-		cppdialect "C++17"
-		staticruntime "On"
 		systemversion "latest"
 
 		defines
@@ -69,31 +69,29 @@ project "SandTable"
 			"SAND_TABLE_PLATFORM_WINDOWS",
 			"SAND_TABLE_BUILD_DLL"
 		}
-		postbuildcommands
-		{
-			("{COPY} %{cfg.buildtarget.relpath} ../bin/" .. outputdir .. "/SandBox")
-		}
-	
+
 	filter "configurations:Degug"
 		defines "SAND_TABLE_DEBUG"
-		buildoptions "/MDd"
-		symbols "On"
+		runtime "Debug"
+		symbols "on"
 
 	filter "configurations:Release"
 		defines "SAND_TABLE_RELEASE"
-		buildoptions "/MDd"
-		optimize "On"
+		runtime "Release"
+		optimize "on"
 
 	filter "configurations:Dist"
 		defines "SAND_TABLE_DIST"
-		buildoptions "/MDd"
-		optimize "On"
+		runtime "Release"
+		optimize "on"
 
 
 project "SandBox"
 	location "SandBox"
 	kind "ConsoleApp"
 	language "C++"
+	cppdialect "C++17"
+	staticruntime "on"
 
 	targetdir("bin/" .. outputdir .. "/%{prj.name}")
 	objdir("bin-int/" .. outputdir .. "/%{prj.name}")
@@ -118,8 +116,7 @@ project "SandBox"
 	}
 
 	filter "system:windows"
-		cppdialect "C++17"
-		staticruntime "On"
+
 		systemversion "latest"
 		defines
 		{
@@ -128,15 +125,15 @@ project "SandBox"
 
 	filter "configurations:Degug"
 		defines "SAND_TABLE_DEBUG"
-		buildoptions "/MDd"
-		symbols "On"
+		runtime "Debug"
+		symbols "on"
 
 	filter "configurations:Release"
 		defines "SAND_TABLE_RELEASE"
-		buildoptions "/MDd"
-		optimize "On"
+		runtime "Release"
+		optimize "on"
 
 	filter "configurations:Dist"
 		defines "SAND_TABLE_DIST"
-		buildoptions "/MDd"
-		optimize "On"
+		runtime "Release"
+		optimize "on"

@@ -3,11 +3,15 @@
 #include <memory>
 
 #ifdef  SAND_TABLE_PLATFORM_WINDOWS
+#if SAND_TABLE_DYNAMIC_LINK
 	#ifdef SAND_TABLE_BUILD_DLL
 		#define SAND_TABLE_API _declspec(dllexport)
 	#else
 		#define SAND_TABLE_API _declspec(dllimport)
 	#endif // SAND_TABLE_BUILD_DLL
+#else
+	#define SAND_TABLE_API
+#endif
 #else
 	#error SandTabel only support Windows!
 #endif //  SAND_TABLE_PLATFORM_WINDOWS
