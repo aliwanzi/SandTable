@@ -3,30 +3,29 @@
 #include "SandTable/Render/Buffer/Buffer.h"
 #include "SandTable/Render/Buffer/VertexBufferLayout.h"
 
-namespace SandTable
+SAND_TABLE_NAMESPACE_BEGIN
+
+class VertexBuffer :public Buffer
 {
-	class VertexBuffer :public Buffer
-	{
-	public:
-		virtual ~VertexBuffer() = default;
-		const std::vector<float>& GetVertex()const;
-		const std::shared_ptr<VertexBufferLayout>& GetVertexBufferLayout()const;
+public:
+	virtual ~VertexBuffer() = default;
+	const std::vector<float>& GetVertex()const;
+	const Ref<VertexBufferLayout>& GetVertexBufferLayout()const;
 
-		static std::shared_ptr<Buffer> Create(const std::vector<float>& vecVertex,
-			const std::shared_ptr<VertexBufferLayout>& spVertexBufferLayout);
+	static Ref<Buffer> Create(const std::vector<float>& vecVertex,
+		const Ref<VertexBufferLayout>& spVertexBufferLayout);
 
-	protected:
-		VertexBuffer(const std::vector<float>& vecVertex,
-			const std::shared_ptr<VertexBufferLayout>& spVertexBufferLayout);
-	private:
-		VertexBuffer() = delete;
-		VertexBuffer(VertexBuffer&) = delete;
-		VertexBuffer& operator=(const VertexBuffer&) = delete;
+protected:
+	VertexBuffer(const std::vector<float>& vecVertex,
+		const Ref<VertexBufferLayout>& spVertexBufferLayout);
+private:
+	VertexBuffer() = delete;
+	VertexBuffer(VertexBuffer&) = delete;
+	VertexBuffer& operator=(const VertexBuffer&) = delete;
 
-	protected:
-		std::vector<float> m_vecVertex;
-		std::shared_ptr<VertexBufferLayout> m_spVertexBufferLayout;
-	};
-}
+protected:
+	std::vector<float> m_vecVertex;
+	Ref<VertexBufferLayout> m_spVertexBufferLayout;
+};
 
-
+SAND_TABLE_NAMESPACE_END

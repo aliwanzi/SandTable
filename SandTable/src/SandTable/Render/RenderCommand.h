@@ -1,17 +1,16 @@
 #pragma once
 #include "SandTable/Render/RenderAPI.h"
 
-namespace SandTable
+SAND_TABLE_NAMESPACE_BEGIN
+
+class RenderCommand
 {
-	class RenderCommand
-	{
-	public:
-		static void SetClearColor(const glm::vec4& vec4Color);
-		static void Clear();
-		static void DrawVertex(const std::shared_ptr<VertexArray>& spVertexArray);
-	private:
-		static std::shared_ptr<RenderAPI> m_spRenderAPI;
-	};
-}
+public:
+	static void SetClearColor(const glm::vec4& vec4Color);
+	static void Clear();
+	static void DrawVertex(const Ref<VertexArray>& spVertexArray);
+private:
+	static Ref<RenderAPI> m_spRenderAPI;
+};
 
-
+SAND_TABLE_NAMESPACE_END

@@ -4,51 +4,50 @@
 #include "SandTable/Core/LayerStack.h"
 #include "SandTable/ImGui/ImGuiLayer.h"
 
-namespace SandTable
+SAND_TABLE_NAMESPACE_BEGIN
+
+class Application
 {
-	class SAND_TABLE_API Application
-	{
-	public:
-		//For Application
-		static void CreateApplication();
+public:
+	//For Application
+	static void CreateApplication();
 
-		virtual ~Application();
-		void Run();
-		void OnEvent(Event& event);
-		void PushLayer(std::shared_ptr<Layer> spLayer);
-		void PushOverlay(std::shared_ptr<Layer> spLayer);
-		int GetWindowWidth() const;
-		int GetWindowHeight() const;
-		const std::unique_ptr<Window>& GetWindow()const;
+	virtual ~Application();
+	void Run();
+	void OnEvent(Event& event);
+	void PushLayer(Ref<Layer> spLayer);
+	void PushOverlay(Ref<Layer> spLayer);
+	int GetWindowWidth() const;
+	int GetWindowHeight() const;
+	const Scope<Window>& GetWindow()const;
 
-		static std::shared_ptr<Application> GetApplication();
-	private:
-		void Init();
-		Application();
-		Application(Application&) = delete;
-		Application& operator=(const Application&) = delete;
-	private:
-		bool OnMouseButtonPressedEvent(MouseButtonPressedEvent& event);
-		bool OnMouseButtonReleasedEvent(MouseButtonReleasedEvent& event);
-		bool OnMouseMovedEvent(MouseMovedEvent& event);
-		bool OnMouseScrolledEvent(MouseScrolledEvent& event);
+	static Ref<Application> GetApplication();
+private:
+	void Init();
+	Application();
+	Application(Application&) = delete;
+	Application& operator=(const Application&) = delete;
+private:
+	bool OnMouseButtonPressedEvent(MouseButtonPressedEvent& event);
+	bool OnMouseButtonReleasedEvent(MouseButtonReleasedEvent& event);
+	bool OnMouseMovedEvent(MouseMovedEvent& event);
+	bool OnMouseScrolledEvent(MouseScrolledEvent& event);
 
-		bool OnKeyPressedEvent(KeyPressedEvent& event);
-		bool OnKeyReleasedEvent(KeyReleasedEvent& event);
-		bool OnKyeTypedEvent(KeyEvent& event);
+	bool OnKeyPressedEvent(KeyPressedEvent& event);
+	bool OnKeyReleasedEvent(KeyReleasedEvent& event);
+	bool OnKyeTypedEvent(KeyEvent& event);
 
-		bool OnWindowResizedEvent(WindowResizedEvent& event);
-		bool OnWindowClosedEvent(WindowCloseEvent& e);
-	private:
-		bool m_bRunning;
-		float m_fLastFrameTime;
+	bool OnWindowResizedEvent(WindowResizedEvent& event);
+	bool OnWindowClosedEvent(WindowCloseEvent& e);
+private:
+	bool m_bRunning;
+	float m_fLastFrameTime;
 
-		std::unique_ptr<Window> m_upWindow;
-		std::shared_ptr<LayerStack> m_spLayerStack;
-		std::shared_ptr<ImGuiLayer> m_spImGuiLayer;
+	Scope<Window> m_upWindow;
+	Ref<LayerStack> m_spLayerStack;
+	Ref<ImGuiLayer> m_spImGuiLayer;
 
-		static std::shared_ptr<Application> m_spApplication;
-	};
-}
+	static Ref<Application> m_spApplication;
+};
 
-
+SAND_TABLE_NAMESPACE_END

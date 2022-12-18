@@ -1,16 +1,15 @@
 #pragma once
 #include "SandTable/Render/Buffer/IndexBuffer.h"
 
-namespace SandTable
+SAND_TABLE_NAMESPACE_BEGIN
+
+class OpenGLIndexBuffer :public IndexBuffer
 {
-	class OpenGLIndexBuffer :public IndexBuffer
-	{
-	public:
-		OpenGLIndexBuffer(const std::vector<int>& vecIndex);
-		~OpenGLIndexBuffer();
-		virtual void Bind() const override;
-		virtual void UnBind() const override;
-	};
-}
+public:
+	OpenGLIndexBuffer(const std::vector<int>& vecIndex);
+	~OpenGLIndexBuffer();
+	virtual void Bind() const override;
+	virtual void UnBind() const override;
+};
 
-
+SAND_TABLE_NAMESPACE_END

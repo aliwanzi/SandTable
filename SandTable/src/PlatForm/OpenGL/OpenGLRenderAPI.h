@@ -1,15 +1,15 @@
 #pragma once
 #include "SandTable/Render/RenderAPI.h"
-namespace SandTable
+
+SAND_TABLE_NAMESPACE_BEGIN
+
+class OpenGLRenderAPI :public RenderAPI
 {
-	class OpenGLRenderAPI:public RenderAPI
-	{
-	public:
-		// 通过 RenderAPI 继承
-		virtual void SetClearColor(const glm::vec4& vec4Color) override;
-		virtual void Clear() override;
-		virtual void DrawVertex(const std::shared_ptr<VertexArray>& spVertexArray) override;
-	};
-}
+public:
+	// 通过 RenderAPI 继承
+	virtual void SetClearColor(const glm::vec4& vec4Color) override;
+	virtual void Clear() override;
+	virtual void DrawVertex(const Ref<VertexArray>& spVertexArray) override;
+};
 
-
+SAND_TABLE_NAMESPACE_END

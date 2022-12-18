@@ -1,24 +1,25 @@
 #pragma once
 #include "SandTable/Render/Buffer/Buffer.h"
 
-namespace SandTable
+SAND_TABLE_NAMESPACE_BEGIN
+
+class IndexBuffer :public Buffer
 {
-	class IndexBuffer :public Buffer
-	{
-	public:
-		~IndexBuffer() = default;
-		static std::shared_ptr<Buffer> Create(const std::vector<int>& vecIndex);
-		const std::vector<int> GetIndex()const;
+public:
+	~IndexBuffer() = default;
+	static Ref<Buffer> Create(const std::vector<int>& vecIndex);
+	const std::vector<int> GetIndex()const;
 
-	private:
-		IndexBuffer() = delete;
-		IndexBuffer(IndexBuffer&) = delete;
-		IndexBuffer& operator=(const IndexBuffer&) = delete;
+private:
+	IndexBuffer() = delete;
+	IndexBuffer(IndexBuffer&) = delete;
+	IndexBuffer& operator=(const IndexBuffer&) = delete;
 
-	protected:
-		IndexBuffer(const std::vector<int>& vecIndex);
+protected:
+	IndexBuffer(const std::vector<int>& vecIndex);
 
-	protected:
-		std::vector<int> m_vecIndex;
-	};
-}
+protected:
+	std::vector<int> m_vecIndex;
+};
+
+SAND_TABLE_NAMESPACE_END

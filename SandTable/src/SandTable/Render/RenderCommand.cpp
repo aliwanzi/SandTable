@@ -2,24 +2,23 @@
 #include "RenderCommand.h"
 #include "PlatForm/OpenGL/OpenGLRenderAPI.h"
 
-namespace SandTable
+SAND_TABLE_NAMESPACE_BEGIN
+
+Ref<RenderAPI> RenderCommand::m_spRenderAPI = RenderAPI::CreateRenderAPI();
+void RenderCommand::SetClearColor(const glm::vec4& vec4Color)
 {
-	std::shared_ptr<RenderAPI> RenderCommand::m_spRenderAPI = RenderAPI::CreateRenderAPI();
-
-	void RenderCommand::SetClearColor(const glm::vec4& vec4Color)
-	{
-		m_spRenderAPI->SetClearColor(vec4Color);
-	}
-
-	void RenderCommand::Clear()
-	{
-		m_spRenderAPI->Clear();
-	}
-
-	void RenderCommand::DrawVertex(const std::shared_ptr<VertexArray>& spVertexArray)
-	{
-		spVertexArray->Bind();
-		m_spRenderAPI->DrawVertex(spVertexArray);
-	}
+	m_spRenderAPI->SetClearColor(vec4Color);
 }
 
+void RenderCommand::Clear()
+{
+	m_spRenderAPI->Clear();
+}
+
+void RenderCommand::DrawVertex(const Ref<VertexArray>& spVertexArray)
+{
+	spVertexArray->Bind();
+	m_spRenderAPI->DrawVertex(spVertexArray);
+}
+
+SAND_TABLE_NAMESPACE_END

@@ -1,17 +1,18 @@
 #pragma once
 #include "SandTable/Render/Buffer/VertexBuffer.h"
 
-namespace SandTable
+SAND_TABLE_NAMESPACE_BEGIN
+
+class OpenGLVertexBuffer :public VertexBuffer
 {
-	class OpenGLVertexBuffer :public VertexBuffer
-	{
-	public:
-		OpenGLVertexBuffer(const std::vector<float>& vecVertics,
-			const std::shared_ptr<VertexBufferLayout>& spVertexBufferLayout);
-		~OpenGLVertexBuffer();
-		virtual void Bind() const override;
-		virtual void UnBind() const override;
-	};
-}
+public:
+	OpenGLVertexBuffer(const std::vector<float>& vecVertics,
+		const Ref<VertexBufferLayout>& spVertexBufferLayout);
+	~OpenGLVertexBuffer();
+	virtual void Bind() const override;
+	virtual void UnBind() const override;
+};
+
+SAND_TABLE_NAMESPACE_END
 
 

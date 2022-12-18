@@ -3,24 +3,23 @@
 #include "SandTable/Render/Camera/Camera.h"
 #include "SandTable/Render/Shader.h"
 
-namespace SandTable
+SAND_TABLE_NAMESPACE_BEGIN
+
+class Render
 {
-	class Render
+public:
+	static void BeginScene(const Ref<Camera>& spCamera);
+	static void EndScene();
+	static void Submit(const Ref<Shader>& spShader,
+		const Ref<VertexArray>& spVertexArray,
+		const glm::mat4& mat4Transform = glm::mat4(1.0f));
+private:
+	struct SceneData
 	{
-	public:
-		static void BeginScene(const std::shared_ptr<Camera>& spCamera);
-		static void EndScene();
-		static void Submit(const std::shared_ptr<Shader>& spShader,
-			const std::shared_ptr<VertexArray>& spVertexArray,
-			const glm::mat4& mat4Transform = glm::mat4(1.0f));
-	private:
-		struct SceneData
-		{
-			glm::mat4 m_mat4ViewProjectionMatrix;
-		};
-
-		static std::shared_ptr<SceneData> m_spSceneData;
+		glm::mat4 m_mat4ViewProjectionMatrix;
 	};
-}
 
+	static Ref<SceneData> m_spSceneData;
+};
 
+SAND_TABLE_NAMESPACE_END

@@ -1,22 +1,21 @@
 #pragma once
 #include "SandTable/Core/Layer.h"
 
-namespace SandTable
+SAND_TABLE_NAMESPACE_BEGIN
+
+class LayerStack
 {
-	class SAND_TABLE_API LayerStack
-	{
-	public:
-		LayerStack();
-		~LayerStack();
+public:
+	LayerStack();
+	~LayerStack();
 
-		void PushLayer(std::shared_ptr<Layer> spLayer);
-		void PushOverlay(std::shared_ptr<Layer> spLayer);
-		void PopLayer(std::shared_ptr<Layer> spLayer);
-		void PopOverlay(std::shared_ptr<Layer> spLayer);
-		const std::list<std::shared_ptr<Layer>>& GetLayers()const;
-	private:
-		std::list<std::shared_ptr<Layer>> m_listLayers;
-	};
-}
+	void PushLayer(Ref<Layer> spLayer);
+	void PushOverlay(Ref<Layer> spLayer);
+	void PopLayer(Ref<Layer> spLayer);
+	void PopOverlay(Ref<Layer> spLayer);
+	const std::list<Ref<Layer>>& GetLayers()const;
+private:
+	std::list<Ref<Layer>> m_listLayers;
+};
 
-
+SAND_TABLE_NAMESPACE_END

@@ -3,7 +3,7 @@
 
 SandBoxLayer::SandBoxLayer() :
 	Layer("SandBox"),
-	m_spOrthoGraphicCamera(std::make_shared<OrthoGraphicCamera>(-1.6f, 1.6f, -0.9f, 0.9f)),
+	m_spOrthoGraphicCamera(CreateRef<OrthoGraphicCamera>(-1.6f, 1.6f, -0.9f, 0.9f)),
 	m_vec3Color(glm::vec3(0.2f,0.3f,0.8f)),
 	m_vec3CameraPosition(glm::vec3(0.f)),
 	m_fCameraMoveSpeed(0.01f),
@@ -25,7 +25,7 @@ SandBoxLayer::SandBoxLayer() :
 		{ VertexDataType::Float3 },
 		{ VertexDataType::Float4 }
 	};
-	auto sTriVertexBufferLayout = std::make_shared<VertexBufferLayout>(vecTriBufferElement);
+	auto sTriVertexBufferLayout = CreateRef<VertexBufferLayout>(vecTriBufferElement);
 	auto spTriVertexBuffer = VertexBuffer::Create(vecTriVertex, sTriVertexBufferLayout);
 	m_spTriangle->AddVertexBuffer(spTriVertexBuffer);
 
@@ -61,7 +61,7 @@ SandBoxLayer::SandBoxLayer() :
 		{ VertexDataType::Float3 },
 		{ VertexDataType::Float2 }
 	};
-	auto spSquVertexBufferLayout = std::make_shared<VertexBufferLayout>(vecSquBufferElement);
+	auto spSquVertexBufferLayout = CreateRef<VertexBufferLayout>(vecSquBufferElement);
 	auto spSquVertexBuffer = VertexBuffer::Create(vecSquVertex, spSquVertexBufferLayout);
 	m_spSquare->AddVertexBuffer(spSquVertexBuffer);
 

@@ -5,28 +5,29 @@
 #include "SandTable/Core/MouseCode.h"
 #include <glm/glm.hpp>
 
-namespace SandTable
+SAND_TABLE_NAMESPACE_BEGIN
+
+class Input
 {
-	class SAND_TABLE_API Input
-	{
-	public:
-		//Key
-		static bool IsKeyPressed(KeyCode keyCode);
+public:
+	//Key
+	static bool IsKeyPressed(KeyCode keyCode);
 
-		//MouseButton
-		static bool IsMouseButtonPressed(KeyCode keyCode);
-		static glm::vec2 GetMousePos();
-		static float GetMouseXPos();
-		static float GetMouseYPos();
+	//MouseButton
+	static bool IsMouseButtonPressed(KeyCode keyCode);
+	static glm::vec2 GetMousePos();
+	static float GetMouseXPos();
+	static float GetMouseYPos();
 
-	protected:
-		virtual bool IsKeyPressedImpl(KeyCode keyCode) = 0;
-		virtual bool IsMouseButtonPressedImpl(MouseCode mouseCode) = 0;
-		virtual glm::vec2 GetMousePosImpl() = 0;
-		virtual float GetMouseXPosImpl() = 0;
-		virtual float GetMouseYPosImpl() = 0;
+protected:
+	virtual bool IsKeyPressedImpl(KeyCode keyCode) = 0;
+	virtual bool IsMouseButtonPressedImpl(MouseCode mouseCode) = 0;
+	virtual glm::vec2 GetMousePosImpl() = 0;
+	virtual float GetMouseXPosImpl() = 0;
+	virtual float GetMouseYPosImpl() = 0;
 
-	private:
-		static std::shared_ptr<Input> m_spInput;
-	};
-}
+private:
+	static Ref<Input> m_spInput;
+};
+
+SAND_TABLE_NAMESPACE_END

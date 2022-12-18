@@ -3,20 +3,21 @@
 #include <spdlog/spdlog.h>
 #include <spdlog/fmt/ostr.h>
 
-namespace SandTable
-{
-	class SAND_TABLE_API Logger
-	{
-	public:
-		static std::shared_ptr<spdlog::logger> GetLogger();
-	private:
-		Logger() = delete;
-		Logger(const Logger&) = delete;
-		Logger& operator=(const Logger&) = delete;
+SAND_TABLE_NAMESPACE_BEGIN
 
-		static std::shared_ptr<spdlog::logger> m_spLogger;
-	};
-}
+class Logger
+{
+public:
+	static Ref<spdlog::logger> GetLogger();
+private:
+	Logger() = delete;
+	Logger(const Logger&) = delete;
+	Logger& operator=(const Logger&) = delete;
+
+	static Ref<spdlog::logger> m_spLogger;
+};
+
+SAND_TABLE_NAMESPACE_END
 
 #define LOG_DEV_ERROR(...)	::SandTable::Logger::GetLogger()->error(__VA_ARGS__)
 #define LOG_DEV_WARN(...)	::SandTable::Logger::GetLogger()->warn(__VA_ARGS__)

@@ -2,15 +2,16 @@
 #include "SandTable/Render/Context.h"
 
 struct GLFWwindow;
-namespace SandTable
+SAND_TABLE_NAMESPACE_BEGIN
+
+class OpenGLContext :public Context
 {
-	class OpenGLContext :public Context
-	{
-	public:
-		OpenGLContext(GLFWwindow* glfwWindow);
-		virtual void Init() override;
-		virtual void SwapBuffers()override;
-	private:
-		GLFWwindow* m_pGLFWWindow;
-	};
-}
+public:
+	OpenGLContext(GLFWwindow* glfwWindow);
+	virtual void Init() override;
+	virtual void SwapBuffers()override;
+private:
+	GLFWwindow* m_pGLFWWindow;
+};
+
+SAND_TABLE_NAMESPACE_END
