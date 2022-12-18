@@ -1,6 +1,5 @@
 #pragma once
-#include "Core.h"
-
+#include "SandTable/Core/Core.h"
 #include <spdlog/spdlog.h>
 #include <spdlog/fmt/ostr.h>
 

@@ -1,14 +1,13 @@
 #include "pch.h"
 #include "Application.h"
 #include "SandTable/Events/ApplicationEvent.h"
-#include "GLFW/glfw3.h"
-#include "Input.h"
+#include "SandTable/Core/Input.h"
 
 namespace SandTable
 {
 	std::shared_ptr<Application> Application::m_spApplication = nullptr;
 
-	Application::Application() :m_bRunning(true)
+	Application::Application() :m_bRunning(true), m_fLastFrameTime(0.f)
 	{
 		m_upWindow = std::unique_ptr<Window>(Window::Create());
 		m_upWindow->SetEventCallback(BIND_EVENT_FUN(Application::OnEvent));
@@ -43,7 +42,7 @@ namespace SandTable
 
 	bool Application::OnKeyPressedEvent(KeyPressedEvent& event)
 	{
-		if (event.GetKeyCode() == GLFW_KEY_ESCAPE)
+		if (event.GetKeyCode() == Key::Escape)
 		{
 			m_bRunning = false;
 		}
@@ -80,13 +79,13 @@ namespace SandTable
 	{
 		while (m_bRunning)
 		{
-			glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
-			glClear(GL_COLOR_BUFFER_BIT);
+			float fTime = TimeStep::GetTime();
+			TimeStep timeStep = fTime - m_fLastFrameTime;
 
 			const auto& listLayers = m_spLayerStack->GetLayers();
 			for (auto iter = listLayers.begin(); iter != listLayers.end(); iter++)
 			{
-				(*iter)->OnUpdate();
+				(*iter)->OnUpdate(timeStep);
 			}
 
 			m_spImGuiLayer->BeginNewFrame();

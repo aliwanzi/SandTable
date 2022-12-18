@@ -1,5 +1,5 @@
 #pragma once
-#include "Event.h"
+#include "SandTable/Events/Event.h"
 #include "SandTable/Core/MouseCode.h"
 
 namespace SandTable

@@ -1,7 +1,7 @@
 #pragma once
-#include "Core.h"
-#include "Window.h"
-#include "LayerStack.h"
+#include "SandTable/Core/Core.h"
+#include "SandTable/Core/Window.h"
+#include "SandTable/Core/LayerStack.h"
 #include "SandTable/ImGui/ImGuiLayer.h"
 
 namespace SandTable
@@ -41,6 +41,7 @@ namespace SandTable
 		bool OnWindowClosedEvent(WindowCloseEvent& e);
 	private:
 		bool m_bRunning;
+		float m_fLastFrameTime;
 
 		std::unique_ptr<Window> m_upWindow;
 		std::shared_ptr<LayerStack> m_spLayerStack;

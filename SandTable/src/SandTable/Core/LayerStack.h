@@ -1,6 +1,6 @@
 #pragma once
-#include "Core.h"
-#include "Layer.h"
+#include "SandTable/Core/Layer.h"
+
 namespace SandTable
 {
 	class SAND_TABLE_API LayerStack

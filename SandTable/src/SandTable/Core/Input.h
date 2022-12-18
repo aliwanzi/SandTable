@@ -1,8 +1,8 @@
 #pragma once
 
-#include "Core.h"
-#include "KeyCode.h"
-#include "MouseCode.h"
+#include "SandTable/Core/Core.h"
+#include "SandTable/Core/KeyCode.h"
+#include "SandTable/Core/MouseCode.h"
 #include <glm/glm.hpp>
 
 namespace SandTable

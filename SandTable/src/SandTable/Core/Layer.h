@@ -1,6 +1,6 @@
 #pragma once
-#include "Core.h"
 #include "SandTable/Events/Event.h"
+#include "SandTable/Core/TimeStep.h"
 
 namespace SandTable
 {
@@ -11,7 +11,7 @@ namespace SandTable
 		virtual ~Layer() {};
 		virtual void OnAttach() {};
 		virtual void OnDetach() {};
-		virtual void OnUpdate() {};
+		virtual void OnUpdate(const TimeStep& timeStep) {};
 		virtual void OnEvent(Event& event) {};
 		virtual void OnImGuiRender() {}
 		const std::string& GetName()const { return m_sLayerName; }

@@ -67,7 +67,8 @@ project "SandTable"
 		{
 			"SAND_TABLE_ENABLE_ASSERTS",
 			"SAND_TABLE_PLATFORM_WINDOWS",
-			"SAND_TABLE_BUILD_DLL"
+			"SAND_TABLE_BUILD_DLL",
+			"SAND_TABLE_RENDER_OPENGL"
 		}
 
 	filter "configurations:Degug"
@@ -120,7 +121,8 @@ project "SandBox"
 		systemversion "latest"
 		defines
 		{
-			"SAND_TABLE_PLATFORM_WINDOWS"
+			"SAND_TABLE_PLATFORM_WINDOWS",
+			"SAND_TABLE_ENABLE_ASSERTS"
 		}
 
 	filter "configurations:Degug"

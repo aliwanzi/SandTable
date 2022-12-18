@@ -1,6 +1,5 @@
 #include "pch.h"
 #include "OpenGLContext.h"
-#include "SandTable/Core/Logger.h"
 #include "GL/gl3w.h"
 #include "GLFW/glfw3.h"
 
@@ -19,7 +18,7 @@ namespace SandTable
 		int bInit = gl3wInit();
 		SAND_TABLE_ASSERT(!bInit, "Failed to initialize GL3W");
 
-
+		LOG_DEV_INFO("{0}", sizeof(float));
 		LOG_DEV_INFO("OpenGL Info:");
 		LOG_DEV_INFO("Vendor: {0}", glGetString(GL_VENDOR));
 		LOG_DEV_INFO("Renderer:{0}", glGetString(GL_RENDERER));
@@ -28,7 +27,6 @@ namespace SandTable
 
 	void OpenGLContext::SwapBuffers()
 	{
-		glbegin
 		glfwSwapBuffers(m_pGLFWWindow);
 	}
 }

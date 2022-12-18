@@ -1,6 +1,4 @@
 #pragma once
-
-#include "SandTable/Core/Core.h"
 #include "SandTable/Core/Logger.h"
 
 namespace SandTable

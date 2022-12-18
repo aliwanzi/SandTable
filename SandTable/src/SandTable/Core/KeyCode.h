@@ -1,7 +1,5 @@
 #pragma once
 
-#include "Core.h"
-
 namespace SandTable
 {
 	using KeyCode = uint32_t;
