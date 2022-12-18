@@ -6,9 +6,9 @@ SandBoxLayer::SandBoxLayer() :
 	m_spOrthoGraphicCamera(CreateRef<OrthoGraphicCamera>(-1.6f, 1.6f, -0.9f, 0.9f)),
 	m_vec3Color(glm::vec3(0.2f,0.3f,0.8f)),
 	m_vec3CameraPosition(glm::vec3(0.f)),
-	m_fCameraMoveSpeed(0.005),
+	m_fCameraMoveSpeed(0.003),
 	m_fCameraRotation(0.f),
-	m_fCameraRotateSpeed(0.5f)
+	m_fCameraRotateSpeed(0.3f)
 {
 	//Texture
 	//VAO
