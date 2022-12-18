@@ -19,6 +19,7 @@ protected:
 	IndexBuffer(const std::vector<int>& vecIndex);
 
 protected:
+	unsigned int m_uiRenderID;
 	std::vector<int> m_vecIndex;
 };
 

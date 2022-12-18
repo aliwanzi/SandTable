@@ -6,79 +6,80 @@ SandBoxLayer::SandBoxLayer() :
 	m_spOrthoGraphicCamera(CreateRef<OrthoGraphicCamera>(-1.6f, 1.6f, -0.9f, 0.9f)),
 	m_vec3Color(glm::vec3(0.2f,0.3f,0.8f)),
 	m_vec3CameraPosition(glm::vec3(0.f)),
-	m_fCameraMoveSpeed(0.01f),
+	m_fCameraMoveSpeed(0.005),
 	m_fCameraRotation(0.f),
 	m_fCameraRotateSpeed(0.5f)
 {
-	//Triangle
+	//Texture
 	//VAO
-	m_spTriangle = VertexArray::Create();
+	m_spTextureArray = VertexArray::Create();
 
 	//VBO
-	std::vector<float> vecTriVertex{
-		-0.5f, -0.5f, 0.0f, 0.8f, 0.2f, 0.8f, 1.0f,
-		 0.5f, -0.5f, 0.0f, 0.2f, 0.3f, 0.8f, 1.0f,
-		 0.0f,  0.5f, 0.0f, 0.8f, 0.8f, 0.2f, 1.0f
-	};
-	std::vector<VertexBufferElement> vecTriBufferElement
-	{
-		{ VertexDataType::Float3 },
-		{ VertexDataType::Float4 }
-	};
-	auto sTriVertexBufferLayout = CreateRef<VertexBufferLayout>(vecTriBufferElement);
-	auto spTriVertexBuffer = VertexBuffer::Create(vecTriVertex, sTriVertexBufferLayout);
-	m_spTriangle->AddVertexBuffer(spTriVertexBuffer);
-
-	//EBO
-	std::vector<int> vecTriIndex{
-		0,1,2
-	};
-	auto spTriIndexBuffer = IndexBuffer::Create(vecTriIndex);
-	m_spTriangle->SetIndexBuffer(spTriIndexBuffer);
-
-	//Shader
-	std::vector<ShaderInfo> vecTriShaderInfo
-	{ 
-		{ShaderType::VETEX_SHADER,"assets/shaders/Triangle.vs"},
-		{ShaderType::FRAGMENT_SHADER,"assets/shaders/Triangle.fs"}
-	};
-	m_spTriangleShader = Shader::Create(vecTriShaderInfo);
-
-
-	//Square
-	//VAO
-	m_spSquare = VertexArray::Create();
-
-	//VBO
-	std::vector<float> vecSquVertex{
+	std::vector<float> vecVertex{
 		-0.5f, -0.5f, 0.0f, 0.0f, 0.0f,
 		 0.5f, -0.5f, 0.0f, 1.0f, 0.0f,
 		 0.5f,  0.5f, 0.0f, 1.0f, 1.0f,
 		-0.5f,  0.5f, 0.0f, 0.0f, 1.0f
 	};
-	std::vector<VertexBufferElement> vecSquBufferElement
+	std::vector<VertexBufferElement> vecBufferElement
 	{
 		{ VertexDataType::Float3 },
 		{ VertexDataType::Float2 }
 	};
-	auto spSquVertexBufferLayout = CreateRef<VertexBufferLayout>(vecSquBufferElement);
-	auto spSquVertexBuffer = VertexBuffer::Create(vecSquVertex, spSquVertexBufferLayout);
-	m_spSquare->AddVertexBuffer(spSquVertexBuffer);
+	auto spVertexBufferLayout = CreateRef<VertexBufferLayout>(vecBufferElement);
+	auto spVertexBuffer = VertexBuffer::Create(vecVertex, spVertexBufferLayout);
+	m_spTextureArray->AddVertexBuffer(spVertexBuffer);
 
 	//EBO
-	std::vector<int> vecSquIndex{
+	std::vector<int> vecIndex{
 		0, 1, 2, 2, 3, 0
 	};
-	auto spSquIndexBuffer = IndexBuffer::Create(vecSquIndex);
-	m_spSquare->SetIndexBuffer(spSquIndexBuffer);
+	auto spIndexBuffer = IndexBuffer::Create(vecIndex);
+	m_spTextureArray->SetIndexBuffer(spIndexBuffer);
 
 	//Shader
-	std::vector<ShaderInfo> vecSquShaderInfo
-	{
-		{ShaderType::VETEX_SHADER,"assets/shaders/Square.vs"},
-		{ShaderType::FRAGMENT_SHADER,"assets/shaders/Square.fs"}
+	std::vector<ShaderInfo> vecTriShaderInfo
+	{ 
+		{ShaderType::VETEX_SHADER,"assets/shaders/texture.vs"},
+		{ShaderType::FRAGMENT_SHADER,"assets/shaders/texture.fs"}
 	};
-	m_spSquareShader = Shader::Create(vecSquShaderInfo);
+	m_spTextureShader = Shader::Create(vecTriShaderInfo);
+
+	//Texture
+	m_spTexture2D = Texture2D::Create("assets/textures/Checkerboard.png");
+	m_spTextureShader->Bind();
+	m_spTextureShader->SetInt("tex", 0);
+
+	//Color
+	//VAO
+	m_spColorArray = VertexArray::Create();
+
+	//VBO
+	std::vector<float> veColorVertex{
+		-0.5f, -0.5f, 0.0f, 0.0f, 0.0f,
+		 0.5f, -0.5f, 0.0f, 1.0f, 0.0f,
+		 0.5f,  0.5f, 0.0f, 1.0f, 1.0f,
+		-0.5f,  0.5f, 0.0f, 0.0f, 1.0f
+	};
+	std::vector<VertexBufferElement> vecColorBufferElement
+	{
+		{ VertexDataType::Float3 },
+		{ VertexDataType::Float2 }
+	};
+	auto spColorVertexBufferLayout = CreateRef<VertexBufferLayout>(vecColorBufferElement);
+	auto spColorVertexBuffer = VertexBuffer::Create(veColorVertex, spColorVertexBufferLayout);
+	m_spColorArray->AddVertexBuffer(spColorVertexBuffer);
+
+	//EBO
+	m_spColorArray->SetIndexBuffer(spIndexBuffer);
+
+	//Shader
+	std::vector<ShaderInfo> vecColorShaderInfo
+	{
+		{ShaderType::VETEX_SHADER,"assets/shaders/color.vs"},
+		{ShaderType::FRAGMENT_SHADER,"assets/shaders/color.fs"}
+	};
+	m_spColorShader = Shader::Create(vecColorShaderInfo);
 }
 
 void SandBoxLayer::OnAttach()
@@ -127,21 +128,21 @@ void SandBoxLayer::OnUpdate(const TimeStep& timeStep)
 	RenderCommand::Clear();
 
 	Render::BeginScene(m_spOrthoGraphicCamera);
-	m_spSquareShader->Bind();
-	m_spSquareShader->SetFloat3("Color", m_vec3Color);
+	m_spColorShader->Bind();
+	m_spColorShader->SetFloat3("Color", m_vec3Color);
 	glm::mat4 mat4Scale = glm::scale(glm::mat4(1.0f), glm::vec3(0.1f));
-	for (int i = 0; i < 20; i++)
+	for (int i = -10; i < 10; i++)
 	{
-		for (int j = 0; j < 20; j++)
+		for (int j = -10; j < 10; j++)
 		{
 			glm::vec3 vec3Pos(i * 0.11f, j * 0.11f, 0.f);
 			glm::mat4 mat4Transform = glm::translate(glm::mat4(1.0f), vec3Pos) * mat4Scale;
 
-			Render::Submit(m_spSquareShader, m_spSquare, mat4Transform);
+			Render::Submit(m_spColorShader, m_spColorArray, mat4Transform);
 		}
 	}
-
-	Render::Submit(m_spTriangleShader, m_spTriangle);
+	m_spTexture2D->Bind();
+	Render::Submit(m_spTextureShader, m_spTextureArray);
 	Render::EndScene();
 }
 

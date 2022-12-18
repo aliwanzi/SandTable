@@ -24,6 +24,7 @@ private:
 	VertexBuffer& operator=(const VertexBuffer&) = delete;
 
 protected:
+	unsigned int m_uiRenderID;
 	std::vector<float> m_vecVertex;
 	Ref<VertexBufferLayout> m_spVertexBufferLayout;
 };

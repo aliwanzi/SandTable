@@ -22,11 +22,12 @@ private:
 	float m_fCameraRotation;
 	float m_fCameraRotateSpeed;
 
-	Ref<VertexArray> m_spTriangle;
-	Ref<Shader> m_spTriangleShader;
+	Ref<VertexArray> m_spTextureArray;
+	Ref<Shader> m_spTextureShader;
 
-	Ref<VertexArray> m_spSquare;
-	Ref<Shader> m_spSquareShader;
-
+	Ref<VertexArray> m_spColorArray;
+	Ref<Shader> m_spColorShader;
 	glm::vec3 m_vec3Color;
+
+	Ref<Texture> m_spTexture2D;
 };

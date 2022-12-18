@@ -17,4 +17,5 @@
 #include "SandTable/Render/Buffer/IndexBuffer.h"
 #include "SandTable/Render/Camera/OrthoGraphicCamera.h"
 #include "SandTable/Render/Shader.h"
+#include "SandTable/Render/Texture/Texture2D.h"
 

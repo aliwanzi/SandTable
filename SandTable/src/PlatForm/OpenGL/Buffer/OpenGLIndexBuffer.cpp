@@ -9,6 +9,7 @@ OpenGLIndexBuffer::OpenGLIndexBuffer(const std::vector<int>& vecIndex) :
 	glGenBuffers(1, &m_uiRenderID);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_uiRenderID);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, m_vecIndex.size() * sizeof(int), &m_vecIndex[0], GL_STATIC_DRAW);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 }
 
 OpenGLIndexBuffer::~OpenGLIndexBuffer()

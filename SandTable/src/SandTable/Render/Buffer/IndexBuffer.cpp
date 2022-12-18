@@ -21,7 +21,9 @@ const std::vector<int> IndexBuffer::GetIndex() const
 	return m_vecIndex;
 }
 
-IndexBuffer::IndexBuffer(const std::vector<int>& vecIndex) :m_vecIndex(vecIndex)
+IndexBuffer::IndexBuffer(const std::vector<int>& vecIndex) :
+	m_vecIndex(vecIndex),
+	m_uiRenderID(0)
 {
 
 }

@@ -55,7 +55,7 @@ void OpenGLVertexArray::AddVertexBuffer(const Ref<Buffer>& spBuffer)
 	const auto& spVertexBufferLayout = spVertexBuffer->GetVertexBufferLayout();
 	SAND_TABLE_ASSERT(spVertexBufferLayout->GetVertexBufferElements().size(), "Vertex Buffer has no layout");
 
-	Bind();
+	glBindVertexArray(m_uiRenderID);
 	spVertexBuffer->Bind();
 
 	GLuint uiIndex(0);
@@ -72,6 +72,8 @@ void OpenGLVertexArray::AddVertexBuffer(const Ref<Buffer>& spBuffer)
 		uiIndex++;
 	}
 
+	spVertexBuffer->UnBind();
+	glBindVertexArray(0);
 	m_vecVertexBuffer.push_back(spVertexBuffer);
 }
 

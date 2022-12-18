@@ -11,6 +11,7 @@ OpenGLVertexBuffer::OpenGLVertexBuffer(const std::vector<float>& vecVertics,
 	glGenBuffers(1, &m_uiRenderID);
 	glBindBuffer(GL_ARRAY_BUFFER, m_uiRenderID);
 	glBufferData(GL_ARRAY_BUFFER, m_vecVertex.size() * sizeof(float), &m_vecVertex[0], GL_STATIC_DRAW);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
 OpenGLVertexBuffer::~OpenGLVertexBuffer()
