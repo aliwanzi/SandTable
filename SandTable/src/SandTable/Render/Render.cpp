@@ -5,6 +5,11 @@
 SAND_TABLE_NAMESPACE_BEGIN
 
 Ref<Render::SceneData> Render::m_spSceneData = CreateRef<Render::SceneData>();
+void Render::Init()
+{
+	RenderCommand::Init();
+}
+
 void Render::BeginScene(const Ref<Camera>& spCamera)
 {
 	m_spSceneData->m_mat4ViewProjectionMatrix = spCamera->GetViewProjectionMatrix();

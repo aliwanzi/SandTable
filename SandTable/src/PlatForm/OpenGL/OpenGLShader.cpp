@@ -22,14 +22,16 @@ namespace
 	}
 }
 
-OpenGLShader::OpenGLShader(const std::vector<ShaderInfo>& vecShaderInfo)
+OpenGLShader::OpenGLShader(const std::vector<ShaderInfo>& vecShaderInfo,const std::string& sShaderName):
+	m_sShaderName(sShaderName)
 {
 	GLuint uiProgram = glCreateProgram();
-	std::vector<GLuint> shaderIDs;
+	std::vector<GLuint> vecShaderIDs;
+	vecShaderIDs.reserve(vecShaderInfo.size());
 	for (auto& shaderInfo : vecShaderInfo)
 	{
 		GLuint uiShader = glCreateShader(GetShaderType(shaderInfo.Type));
-		shaderIDs.emplace_back(uiShader);
+		vecShaderIDs.emplace_back(uiShader);
 		auto pSource = ReadFile(shaderInfo.Path);
 		SAND_TABLE_ASSERT(pSource, "Shader Source in OpenGLShader is null");
 		glShaderSource(uiShader, 1, &pSource, NULL);
@@ -37,7 +39,7 @@ OpenGLShader::OpenGLShader(const std::vector<ShaderInfo>& vecShaderInfo)
 		glCompileShader(uiShader);
 		if (!CheckCompileError(uiShader, CompileType::LINK_STATUS))
 		{
-			for (auto& shader : shaderIDs)
+			for (auto& shader : vecShaderIDs)
 			{
 				glDeleteShader(shader);
 			}
@@ -50,14 +52,14 @@ OpenGLShader::OpenGLShader(const std::vector<ShaderInfo>& vecShaderInfo)
 
 	if (!CheckCompileError(uiProgram, CompileType::PROGRAM_STATUS))
 	{
-		for (auto& shader : shaderIDs)
+		for (auto& shader : vecShaderIDs)
 		{
 			glDeleteShader(shader);
 		}
 		SAND_TABLE_ASSERT(false, "Program Compile Failed");
 	}
 
-	for (auto& shader : shaderIDs)
+	for (auto& shader : vecShaderIDs)
 	{
 		glDeleteShader(shader);
 	}
@@ -83,10 +85,9 @@ bool OpenGLShader::CheckCompileError(unsigned int uiShader, CompileType compileT
 			GLsizei uiLen(0);
 			glGetShaderiv(uiShader, GL_INFO_LOG_LENGTH, &uiLen);
 
-			GLchar* pLogInfo = new GLchar[uiLen + 1];
-			glGetShaderInfoLog(uiShader, uiLen, &uiLen, pLogInfo);
-			pLogInfo[uiLen] = '\0';
-			LOG_DEV_ERROR(pLogInfo);
+			std::vector<GLchar> vecLogInfo(uiLen);
+			glGetShaderInfoLog(uiShader, uiLen, &uiLen, &vecLogInfo[0]);
+			LOG_DEV_ERROR(vecLogInfo.data());
 			return false;
 		}
 		return true;
@@ -100,8 +101,9 @@ bool OpenGLShader::CheckCompileError(unsigned int uiShader, CompileType compileT
 			GLsizei uiLen(0);
 			glGetShaderiv(uiShader, GL_INFO_LOG_LENGTH, &uiLen);
 
-			GLchar* pLogInfo = new GLchar[uiLen + 1];
-			glGetShaderInfoLog(uiShader, uiLen, &uiLen, pLogInfo);
+			std::vector<GLchar> vecLogInfo(uiLen);
+			glGetShaderInfoLog(uiShader, uiLen, &uiLen, &vecLogInfo[0]);
+			LOG_DEV_ERROR(vecLogInfo.data());
 			return false;
 		}
 		return true;
@@ -191,7 +193,7 @@ void OpenGLShader::SetBool(const std::string& sName, bool bValue)
 
 const std::string& OpenGLShader::GetName() const
 {
-	return "";
+	return m_sShaderName;
 }
 
 SAND_TABLE_NAMESPACE_END

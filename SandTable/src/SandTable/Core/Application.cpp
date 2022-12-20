@@ -2,6 +2,7 @@
 #include "Application.h"
 #include "SandTable/Events/ApplicationEvent.h"
 #include "SandTable/Core/Input.h"
+#include "SandTable/Render/Render.h"
 
 SAND_TABLE_NAMESPACE_BEGIN
 
@@ -15,6 +16,7 @@ Application::Application() :m_bRunning(true), m_fLastFrameTime(0.f)
 
 void Application::Init()
 {
+	Render::Init();
 	m_spLayerStack = CreateRef<LayerStack>();
 	m_spImGuiLayer = CreateRef<ImGuiLayer>();
 	PushOverlay(m_spImGuiLayer);

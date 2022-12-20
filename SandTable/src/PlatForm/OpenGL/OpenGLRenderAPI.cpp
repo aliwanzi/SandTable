@@ -4,6 +4,12 @@
 
 SAND_TABLE_NAMESPACE_BEGIN
 
+void OpenGLRenderAPI::Init()
+{
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+}
+
 void OpenGLRenderAPI::SetClearColor(const glm::vec4& vec4Color)
 {
 	glClearColor(vec4Color.r, vec4Color.g, vec4Color.b, vec4Color.a);

@@ -46,7 +46,8 @@ SandBoxLayer::SandBoxLayer() :
 	m_spTextureShader = Shader::Create(vecTriShaderInfo);
 
 	//Texture
-	m_spTexture2D = Texture2D::Create("assets/textures/Checkerboard.png");
+	m_spTexture2DRGB = Texture2D::Create("assets/textures/Checkerboard.png");
+	m_spTexture2DRGBA = Texture2D::Create("assets/textures/ChernoLogo.png");
 	m_spTextureShader->Bind();
 	m_spTextureShader->SetInt("tex", 0);
 
@@ -141,7 +142,9 @@ void SandBoxLayer::OnUpdate(const TimeStep& timeStep)
 			Render::Submit(m_spColorShader, m_spColorArray, mat4Transform);
 		}
 	}
-	m_spTexture2D->Bind();
+	m_spTexture2DRGB->Bind();
+	Render::Submit(m_spTextureShader, m_spTextureArray);
+	m_spTexture2DRGBA->Bind();
 	Render::Submit(m_spTextureShader, m_spTextureArray);
 	Render::EndScene();
 }

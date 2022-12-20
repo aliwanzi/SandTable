@@ -8,6 +8,7 @@ SAND_TABLE_NAMESPACE_BEGIN
 class Render
 {
 public:
+	static void Init();
 	static void BeginScene(const Ref<Camera>& spCamera);
 	static void EndScene();
 	static void Submit(const Ref<Shader>& spShader,

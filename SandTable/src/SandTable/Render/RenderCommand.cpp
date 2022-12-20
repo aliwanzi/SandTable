@@ -5,6 +5,10 @@
 SAND_TABLE_NAMESPACE_BEGIN
 
 Ref<RenderAPI> RenderCommand::m_spRenderAPI = RenderAPI::CreateRenderAPI();
+void RenderCommand::Init()
+{
+	m_spRenderAPI->Init();
+}
 void RenderCommand::SetClearColor(const glm::vec4& vec4Color)
 {
 	m_spRenderAPI->SetClearColor(vec4Color);

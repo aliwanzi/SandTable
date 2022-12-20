@@ -49,17 +49,26 @@ public:
 	virtual void SetBool(const std::string& sName, bool bValue) = 0;
 	virtual const std::string& GetName() const = 0;
 
-	static Ref<Shader> Create(const std::vector<ShaderInfo>& vecShaderInfo);
+	static Ref<Shader> Create(const std::vector<ShaderInfo>& vecShaderInfo, const std::string& sShaderName = "shader");
 
 protected:
 	const char* ReadFile(const std::string& filepath);
-	Shader();
+	Shader() = default;
 
 private:
 	Shader(Shader&) = delete;
 	Shader& operator=(const Shader&) = delete;
-protected:
-	unsigned int m_uiRenderID;
+};
+
+class ShaderLibrary
+{
+public:
+	void Add(const Ref<Shader>& spShader);
+	void Add(const Ref<Shader>& spShader, const std::string& sShaderName = "shader");
+	Ref<Shader> Load(const std::vector<ShaderInfo>& vecShaderInfo, const std::string& sShaderName = "shader");
+	Ref<Shader> Get(const std::string& sShaderName);
+private:
+	std::unordered_map<std::string, Ref<Shader>> m_mapShaders;
 };
 
 SAND_TABLE_NAMESPACE_END

@@ -4,12 +4,12 @@
 
 SAND_TABLE_NAMESPACE_BEGIN
 
-Ref<Shader> Shader::Create(const std::vector<ShaderInfo>& vecShaderInfo)
+Ref<Shader> Shader::Create(const std::vector<ShaderInfo>& vecShaderInfo, const std::string& sShaderName)
 {
 	switch (RenderAPI::GetAPIType())
 	{
 	case RenderAPI::APIType::OpenGL:
-		return Ref<OpenGLShader>(new OpenGLShader(vecShaderInfo));
+		return Ref<OpenGLShader>(new OpenGLShader(vecShaderInfo, sShaderName));
 	default:
 		SAND_TABLE_ASSERT(false, "Unknown RenderAPI");
 		return nullptr;
@@ -43,9 +43,39 @@ const char* Shader::ReadFile(const std::string& sFilepath)
 	return nullptr;
 }
 
-Shader::Shader():m_uiRenderID(0)
+void ShaderLibrary::Add(const Ref<Shader>& spShader)
 {
+	const auto& sShaderName = spShader->GetName();
+	Add(spShader, sShaderName);
+}
 
+void ShaderLibrary::Add(const Ref<Shader>& spShader, const std::string& sShaderName)
+{
+	if (m_mapShaders.find(sShaderName) != m_mapShaders.end())
+	{
+		LOG_DEV_WARN("Shader already exists!");
+	}
+	m_mapShaders[sShaderName] = spShader;
+}
+
+Ref<Shader> ShaderLibrary::Load(const std::vector<ShaderInfo>& vecShaderInfo, const std::string& sShaderName)
+{
+	if (m_mapShaders.find(sShaderName) != m_mapShaders.end())
+	{
+		LOG_DEV_WARN("Shader already exists!");
+	}
+	auto spShader = Shader::Create(vecShaderInfo, sShaderName);
+	m_mapShaders[sShaderName] = spShader;
+	return spShader;
+}
+
+Ref<Shader> ShaderLibrary::Get(const std::string& sShaderName)
+{
+	SAND_TABLE_ASSERT(m_mapShaders.find(sShaderName) != m_mapShaders.end(), "Shader already exists!");
+
+	return m_mapShaders[sShaderName];
 }
 
 SAND_TABLE_NAMESPACE_END
+
+

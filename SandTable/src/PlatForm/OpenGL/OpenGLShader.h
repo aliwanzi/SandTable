@@ -6,7 +6,7 @@ SAND_TABLE_NAMESPACE_BEGIN
 class OpenGLShader :public Shader
 {
 public:
-	OpenGLShader(const std::vector<ShaderInfo>& vecShaderInfo);
+	OpenGLShader(const std::vector<ShaderInfo>& vecShaderInfo, const std::string& sShaderName);
 	virtual ~OpenGLShader();
 private:
 	bool CheckCompileError(unsigned int uiShader, CompileType type);
@@ -26,6 +26,9 @@ private:
 	virtual void SetInt4(const std::string& sName, const glm::ivec4& vec4Value) override;
 	virtual void SetBool(const std::string& sName, bool bValue) override;
 	virtual const std::string& GetName() const override;
+private:
+	unsigned int m_uiRenderID;
+	std::string m_sShaderName;
 };
 
 SAND_TABLE_NAMESPACE_END

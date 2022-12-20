@@ -29,5 +29,5 @@ private:
 	Ref<Shader> m_spColorShader;
 	glm::vec3 m_vec3Color;
 
-	Ref<Texture> m_spTexture2D;
+	Ref<Texture> m_spTexture2DRGB, m_spTexture2DRGBA;
 };
