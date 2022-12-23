@@ -13,6 +13,7 @@ public:
 	};
 	virtual void Init() = 0;
 	virtual void SetClearColor(const glm::vec4& vec4Color) = 0;
+	virtual void SetViewPort(unsigned int uiWidth, unsigned int uiHeight) = 0;
 	virtual void Clear() = 0;
 	virtual void DrawVertex(const Ref<VertexArray>& spVertexArray) = 0;
 	static APIType GetAPIType();

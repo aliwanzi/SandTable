@@ -41,6 +41,7 @@ private:
 	bool OnWindowClosedEvent(WindowCloseEvent& e);
 private:
 	bool m_bRunning;
+	bool m_bMinimized;
 	float m_fLastFrameTime;
 
 	Scope<Window> m_upWindow;

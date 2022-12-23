@@ -20,7 +20,6 @@ bool WindowsInput::IsKeyPressedImpl(KeyCode keyCode)
 
 bool WindowsInput::IsMouseButtonPressedImpl(MouseCode mouseCode)
 {
-	double dXPos(0.0), dYPos(0.0);
 	const auto& upWindow = Application::GetApplication()->GetWindow();
 	SAND_TABLE_ASSERT(upWindow, "WindowsInput get window failed");
 	auto glfwWindow = static_cast<GLFWwindow*>(upWindow->GetNativeWindow());

@@ -9,6 +9,7 @@ public:
 	// Í¨¹ý RenderAPI ¼Ì³Ð
 	virtual void Init()override;
 	virtual void SetClearColor(const glm::vec4& vec4Color) override;
+	virtual void SetViewPort(unsigned int uiWidth, unsigned int uiHeight) override;
 	virtual void Clear() override;
 	virtual void DrawVertex(const Ref<VertexArray>& spVertexArray) override;
 };

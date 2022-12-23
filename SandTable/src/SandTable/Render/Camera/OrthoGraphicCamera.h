@@ -8,6 +8,7 @@ class OrthoGraphicCamera :public Camera
 {
 public:
 	OrthoGraphicCamera(float fLeft, float fRight, float fBottom, float fTop);
+	void SetProjection(float fLeft, float fRight, float fBottom, float fTop);
 private:
 	virtual void RecalculateViewMatrix() override;
 };

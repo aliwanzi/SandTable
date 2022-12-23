@@ -9,16 +9,16 @@ SAND_TABLE_NAMESPACE_BEGIN
 Ref<Context> WindowsWindow::m_spContext = nullptr;
 namespace
 {
-	void OnDebug(GLenum source, GLenum type, GLuint id, GLenum severity,
-		GLsizei length, const GLchar* message, GLvoid* userParam)
-	{
-		switch (severity)
-		{
-		case GL_DEBUG_SEVERITY_MEDIUM:       LOG_DEV_ERROR(message); return;
-		case GL_DEBUG_SEVERITY_LOW:          LOG_DEV_WARN(message); return;
-		case GL_DEBUG_SEVERITY_NOTIFICATION: LOG_DEV_INFO(message); return;
-		}
-	}
+	//void OnDebug(GLenum source, GLenum type, GLuint id, GLenum severity,
+	//	GLsizei length, const GLchar* message, GLvoid* userParam)
+	//{
+	//	switch (severity)
+	//	{
+	//	case GL_DEBUG_SEVERITY_MEDIUM:       LOG_DEV_ERROR(message); return;
+	//	case GL_DEBUG_SEVERITY_LOW:          LOG_DEV_WARN(message); return;
+	//	case GL_DEBUG_SEVERITY_NOTIFICATION: LOG_DEV_INFO(message); return;
+	//	}
+	//}
 
 	bool IsExtensionSupported(const std::string& sExtersionName)
 	{
@@ -129,6 +129,7 @@ void WindowsWindow::Init(const WindowProps& windowPorps)
 			pWindowCallBack.Height = height;
 
 			WindowResizedEvent event(width, height);
+			LOG_DEV_WARN("window resize {0},{1}", width, height);
 			pWindowCallBack.EventCallback(event);
 		});
 
@@ -139,7 +140,7 @@ void WindowsWindow::Init(const WindowProps& windowPorps)
 			pWindowCallBack.EventCallback(event);
 		});
 
-	glfwSetKeyCallback(m_pGLFWWindow, [](GLFWwindow* window, int key, int scancode, int action, int mods)
+	glfwSetKeyCallback(m_pGLFWWindow, [](GLFWwindow* window, int key, int /*scancode*/, int action, int /*mods*/)
 		{
 			auto& pWindowCallBack = *(WindowCallBack*)glfwGetWindowUserPointer(window);
 			switch (action)

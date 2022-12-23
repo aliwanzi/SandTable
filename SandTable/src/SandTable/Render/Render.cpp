@@ -10,6 +10,11 @@ void Render::Init()
 	RenderCommand::Init();
 }
 
+void Render::OnWindowResize(unsigned int uiWidth, unsigned int uiHeight)
+{
+	RenderCommand::SetViewPort(uiWidth, uiHeight);
+}
+
 void Render::BeginScene(const Ref<Camera>& spCamera)
 {
 	m_spSceneData->m_mat4ViewProjectionMatrix = spCamera->GetViewProjectionMatrix();

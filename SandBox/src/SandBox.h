@@ -15,12 +15,7 @@ public:
 	virtual void OnImGuiRender() override;
 	void OnEvent(Event& e) override;
 private:
-	Ref<OrthoGraphicCamera> m_spOrthoGraphicCamera;
-	glm::vec3 m_vec3CameraPosition;
-	float m_fCameraMoveSpeed;
-
-	float m_fCameraRotation;
-	float m_fCameraRotateSpeed;
+	Ref<OrthoGraphicCameraController> m_spOrthoGraphicCameraController;
 
 	Ref<VertexArray> m_spTextureArray;
 	Ref<Shader> m_spTextureShader;

@@ -9,6 +9,12 @@ OrthoGraphicCamera::OrthoGraphicCamera(float fLeft, float fRight, float fBottom,
 
 }
 
+void OrthoGraphicCamera::SetProjection(float fLeft, float fRight, float fBottom, float fTop)
+{
+	m_mat4ProjectionMatrix = glm::ortho(fLeft, fRight, fBottom, fTop);
+	m_mat4ViewProjectionMatrix = m_mat4ProjectionMatrix * m_mat4ViewMatrix;
+}
+
 void OrthoGraphicCamera::RecalculateViewMatrix()
 {
 	auto mat4Transform = glm::translate(glm::mat4(1.f), m_vec3Position);

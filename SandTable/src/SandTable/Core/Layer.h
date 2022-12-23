@@ -11,8 +11,8 @@ public:
 	virtual ~Layer() {};
 	virtual void OnAttach() {};
 	virtual void OnDetach() {};
-	virtual void OnUpdate(const TimeStep& timeStep) {};
-	virtual void OnEvent(Event& event) {};
+	virtual void OnUpdate(const TimeStep&) {};
+	virtual void OnEvent(Event&) {};
 	virtual void OnImGuiRender() {}
 	const std::string& GetName()const { return m_sLayerName; }
 protected:

@@ -63,10 +63,17 @@ bool Application::OnKyeTypedEvent(KeyEvent& event)
 
 bool Application::OnWindowResizedEvent(WindowResizedEvent& event)
 {
+	if (event.GetWidth() == 0 || event.GetHeight() == 0)
+	{
+		m_bMinimized = true;
+		return false;
+	}
+	m_bMinimized = false;
+	Render::OnWindowResize(event.GetWidth(), event.GetHeight());
 	return false;
 }
 
-bool Application::OnWindowClosedEvent(WindowCloseEvent& e)
+bool Application::OnWindowClosedEvent(WindowCloseEvent& /*event*/)
 {
 	m_bRunning = false;
 	return true;
@@ -83,11 +90,16 @@ void Application::Run()
 	{
 		float fTime = TimeStep::GetTime();
 		TimeStep timeStep = fTime - m_fLastFrameTime;
+		m_fLastFrameTime = fTime;
 
 		const auto& listLayers = m_spLayerStack->GetLayers();
-		for (auto iter = listLayers.begin(); iter != listLayers.end(); iter++)
+
+		if (!m_bMinimized)
 		{
-			(*iter)->OnUpdate(timeStep);
+			for (auto iter = listLayers.begin(); iter != listLayers.end(); iter++)
+			{
+				(*iter)->OnUpdate(timeStep);
+			}
 		}
 
 		m_spImGuiLayer->BeginNewFrame();

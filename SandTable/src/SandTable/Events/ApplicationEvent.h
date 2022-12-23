@@ -7,8 +7,8 @@ class WindowResizedEvent :public Event
 {
 public:
 	WindowResizedEvent(unsigned int uiWidth, unsigned int uiHeight);
-	inline unsigned int GetWidth()const;
-	inline unsigned int GetHeight()const;
+	unsigned int GetWidth()const;
+	unsigned int GetHeight()const;
 	std::string ToString() const override;
 
 	// Í¨¹ý Event ¼Ì³Ð

@@ -9,6 +9,7 @@ class Render
 {
 public:
 	static void Init();
+	static void OnWindowResize(unsigned int uiWidth, unsigned int uiHeight);
 	static void BeginScene(const Ref<Camera>& spCamera);
 	static void EndScene();
 	static void Submit(const Ref<Shader>& spShader,

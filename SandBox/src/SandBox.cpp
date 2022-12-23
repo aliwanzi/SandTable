@@ -3,13 +3,11 @@
 
 SandBoxLayer::SandBoxLayer() :
 	Layer("SandBox"),
-	m_spOrthoGraphicCamera(CreateRef<OrthoGraphicCamera>(-1.6f, 1.6f, -0.9f, 0.9f)),
-	m_vec3Color(glm::vec3(0.2f,0.3f,0.8f)),
-	m_vec3CameraPosition(glm::vec3(0.f)),
-	m_fCameraMoveSpeed(0.003),
-	m_fCameraRotation(0.f),
-	m_fCameraRotateSpeed(0.3f)
+	m_vec3Color(glm::vec3(0.2f,0.3f,0.8f))
 {
+	m_spOrthoGraphicCameraController = CreateRef<OrthoGraphicCameraController>
+		(static_cast<float>(Application::GetApplication()->GetWindowWidth()) /
+			static_cast<float>(Application::GetApplication()->GetWindowHeight()), true);
 	//Texture
 	//VAO
 	m_spTextureArray = VertexArray::Create();
@@ -95,40 +93,13 @@ void SandBoxLayer::OnDetach()
 
 void SandBoxLayer::OnUpdate(const TimeStep& timeStep)
 {
-	if (Input::IsKeyPressed(Key::W))
-	{
-		m_vec3CameraPosition.y += m_fCameraMoveSpeed * timeStep;
-	}
-	else if (Input::IsKeyPressed(Key::S))
-	{
-		m_vec3CameraPosition.y -= m_fCameraMoveSpeed * timeStep;
-	}
-
-	if (Input::IsKeyPressed(Key::A))
-	{
-		m_vec3CameraPosition.x -= m_fCameraMoveSpeed * timeStep;
-	}
-	else if (Input::IsKeyPressed(Key::D))
-	{
-		m_vec3CameraPosition.x += m_fCameraMoveSpeed * timeStep;
-	}
-
-	if (Input::IsKeyPressed(Key::C))
-	{
-		m_fCameraRotation -= m_fCameraRotateSpeed * timeStep;
-	}
-	else if(Input::IsKeyPressed(Key::Z))
-	{
-		m_fCameraRotation += m_fCameraRotateSpeed * timeStep;
-	}
-
-	m_spOrthoGraphicCamera->SetPosition(m_vec3CameraPosition);
-	m_spOrthoGraphicCamera->SetRotation(m_fCameraRotation);
+	m_spOrthoGraphicCameraController->OnUpdate(timeStep);
 
 	RenderCommand::SetClearColor(glm::vec4(glm::vec3(0.1f), 1.0f));
 	RenderCommand::Clear();
 
-	Render::BeginScene(m_spOrthoGraphicCamera);
+
+	Render::BeginScene(m_spOrthoGraphicCameraController->GetCamera());
 	m_spColorShader->Bind();
 	m_spColorShader->SetFloat3("Color", m_vec3Color);
 	glm::mat4 mat4Scale = glm::scale(glm::mat4(1.0f), glm::vec3(0.1f));
@@ -156,8 +127,9 @@ void SandBoxLayer::OnImGuiRender()
 	ImGui::End();
 }
 
-void SandBoxLayer::OnEvent(Event& e)
+void SandBoxLayer::OnEvent(Event& event)
 {
+	m_spOrthoGraphicCameraController->OnEvent(event);
 }
 
 

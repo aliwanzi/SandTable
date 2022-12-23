@@ -14,6 +14,11 @@ void RenderCommand::SetClearColor(const glm::vec4& vec4Color)
 	m_spRenderAPI->SetClearColor(vec4Color);
 }
 
+void RenderCommand::SetViewPort(unsigned int uiWidth, unsigned int uiHeight)
+{
+	m_spRenderAPI->SetViewPort(uiWidth, uiHeight);
+}
+
 void RenderCommand::Clear()
 {
 	m_spRenderAPI->Clear();
