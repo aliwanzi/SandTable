@@ -10,8 +10,10 @@ public:
 	virtual int GetWidth() const override;
 	virtual int GetHeight() const override;
 	static Ref<Texture> Create(const std::string& sPath);
+	static Ref<Texture> Create(unsigned int uiWidth, unsigned int uiHeight);
 protected:
 	Texture2D(const std::string& sPath);
+	Texture2D(int iWidth, int iHeight);
 private:
 	Texture2D() = delete;
 	Texture2D(Texture2D&) = delete;
@@ -24,6 +26,8 @@ protected:
 	int m_iChannel;
 
 	unsigned int m_uiRenderID;
+	unsigned int m_uiInternalFormat;
+	unsigned int m_uiDataFormat;
 };
 
 SAND_TABLE_NAMESPACE_END

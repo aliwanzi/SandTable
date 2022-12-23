@@ -7,6 +7,7 @@ SAND_TABLE_NAMESPACE_BEGIN
 void OpenGLRenderAPI::Init()
 {
 	glEnable(GL_BLEND);
+	glEnable(GL_DEPTH_TEST);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 }
 

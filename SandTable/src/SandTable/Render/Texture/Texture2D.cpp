@@ -13,6 +13,16 @@ Texture2D::Texture2D(const std::string& sPath) :
 {
 }
 
+
+Texture2D::Texture2D(int iWidth, int iHeight):
+	m_sPath(""),
+	m_iWidth(iWidth),
+	m_iHeight(iHeight),
+	m_iChannel(0),
+	m_uiRenderID(0)
+{
+}
+
 int Texture2D::GetWidth() const
 {
 	return m_iWidth;
@@ -34,5 +44,18 @@ Ref<Texture> Texture2D::Create(const std::string& sPath)
 		return nullptr;
 	}
 }
+
+Ref<Texture> Texture2D::Create(unsigned int uiWidth, unsigned int uiHeight)
+{
+	switch (RenderAPI::GetAPIType())
+	{
+	case RenderAPI::APIType::OpenGL:
+		return CreateRef<OpenGLTexture2D>(uiWidth, uiHeight);
+	default:
+		SAND_TABLE_ASSERT(false, "Unknown RenderAPI");
+		return nullptr;
+	}
+}
+
 
 SAND_TABLE_NAMESPACE_END
