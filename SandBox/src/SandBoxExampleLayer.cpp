@@ -6,8 +6,7 @@ SandBoxExampleLayer::SandBoxExampleLayer() :
 	m_vec4Color(glm::vec4(0.2f, 0.3f, 0.8f,1.0f))
 {
 	m_spOrthoGraphicCameraController = CreateRef<OrthoGraphicCameraController>
-		(static_cast<float>(Application::GetApplication()->GetWindowWidth()) /
-			static_cast<float>(Application::GetApplication()->GetWindowHeight()), true);
+		(1280.f/720.f, true);
 	//Texture
 	//VAO
 	m_spTextureArray = VertexArray::Create();

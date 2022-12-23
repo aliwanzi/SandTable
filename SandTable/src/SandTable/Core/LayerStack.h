@@ -6,9 +6,8 @@ SAND_TABLE_NAMESPACE_BEGIN
 class LayerStack
 {
 public:
-	LayerStack();
+	LayerStack() = default;
 	~LayerStack();
-
 	void PushLayer(Ref<Layer> spLayer);
 	void PushOverlay(Ref<Layer> spLayer);
 	void PopLayer(Ref<Layer> spLayer);

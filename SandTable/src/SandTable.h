@@ -1,15 +1,14 @@
 #pragma once
 
 //For use by Application
-
-#include "SandTable/Core/Application.h"
 #include "SandTable/Core/Logger.h"
 #include "SandTable/Core/KeyCode.h"
 #include "SandTable/Core/MouseCode.h"
 #include "SandTable/Core/Input.h"
 
 #include "SandTable/ImGui/ImGuiLayer.h"
-#include "SandTable/Core/Timer.h"
+
+#include "SandTable/Debug/Instrumentor.h"
 
 #include "SandTable/Render/Render.h"
 #include "SandTable/Render/Render2D.h"

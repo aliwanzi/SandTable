@@ -14,6 +14,7 @@ ImGuiLayer::ImGuiLayer() :Layer("ImguiLayer"), m_bShowDemoWindow(true), m_fTime(
 
 ImGuiLayer::~ImGuiLayer()
 {
+	LOG_DEV_INFO("ImGuiLayer Finalize");
 }
 
 void ImGuiLayer::OnAttach()

@@ -2,13 +2,9 @@
 #include "LayerStack.h"
 
 SAND_TABLE_NAMESPACE_BEGIN
-
-LayerStack::LayerStack()
-{
-}
-
 LayerStack::~LayerStack()
 {
+	m_listLayers.clear();
 }
 
 void LayerStack::PushLayer(Ref<Layer> spLayer)
