@@ -59,13 +59,6 @@ void ImGuiLayer::OnDetach()
 	ImGui::DestroyContext();
 }
 
-
-void ImGuiLayer::OnImGuiRender()
-{
-	if (m_bShowDemoWindow)
-		ImGui::ShowDemoWindow(&m_bShowDemoWindow);
-}
-
 void ImGuiLayer::BeginNewFrame()
 {
 	ImGui_ImplOpenGL3_NewFrame();

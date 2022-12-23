@@ -14,9 +14,16 @@ public:
 	virtual void OnImGuiRender() override;
 	void OnEvent(Event& e) override;
 private:
+	struct ProfileResult
+	{
+		std::string Name;
+		float Time;
+	};
 	Ref<OrthoGraphicCameraController> m_spOrthoGraphicCameraController;
 	Ref<Texture> m_spTexture;
 
 	glm::vec4 m_vec4Color;
+
+	std::vector<ProfileResult> m_vecProfileResult;
 };
 
