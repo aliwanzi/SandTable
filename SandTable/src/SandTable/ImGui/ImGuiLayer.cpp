@@ -4,6 +4,7 @@
 #include "GLFW/glfw3.h"
 #include "examples/imgui_impl_glfw.h"
 #include "examples/imgui_impl_opengl3.h"
+#include "SandTable/Debug/Instrumentor.h"
 
 SAND_TABLE_NAMESPACE_BEGIN
 
@@ -19,6 +20,7 @@ ImGuiLayer::~ImGuiLayer()
 
 void ImGuiLayer::OnAttach()
 {
+	SAND_TABLE_PROFILE_FUNCTION();
 	// Setup Dear ImGui context
 	IMGUI_CHECKVERSION();
 	ImGui::CreateContext();
@@ -55,6 +57,7 @@ void ImGuiLayer::OnAttach()
 
 void ImGuiLayer::OnDetach()
 {
+	SAND_TABLE_PROFILE_FUNCTION();
 	ImGui_ImplOpenGL3_Shutdown();
 	ImGui_ImplGlfw_Shutdown();
 	ImGui::DestroyContext();

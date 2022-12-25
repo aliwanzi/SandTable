@@ -2,6 +2,7 @@
 #include "OpenGLContext.h"
 #include "GL/gl3w.h"
 #include "GLFW/glfw3.h"
+#include "SandTable/Debug/Instrumentor.h"
 
 SAND_TABLE_NAMESPACE_BEGIN
 
@@ -13,6 +14,7 @@ OpenGLContext::OpenGLContext(GLFWwindow* glfwWindow) :
 
 void OpenGLContext::Init()
 {
+	SAND_TABLE_PROFILE_FUNCTION();
 	glfwMakeContextCurrent(m_pGLFWWindow);
 
 	int bInit = gl3wInit();

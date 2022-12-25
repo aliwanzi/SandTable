@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "OpenGLVertexArray.h"
 #include "GL/gl3w.h"
+#include "SandTable/Debug/Instrumentor.h"
 
 SAND_TABLE_NAMESPACE_BEGIN
 
@@ -29,6 +30,7 @@ GLenum GetDataType(VertexDataType dataType)
 
 OpenGLVertexArray::OpenGLVertexArray()
 {
+	SAND_TABLE_PROFILE_FUNCTION();
 	glGenVertexArrays(1, &m_uiRenderID);
 }
 

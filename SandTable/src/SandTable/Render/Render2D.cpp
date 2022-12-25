@@ -4,6 +4,7 @@
 #include "SandTable/Render/Shader.h"
 #include "SandTable/Render/RenderCommand.h"
 #include "SandTable/Render/Texture/Texture2D.h"
+#include "SandTable/Debug/Instrumentor.h"
 
 SAND_TABLE_NAMESPACE_BEGIN
 
@@ -11,6 +12,7 @@ Ref<Render2D::Render2DStroge> Render2D::m_spRender2DStroge = CreateRef<Render2D:
 
 void Render2D::Init()
 {
+	SAND_TABLE_PROFILE_FUNCTION();
 	//VBO
 	m_spRender2DStroge->VertexArray = VertexArray::Create();
 	std::vector<float> vecVertex{
@@ -82,15 +84,18 @@ void Render2D::DrawQuad(const glm::vec3& vec3Position, float fRotation, const gl
 	RenderCommand::DrawVertex(m_spRender2DStroge->VertexArray);
 }
 
-void Render2D::DrawQuad(const glm::vec2& vec2Position, float fRotation, const glm::vec2& vec2Size, const Ref<Texture>& spTexture)
+void Render2D::DrawQuad(const glm::vec2& vec2Position, float fRotation, const glm::vec2& vec2Size, const Ref<Texture>& spTexture, 
+	float fFactor, const glm::vec4& vec4Color)
 {
-	DrawQuad(glm::vec3(vec2Position, 1.f), fRotation, vec2Size, spTexture);
+	DrawQuad(glm::vec3(vec2Position, 1.f), fRotation, vec2Size, spTexture, fFactor, vec4Color);
 }
 
-void Render2D::DrawQuad(const glm::vec3& vec3Position, float fRotation, const glm::vec2& vec2Size, const Ref<Texture>& spTexture)
+void Render2D::DrawQuad(const glm::vec3& vec3Position, float fRotation, const glm::vec2& vec2Size, const Ref<Texture>& spTexture, 
+	float fFactor, const glm::vec4& vec4Color)
 {
 	m_spRender2DStroge->Shader->Bind();
-	m_spRender2DStroge->Shader->SetFloat4("Color", glm::vec4(1.0f));
+	m_spRender2DStroge->Shader->SetFloat4("Color", vec4Color);
+	m_spRender2DStroge->Shader->SetFloat("Factor", fFactor);
 	spTexture->Bind();
 
 	glm::mat4 matTransform = glm::translate(glm::mat4(1.f), vec3Position)

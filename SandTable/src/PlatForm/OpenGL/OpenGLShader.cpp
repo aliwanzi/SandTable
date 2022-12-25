@@ -2,6 +2,7 @@
 #include "OpenGLShader.h"
 #include "GL/gl3w.h"
 #include "SandTable/Core/Logger.h"
+#include "SandTable/Debug/Instrumentor.h"
 
 SAND_TABLE_NAMESPACE_BEGIN
 
@@ -25,6 +26,7 @@ namespace
 OpenGLShader::OpenGLShader(const std::vector<ShaderInfo>& vecShaderInfo,const std::string& sShaderName):
 	m_sShaderName(sShaderName)
 {
+	SAND_TABLE_PROFILE_FUNCTION();
 	GLuint uiProgram = glCreateProgram();
 	std::vector<GLuint> vecShaderIDs;
 	vecShaderIDs.reserve(vecShaderInfo.size());
@@ -69,6 +71,7 @@ OpenGLShader::OpenGLShader(const std::vector<ShaderInfo>& vecShaderInfo,const st
 
 OpenGLShader::~OpenGLShader()
 {
+	SAND_TABLE_PROFILE_FUNCTION();
 	glDeleteProgram(m_uiRenderID);
 }
 

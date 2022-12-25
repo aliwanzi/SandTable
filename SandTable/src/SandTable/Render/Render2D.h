@@ -22,9 +22,11 @@ public:
 
 	static void DrawQuad(const glm::vec2& vec2Position, float fRotation, const glm::vec2& vec2Size, const glm::vec4& vec4Color);
 	static void DrawQuad(const glm::vec3& vec3Position, float fRotation, const glm::vec2& vec2Size, const glm::vec4& vec4Color);
-	static void DrawQuad(const glm::vec2& vec2Position, float fRotation, const glm::vec2& vec2Size, const Ref<Texture>& spTexture);
-	static void DrawQuad(const glm::vec3& vec3Position, float fRotation, const glm::vec2& vec2Size, const Ref<Texture>& spTexture);
-private:
+	static void DrawQuad(const glm::vec2& vec2Position, float fRotation, const glm::vec2& vec2Size, const Ref<Texture>& spTexture, 
+		float fFactor = 1.0f, const glm::vec4& vec4Color = glm::vec4(1.0f));
+	static void DrawQuad(const glm::vec3& vec3Position, float fRotation, const glm::vec2& vec2Size, const Ref<Texture>& spTexture, 
+		float fFactor = 1.0f, const glm::vec4& vec4Color = glm::vec4(1.0f));
+private:																																			   
 	static Ref<Render2DStroge> m_spRender2DStroge;
 };
 

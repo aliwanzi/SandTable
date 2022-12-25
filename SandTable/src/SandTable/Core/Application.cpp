@@ -4,6 +4,7 @@
 #include "SandTable/Core/Input.h"
 #include "SandTable/Render/Render.h"
 #include "SandTable/Render/Render2D.h"
+#include "SandTable/Debug/Instrumentor.h"
 
 SAND_TABLE_NAMESPACE_BEGIN
 
@@ -11,12 +12,14 @@ Ref<Application> Application::m_spApplication = nullptr;
 
 Application::Application() :m_bRunning(true), m_fLastFrameTime(0.f)
 {
+	SAND_TABLE_PROFILE_FUNCTION();
 	m_upWindow = Scope<Window>(Window::Create());
 	m_upWindow->SetEventCallback(BIND_EVENT_FUN(Application::OnEvent));
 }
 
 void Application::Init()
 {
+	SAND_TABLE_PROFILE_FUNCTION();
 	Render::Init();
 	Render2D::Init();
 	m_spLayerStack = CreateRef<LayerStack>();
@@ -88,6 +91,7 @@ Application::~Application()
 
 void Application::Run()
 {
+	SAND_TABLE_PROFILE_FUNCTION();
 	while (m_bRunning)
 	{
 		float fTime = TimeStep::GetTime();
@@ -98,25 +102,32 @@ void Application::Run()
 
 		if (!m_bMinimized)
 		{
-			for (auto iter = listLayers.begin(); iter != listLayers.end(); iter++)
 			{
-				(*iter)->OnUpdate(timeStep);
+				SAND_TABLE_PROFILE_SCOPE("Layer OnUpdate")
+				for (auto iter = listLayers.begin(); iter != listLayers.end(); iter++)
+				{
+					(*iter)->OnUpdate(timeStep);
+				}
 			}
-		}
 
-		m_spImGuiLayer->BeginNewFrame();
-		for (auto iter = listLayers.begin(); iter != listLayers.end(); iter++)
-		{
-			(*iter)->OnImGuiRender();
-		}
-		m_spImGuiLayer->EndNewFrame();
+			m_spImGuiLayer->BeginNewFrame();
+			{
+				SAND_TABLE_PROFILE_SCOPE("Layer OnImGuiRender")
+				for (auto iter = listLayers.begin(); iter != listLayers.end(); iter++)
+				{
+					(*iter)->OnImGuiRender();
+				}
+			}
 
+			m_spImGuiLayer->EndNewFrame();
+		}
 		m_upWindow->OnUpdate();
 	}
 }
 
 void Application::OnEvent(Event& event)
 {
+	//SAND_TABLE_PROFILE_FUNCTION();
 	EventDispatcher dispatcher(event);
 	dispatcher.Dispatch<MouseButtonPressedEvent>(BIND_EVENT_FUN(Application::OnMouseButtonPressedEvent));
 	dispatcher.Dispatch<MouseButtonReleasedEvent>(BIND_EVENT_FUN(Application::OnMouseButtonReleasedEvent));
@@ -141,12 +152,16 @@ void Application::OnEvent(Event& event)
 
 void Application::PushLayer(Ref<Layer> spLayer)
 {
+	SAND_TABLE_PROFILE_FUNCTION();
+
 	m_spLayerStack->PushLayer(spLayer);
 	spLayer->OnAttach();
 }
 
 void Application::PushOverlay(Ref<Layer> spLayer)
 {
+	SAND_TABLE_PROFILE_FUNCTION();
+
 	m_spLayerStack->PushOverlay(spLayer);
 	spLayer->OnAttach();
 }

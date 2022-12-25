@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "OrthoGraphicCameraController.h"
 #include "SandTable/Core/Input.h"
+#include "SandTable/Debug/Instrumentor.h"
 
 SAND_TABLE_NAMESPACE_BEGIN
 
@@ -37,6 +38,7 @@ float OrthoGraphicCameraController::GetZoomLevel() const
 
 void OrthoGraphicCameraController::OnUpdate(TimeStep timeStep)
 {
+	SAND_TABLE_PROFILE_FUNCTION();
 	if (Input::IsKeyPressed(Key::W))
 	{
 		m_vec3CameraPosition.y += m_fCameraTranslationSpeed * timeStep;

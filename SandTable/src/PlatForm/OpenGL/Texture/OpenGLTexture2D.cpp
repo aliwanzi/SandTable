@@ -2,6 +2,7 @@
 #include "OpenGLTexture2D.h"
 #include "GL/gl3w.h"
 #include "stb_image.h"
+#include "SandTable/Debug/Instrumentor.h"
 
 SAND_TABLE_NAMESPACE_BEGIN
 namespace
@@ -41,6 +42,7 @@ namespace
 OpenGLTexture2D::OpenGLTexture2D(int iWidth, int iHeight) :
 	m_uiInternalFormat(GL_RGBA8), m_uiDataFormat(GL_RGBA), Texture2D(iWidth, iHeight)
 {
+	SAND_TABLE_PROFILE_FUNCTION();
 	glCreateTextures(GL_TEXTURE_2D, 1, &m_uiRenderID);
 	glTextureStorage2D(m_uiRenderID, 1, m_uiInternalFormat, m_iWidth, m_iHeight);
 
@@ -53,8 +55,14 @@ OpenGLTexture2D::OpenGLTexture2D(int iWidth, int iHeight) :
 OpenGLTexture2D::OpenGLTexture2D(const std::string& sPath):
 	Texture2D(sPath)
 {
+	SAND_TABLE_PROFILE_FUNCTION();
 	stbi_set_flip_vertically_on_load(1);
-	stbi_uc* pImageData = stbi_load(m_sPath.c_str(), &m_iWidth, &m_iHeight, &m_iChannel, 0);
+	stbi_uc* pImageData = nullptr;
+	{
+		SAND_TABLE_PROFILE_SCOPE("Load Data in OpenGLTexture2D.");
+		pImageData = stbi_load(m_sPath.c_str(), &m_iWidth, &m_iHeight, &m_iChannel, 0);
+	}
+
 	SAND_TABLE_ASSERT(pImageData, "Image Load in OpenGLTexture2D Failed");
 
 	GetFormat(m_iChannel, m_uiInternalFormat, m_uiDataFormat);
@@ -75,6 +83,7 @@ OpenGLTexture2D::OpenGLTexture2D(const std::string& sPath):
 
 OpenGLTexture2D::~OpenGLTexture2D()
 {
+	//SAND_TABLE_PROFILE_FUNCTION();
 	glDeleteTextures(1, &m_uiRenderID);
 }
 
@@ -85,6 +94,7 @@ void OpenGLTexture2D::Bind(unsigned int uiPos) const
 
 void OpenGLTexture2D::SetData(void* pData, unsigned int uiSize)
 {
+	SAND_TABLE_PROFILE_FUNCTION();
 	int iChannel = m_uiDataFormat == GL_RGBA ? 4 : 3;
 	SAND_TABLE_ASSERT(uiSize = m_iWidth * m_iHeight * iChannel, "Data must be entire in OpenGLTexture2D");
 	SAND_TABLE_ASSERT(pData, "Data is null in OpenGLTexture2D");

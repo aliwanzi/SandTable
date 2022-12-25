@@ -1,11 +1,14 @@
 #include "pch.h"
 #include "OpenGLRenderAPI.h"
 #include "GL/gl3w.h"
+#include "SandTable/Debug/Instrumentor.h"
 
 SAND_TABLE_NAMESPACE_BEGIN
 
 void OpenGLRenderAPI::Init()
 {
+	SAND_TABLE_PROFILE_FUNCTION();
+
 	glEnable(GL_BLEND);
 	glEnable(GL_DEPTH_TEST);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);

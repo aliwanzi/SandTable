@@ -8,14 +8,14 @@ int main()
 {
 	LOG_DEV_WARN("Initialize Log!");
 
-	SAND_TABLE_BEGIN_SESSION("Startup", "SandTableProfile-Startup.json");
+	SAND_TABLE_PROFILE_BEGIN_SESSION("Startup", "SandTableProfile-Startup.json");
 	SandTable::Application::CreateApplication();
-	SAND_TABLE_END_SESSION();
+	SAND_TABLE_PROFILE_END_SESSION();
 
-	SAND_TABLE_BEGIN_SESSION("Runtime", "SandTableProfile-Runtime.json");
+	SAND_TABLE_PROFILE_BEGIN_SESSION("Runtime", "SandTableProfile-Runtime.json");
 	auto spApplication = SandTable::Application::GetApplication();
 	spApplication->Run();
-	SAND_TABLE_END_SESSION();
+	SAND_TABLE_PROFILE_END_SESSION();
 
 	EXIT_SUCCESS;
 }

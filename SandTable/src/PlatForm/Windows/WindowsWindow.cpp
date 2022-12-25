@@ -3,6 +3,7 @@
 #include "GL/gl3w.h"
 #include "WindowsWindow.h"
 #include "PlatForm/OpenGL/OpenGLContext.h"
+#include "SandTable/Debug/Instrumentor.h"
 
 SAND_TABLE_NAMESPACE_BEGIN
 
@@ -49,6 +50,7 @@ Window* Window::Create(const WindowProps& windowPorps)
 
 WindowsWindow::WindowsWindow(const WindowProps& windowPorps)
 {
+	SAND_TABLE_PROFILE_FUNCTION();
 	Init(windowPorps);
 }
 
@@ -80,6 +82,7 @@ inline void WindowsWindow::SetEventCallback(const EventCallbackFn& eventCallBack
 
 void WindowsWindow::SetVSync(bool bEnabled)
 {
+	SAND_TABLE_PROFILE_FUNCTION();
 	bEnabled ? glfwSwapInterval(1) : glfwSwapInterval(0);
 	m_windowCallBack.VSync = bEnabled;
 }
@@ -96,6 +99,8 @@ void* WindowsWindow::GetNativeWindow() const
 
 void WindowsWindow::Init(const WindowProps& windowPorps)
 {
+	SAND_TABLE_PROFILE_FUNCTION();
+
 	LOG_DEV_INFO("Creating window {0} ({1}, {2})",
 		windowPorps.Title, windowPorps.Width, windowPorps.Height);
 	bool bInit = glfwInit();
@@ -111,8 +116,12 @@ void WindowsWindow::Init(const WindowProps& windowPorps)
 	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 	glfwWindowHint(GLFW_SAMPLES, windowPorps.Samples);
 
-	m_pGLFWWindow = glfwCreateWindow(windowPorps.Width,
-		windowPorps.Height, windowPorps.Title.c_str(), nullptr, nullptr);
+	{
+		SAND_TABLE_PROFILE_SCOPE("glfw Create Window")
+		m_pGLFWWindow = glfwCreateWindow(windowPorps.Width,
+			windowPorps.Height, windowPorps.Title.c_str(), nullptr, nullptr);
+	}
+
 	SAND_TABLE_ASSERT(m_pGLFWWindow, "Failed to creat GLFW window");
 	m_spContext = Ref<OpenGLContext>(new OpenGLContext(m_pGLFWWindow));
 	m_spContext->Init();
