@@ -7,8 +7,8 @@ class IndexBuffer :public Buffer
 {
 public:
 	~IndexBuffer() = default;
-	static Ref<Buffer> Create(const std::vector<int>& vecIndex);
-	const std::vector<int> GetIndex()const;
+	static Ref<Buffer> Create(const std::vector<unsigned int>& vecIndex);
+	const std::vector<unsigned int> GetIndex()const;
 
 private:
 	IndexBuffer() = delete;
@@ -16,11 +16,11 @@ private:
 	IndexBuffer& operator=(const IndexBuffer&) = delete;
 
 protected:
-	IndexBuffer(const std::vector<int>& vecIndex);
+	IndexBuffer(const std::vector<unsigned int>& vecIndex);
 
 protected:
 	unsigned int m_uiRenderID;
-	std::vector<int> m_vecIndex;
+	std::vector<unsigned int> m_vecIndex;
 };
 
 SAND_TABLE_NAMESPACE_END

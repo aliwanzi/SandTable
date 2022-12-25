@@ -14,6 +14,29 @@ OpenGLVertexBuffer::OpenGLVertexBuffer(const std::vector<float>& vecVertics,
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
+OpenGLVertexBuffer::OpenGLVertexBuffer(const std::vector<float>& vecVertics):
+	VertexBuffer(vecVertics)
+{
+	glGenBuffers(1, &m_uiRenderID);
+	glBindBuffer(GL_ARRAY_BUFFER, m_uiRenderID);
+	glBufferData(GL_ARRAY_BUFFER, m_vecVertex.size() * sizeof(float), &m_vecVertex[0], GL_STATIC_DRAW);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+}
+
+OpenGLVertexBuffer::OpenGLVertexBuffer(unsigned int uiVertexSize)
+{
+	glCreateBuffers(1, &m_uiRenderID);
+	glBindBuffer(GL_ARRAY_BUFFER, m_uiRenderID);
+	glBufferData(GL_ARRAY_BUFFER, uiVertexSize, nullptr, GL_DYNAMIC_DRAW);
+}
+
+void OpenGLVertexBuffer::SetData(const void* pData, uint32_t uiVertexSize)
+{
+	SAND_TABLE_ASSERT(pData, "SetData is Null in OpenGLVertexBuffer");
+	glBindBuffer(GL_ARRAY_BUFFER, m_uiRenderID);
+	glBufferSubData(GL_ARRAY_BUFFER, 0, uiVertexSize, pData);
+}
+
 OpenGLVertexBuffer::~OpenGLVertexBuffer()
 {
 	glDeleteBuffers(1, &m_uiRenderID);

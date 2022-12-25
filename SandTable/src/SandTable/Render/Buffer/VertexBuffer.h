@@ -9,17 +9,23 @@ class VertexBuffer :public Buffer
 {
 public:
 	virtual ~VertexBuffer() = default;
-	const std::vector<float>& GetVertex()const;
-	const Ref<VertexBufferLayout>& GetVertexBufferLayout()const;
 
-	static Ref<Buffer> Create(const std::vector<float>& vecVertex,
-		const Ref<VertexBufferLayout>& spVertexBufferLayout);
+	void SetVertexBufferLayout(const Ref<VertexBufferLayout>& spVertexBufferLayout);
+	const Ref<VertexBufferLayout>& GetVertexBufferLayout()const;
+	const std::vector<float>& GetVertex()const;
+
+	virtual void SetData(const void* pData, uint32_t uiVertexSize) = 0;
+
+	static Ref<Buffer> Create(const std::vector<float>& vecVertex, const Ref<VertexBufferLayout>& spVertexBufferLayout);
+	static Ref<Buffer> Create(const std::vector<float>& vecVertex);
+	static Ref<Buffer> Create(unsigned int uiVertexSize);
 
 protected:
-	VertexBuffer(const std::vector<float>& vecVertex,
-		const Ref<VertexBufferLayout>& spVertexBufferLayout);
+	VertexBuffer();
+	VertexBuffer(const std::vector<float>& vecVertex);
+	VertexBuffer(const std::vector<float>& vecVertex, const Ref<VertexBufferLayout>& spVertexBufferLayout);
+
 private:
-	VertexBuffer() = delete;
 	VertexBuffer(VertexBuffer&) = delete;
 	VertexBuffer& operator=(const VertexBuffer&) = delete;
 

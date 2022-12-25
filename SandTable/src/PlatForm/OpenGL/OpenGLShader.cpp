@@ -71,7 +71,6 @@ OpenGLShader::OpenGLShader(const std::vector<ShaderInfo>& vecShaderInfo,const st
 
 OpenGLShader::~OpenGLShader()
 {
-	SAND_TABLE_PROFILE_FUNCTION();
 	glDeleteProgram(m_uiRenderID);
 }
 

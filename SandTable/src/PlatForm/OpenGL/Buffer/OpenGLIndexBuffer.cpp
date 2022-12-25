@@ -3,12 +3,12 @@
 #include "GL/gl3w.h"
 
 SAND_TABLE_NAMESPACE_BEGIN
-OpenGLIndexBuffer::OpenGLIndexBuffer(const std::vector<int>& vecIndex) :
+OpenGLIndexBuffer::OpenGLIndexBuffer(const std::vector<unsigned int>& vecIndex) :
 	IndexBuffer(vecIndex)
 {
 	glGenBuffers(1, &m_uiRenderID);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_uiRenderID);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, m_vecIndex.size() * sizeof(int), &m_vecIndex[0], GL_STATIC_DRAW);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, m_vecIndex.size() * sizeof(unsigned int), &m_vecIndex[0], GL_STATIC_DRAW);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 }
 

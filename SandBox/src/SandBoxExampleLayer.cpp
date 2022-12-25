@@ -29,7 +29,7 @@ SandBoxExampleLayer::SandBoxExampleLayer() :
 	m_spTextureArray->AddVertexBuffer(spVertexBuffer);
 
 	//EBO
-	std::vector<int> vecIndex{
+	std::vector<unsigned int> vecIndex{
 		0, 1, 2, 2, 3, 0
 	};
 	auto spIndexBuffer = IndexBuffer::Create(vecIndex);

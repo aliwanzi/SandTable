@@ -4,7 +4,7 @@
 
 SAND_TABLE_NAMESPACE_BEGIN
 
-Ref<Buffer> IndexBuffer::Create(const std::vector<int>& vecIndex)
+Ref<Buffer> IndexBuffer::Create(const std::vector<unsigned int>& vecIndex)
 {
 	switch (RenderAPI::GetAPIType())
 	{
@@ -16,12 +16,12 @@ Ref<Buffer> IndexBuffer::Create(const std::vector<int>& vecIndex)
 	}
 }
 
-const std::vector<int> IndexBuffer::GetIndex() const
+const std::vector<unsigned int> IndexBuffer::GetIndex() const
 {
 	return m_vecIndex;
 }
 
-IndexBuffer::IndexBuffer(const std::vector<int>& vecIndex) :
+IndexBuffer::IndexBuffer(const std::vector<unsigned int>& vecIndex) :
 	m_vecIndex(vecIndex),
 	m_uiRenderID(0)
 {

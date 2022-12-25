@@ -24,10 +24,10 @@ void RenderCommand::Clear()
 	m_spRenderAPI->Clear();
 }
 
-void RenderCommand::DrawVertex(const Ref<VertexArray>& spVertexArray)
+void RenderCommand::DrawVertex(const Ref<VertexArray>& spVertexArray,uint32_t uiIndexCount)
 {
 	spVertexArray->Bind();
-	m_spRenderAPI->DrawVertex(spVertexArray);
+	m_spRenderAPI->DrawVertex(spVertexArray, uiIndexCount);
 }
 
 SAND_TABLE_NAMESPACE_END
