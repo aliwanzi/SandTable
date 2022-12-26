@@ -35,8 +35,9 @@ OpenGLShader::OpenGLShader(const std::vector<ShaderInfo>& vecShaderInfo,const st
 		GLuint uiShader = glCreateShader(GetShaderType(shaderInfo.Type));
 		vecShaderIDs.emplace_back(uiShader);
 		auto pSource = ReadFile(shaderInfo.Path);
-		SAND_TABLE_ASSERT(pSource, "Shader Source in OpenGLShader is null");
-		glShaderSource(uiShader, 1, &pSource, NULL);
+		const char* pSourceCode = pSource.c_str();
+		SAND_TABLE_ASSERT(pSourceCode, "Shader Source in OpenGLShader is null");
+		glShaderSource(uiShader, 1, &pSourceCode, NULL);
 
 		glCompileShader(uiShader);
 		if (!CheckCompileError(uiShader, CompileType::LINK_STATUS))
@@ -185,6 +186,12 @@ void OpenGLShader::SetInt4(const std::string& sName, const glm::ivec4& vec4Value
 {
 	GLint iLocation = glGetUniformLocation(m_uiRenderID, sName.c_str());
 	glUniform4iv(iLocation, 1, &vec4Value[0]);
+}
+
+void OpenGLShader::SetIntArray(const std::string& sName, const int* pValues, unsigned int uiCount)
+{
+	GLint iLocation = glGetUniformLocation(m_uiRenderID, sName.c_str());
+	glUniform1iv(iLocation, uiCount, pValues);
 }
 
 void OpenGLShader::SetBool(const std::string& sName, bool bValue)

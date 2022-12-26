@@ -24,6 +24,7 @@ private:
 	virtual void SetInt2(const std::string& sName, const glm::ivec2& vec2Value) override;
 	virtual void SetInt3(const std::string& sName, const glm::ivec3& vec3Value) override;
 	virtual void SetInt4(const std::string& sName, const glm::ivec4& vec4Value) override;
+	virtual void SetIntArray(const std::string& sName, const int* pValues,unsigned int uiCount) override;
 	virtual void SetBool(const std::string& sName, bool bValue) override;
 	virtual const std::string& GetName() const override;
 private:

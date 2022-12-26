@@ -20,7 +20,9 @@ void Render2D::Init()
 	{
 		{ VertexDataType::Float3 },
 		{ VertexDataType::Float4 },
-		{ VertexDataType::Float2 }
+		{ VertexDataType::Float2 },
+		{ VertexDataType::Float },
+		{ VertexDataType::Float }
 	};
 	auto spVertexBufferLayout = CreateRef<VertexBufferLayout>(vecBufferElement);
 	m_spRender2DStroge->VertexBuffer = VertexBuffer::Create(m_spRender2DStroge->MaxVertices * sizeof(Vertex));
@@ -28,6 +30,10 @@ void Render2D::Init()
 	m_spRender2DStroge->VertexArray->AddVertexBuffer(m_spRender2DStroge->VertexBuffer);
 
 	m_spRender2DStroge->Vertex.reserve(m_spRender2DStroge->MaxVertices);
+	m_spRender2DStroge->VertexPosition[0] = glm::vec4(-0.5f, -0.5f, 0.0f, 1.0f);
+	m_spRender2DStroge->VertexPosition[1] = glm::vec4( 0.5f, -0.5f, 0.0f, 1.0f);
+	m_spRender2DStroge->VertexPosition[2] = glm::vec4( 0.5f,  0.5f, 0.0f, 1.0f);
+	m_spRender2DStroge->VertexPosition[3] = glm::vec4(-0.5f,  0.5f, 0.0f, 1.0f);
 
 	//EBO
 	std::vector<unsigned int> vecIndices(m_spRender2DStroge->MaxIndices);
@@ -57,9 +63,22 @@ void Render2D::Init()
 	};
 	m_spRender2DStroge->Shader = Shader::Create(vecColorShaderInfo);
 
+	std::vector<int> vecTextures(32);
+	for (int i = 0; i < 32; i++)
+	{
+		vecTextures[i] = i;
+	}
+	m_spRender2DStroge->Shader->Bind();
+	m_spRender2DStroge->Shader->SetIntArray("u_Textures", &vecTextures[0], vecTextures.size());
+	m_spRender2DStroge->TextureCoord[0] = glm::vec2(0.f, 0.f);
+	m_spRender2DStroge->TextureCoord[1] = glm::vec2(1.f, 0.f);
+	m_spRender2DStroge->TextureCoord[2] = glm::vec2(1.f, 1.f);
+	m_spRender2DStroge->TextureCoord[3] = glm::vec2(0.f, 1.f);
+
 	int uiWiteTextureData = 0xffffffff;
 	m_spRender2DStroge->WhiteTexture = Texture2D::Create(1, 1);
 	m_spRender2DStroge->WhiteTexture->SetData(&uiWiteTextureData, sizeof(uiWiteTextureData));
+	m_spRender2DStroge->TextureSlots[m_spRender2DStroge->WhiteTexture->GetRenderID()] = m_spRender2DStroge->WhiteTexture;
 }
 
 void Render2D::ShutDown()
@@ -82,67 +101,73 @@ void Render2D::EndScene()
 
 void Render2D::Flush()
 {
+	int iIndex(1);
+	for (auto iter : m_spRender2DStroge->TextureSlots)
+	{
+		iter.second->Bind(iIndex++);
+	}
 	RenderCommand::DrawVertex(m_spRender2DStroge->VertexArray, m_spRender2DStroge->QuadIndexCount);
 }
 
 void Render2D::DrawQuad(const glm::vec2& vec2Position, float fRotation, const glm::vec2& vec2Size, const glm::vec4& vec4Color)
 {
-	DrawQuad(glm::vec3(vec2Position, 1.f), fRotation, vec2Size, vec4Color);
+	DrawQuad(glm::vec3(vec2Position, 0.f), fRotation, vec2Size, vec4Color);
 }
 
 void Render2D::DrawQuad(const glm::vec3& vec3Position, float fRotation, const glm::vec2& vec2Size, const glm::vec4& vec4Color)
 {
-	m_spRender2DStroge->Vertex.emplace_back
-	(Vertex{ vec3Position,vec4Color,{0.f,0.f} });
+	glm::mat4 matTransform = glm::translate(glm::mat4(1.f), vec3Position)
+		* glm::rotate(glm::mat4(1.f), glm::radians(fRotation), glm::vec3(0.f, 0.f, 1.f))
+		* glm::scale(glm::mat4(1.f), glm::vec3(vec2Size, 1.f));
 
-	m_spRender2DStroge->Vertex.emplace_back
-	(Vertex{ glm::vec3(vec3Position.x + vec2Size.x,vec3Position.y,0.0f),vec4Color,{1.f,0.f} });
-
-	m_spRender2DStroge->Vertex.emplace_back
-	(Vertex{ glm::vec3(vec3Position.x + vec2Size.x,vec3Position.y + vec2Size.y,0.0f),vec4Color,{1.f,1.f} });
-
-	m_spRender2DStroge->Vertex.emplace_back
-	(Vertex{ glm::vec3(vec3Position.x,vec3Position.y + vec2Size.y,0.0f),vec4Color,{0.f,1.f} });
+	for (int i = 0; i < 4; i++)
+	{
+		Vertex vertex;
+		vertex.Position = matTransform * m_spRender2DStroge->VertexPosition[i];
+		vertex.Color = vec4Color;
+		vertex.TexCoord = m_spRender2DStroge->TextureCoord[i];
+		vertex.TexIndex = m_spRender2DStroge->WhiteTexture->GetRenderID();
+		vertex.TilingFactor = 1.0f;
+		m_spRender2DStroge->Vertex.emplace_back(vertex);
+	}
 
 	m_spRender2DStroge->QuadIndexCount += 6;
 
 	SAND_TABLE_ASSERT(m_spRender2DStroge->Vertex.size() < m_spRender2DStroge->MaxVertices, "the vertices out of the side");
-
-	//m_spRender2DStroge->Shader->Bind();
-	//m_spRender2DStroge->Shader->SetFloat4("Color", vec4Color);
-	//m_spRender2DStroge->Shader->SetFloat("Factor", 1.f);
-	//m_spRender2DStroge->WhiteTexture->Bind();
-
-	//glm::mat4 matTransform = glm::translate(glm::mat4(1.f), vec3Position)
-	//	* glm::rotate(glm::mat4(1.f), glm::radians(fRotation), glm::vec3(0.f, 0.f, 1.f))
-	//	* glm::scale(glm::mat4(1.f), glm::vec3(vec2Size, 1.f));
-	//m_spRender2DStroge->Shader->SetMat4("Transform", matTransform);
-
-	//m_spRender2DStroge->VertexArray->Bind();
-	//RenderCommand::DrawVertex(m_spRender2DStroge->VertexArray);
 }
 
 void Render2D::DrawQuad(const glm::vec2& vec2Position, float fRotation, const glm::vec2& vec2Size, const Ref<Texture>& spTexture, 
 	float fFactor, const glm::vec4& vec4Color)
 {
-	DrawQuad(glm::vec3(vec2Position, 1.f), fRotation, vec2Size, spTexture, fFactor, vec4Color);
+	DrawQuad(glm::vec3(vec2Position, 0.f), fRotation, vec2Size, spTexture, fFactor, vec4Color);
 }
 
 void Render2D::DrawQuad(const glm::vec3& vec3Position, float fRotation, const glm::vec2& vec2Size, const Ref<Texture>& spTexture, 
 	float fFactor, const glm::vec4& vec4Color)
 {
-	m_spRender2DStroge->Shader->Bind();
-	m_spRender2DStroge->Shader->SetFloat4("Color", vec4Color);
-	m_spRender2DStroge->Shader->SetFloat("Factor", fFactor);
-	spTexture->Bind();
+	if (m_spRender2DStroge->TextureSlots.find(spTexture->GetRenderID()) == m_spRender2DStroge->TextureSlots.end())
+	{
+		m_spRender2DStroge->TextureSlots[spTexture->GetRenderID()] = spTexture;
+	}
 
 	glm::mat4 matTransform = glm::translate(glm::mat4(1.f), vec3Position)
 		* glm::rotate(glm::mat4(1.f), glm::radians(fRotation), glm::vec3(0.f, 0.f, 1.f))
 		* glm::scale(glm::mat4(1.f), glm::vec3(vec2Size, 1.f));
-	m_spRender2DStroge->Shader->SetMat4("Transform", matTransform);
-	m_spRender2DStroge->VertexArray->Bind();
-	RenderCommand::DrawVertex(m_spRender2DStroge->VertexArray);
-	spTexture->UnBind();
+
+	for (int i = 0; i < 4; i++)
+	{
+		Vertex vertex;
+		vertex.Position = matTransform * m_spRender2DStroge->VertexPosition[i];
+		vertex.Color = vec4Color;
+		vertex.TexCoord = m_spRender2DStroge->TextureCoord[i];
+		vertex.TexIndex = spTexture->GetRenderID();
+		vertex.TilingFactor = fFactor;
+		m_spRender2DStroge->Vertex.emplace_back(vertex);
+	}
+
+	m_spRender2DStroge->QuadIndexCount += 6;
+
+	SAND_TABLE_ASSERT(m_spRender2DStroge->Vertex.size() < m_spRender2DStroge->MaxVertices, "the vertices out of the side");
 }
 
 SAND_TABLE_NAMESPACE_END

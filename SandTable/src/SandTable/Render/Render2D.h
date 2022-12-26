@@ -1,5 +1,6 @@
 #pragma once
 #include "SandTable/Render/Camera/OrthoGraphicCameraController.h"
+#include <map>
 
 SAND_TABLE_NAMESPACE_BEGIN
 class VertexArray;
@@ -15,6 +16,8 @@ public:
 		glm::vec3 Position;
 		glm::vec4 Color;
 		glm::vec2 TexCoord;
+		float TexIndex;
+		float TilingFactor;
 	};
 
 	struct Render2DStroge
@@ -25,10 +28,16 @@ public:
 		const unsigned int MaxIndices = MaxQuads * 6;
 
 		Ref<VertexArray> VertexArray;
+
 		std::vector<Vertex> Vertex;
+		std::array<glm::vec4, 4> VertexPosition;
 		Ref<Buffer> VertexBuffer;
+
 		Ref<Shader> Shader;
+
+		std::map<unsigned int, Ref<Texture>> TextureSlots;
 		Ref<Texture> WhiteTexture;
+		std::array<glm::vec2, 4> TextureCoord;
 	};
 
 	static void Init();

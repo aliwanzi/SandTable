@@ -57,5 +57,10 @@ Ref<Texture> Texture2D::Create(unsigned int uiWidth, unsigned int uiHeight)
 	}
 }
 
+unsigned int Texture2D::GetRenderID() const
+{
+	return m_uiRenderID;
+}
+
 
 SAND_TABLE_NAMESPACE_END

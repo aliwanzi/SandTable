@@ -1,15 +1,16 @@
 #version 420 core
 out vec4 FragColor;
 
-in vec2 texcoord;
-in vec4 color;
+uniform sampler2D u_Textures[32];
 
-uniform sampler2D Texture;
-uniform vec4 Color;
-uniform float Factor;
+in VS_OUT {
+	vec4 v_Color;
+	vec2 v_TexCoord;
+	float v_TexIndex;
+	float v_TilingFactor;
+} fs_in;
 
 void main()
 {
-    //FragColor = texture(Texture, texcoord * Factor) * Color;
-    FragColor = color;
+    FragColor = texture(u_Textures[int(fs_in.v_TexIndex)], fs_in.v_TexCoord * fs_in.v_TilingFactor) * fs_in.v_Color;
 }

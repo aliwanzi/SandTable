@@ -11,6 +11,7 @@ public:
 	virtual int GetHeight() const override;
 	static Ref<Texture> Create(const std::string& sPath);
 	static Ref<Texture> Create(unsigned int uiWidth, unsigned int uiHeight);
+	virtual unsigned int GetRenderID() const override;
 protected:
 	Texture2D(const std::string& sPath);
 	Texture2D(int iWidth, int iHeight);

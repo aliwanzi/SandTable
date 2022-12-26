@@ -16,7 +16,7 @@ Ref<Shader> Shader::Create(const std::vector<ShaderInfo>& vecShaderInfo, const s
 	}
 }
 
-const char* Shader::ReadFile(const std::string& sFilepath)
+std::string Shader::ReadFile(const std::string& sFilepath)
 {
 	std::ifstream ifSteam(sFilepath, std::ios::in | std::ios::binary); // ifstream closes itself due to RAII
 	if (ifSteam)
@@ -29,7 +29,7 @@ const char* Shader::ReadFile(const std::string& sFilepath)
 			sResult.resize(stSize);
 			ifSteam.seekg(0, std::ios::beg);
 			ifSteam.read(&sResult[0], stSize);
-			return sResult.c_str();
+			return sResult;
 		}
 		else
 		{
@@ -40,7 +40,7 @@ const char* Shader::ReadFile(const std::string& sFilepath)
 	{
 		LOG_DEV_ERROR("Could not open file '{0}'", sFilepath);
 	}
-	return nullptr;
+	return "";
 }
 
 void ShaderLibrary::Add(const Ref<Shader>& spShader)

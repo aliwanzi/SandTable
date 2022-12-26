@@ -45,6 +45,7 @@ public:
 	virtual void SetInt2(const std::string& sName, const glm::ivec2& vec2Value) = 0;
 	virtual void SetInt3(const std::string& sName, const glm::ivec3& vec3Value) = 0;
 	virtual void SetInt4(const std::string& sName, const glm::ivec4& vec4Value) = 0;
+	virtual void SetIntArray(const std::string& sName, const int* pValues, unsigned int uiCount) = 0;
 
 	virtual void SetBool(const std::string& sName, bool bValue) = 0;
 	virtual const std::string& GetName() const = 0;
@@ -52,7 +53,7 @@ public:
 	static Ref<Shader> Create(const std::vector<ShaderInfo>& vecShaderInfo, const std::string& sShaderName = "shader");
 
 protected:
-	const char* ReadFile(const std::string& filepath);
+	std::string ReadFile(const std::string& filepath);
 	Shader() = default;
 
 private:

@@ -43,13 +43,16 @@ OpenGLTexture2D::OpenGLTexture2D(int iWidth, int iHeight) :
 	m_uiInternalFormat(GL_RGBA8), m_uiDataFormat(GL_RGBA), Texture2D(iWidth, iHeight)
 {
 	SAND_TABLE_PROFILE_FUNCTION();
-	glCreateTextures(GL_TEXTURE_2D, 1, &m_uiRenderID);
+	glGenTextures(1, &m_uiRenderID);
+	glBindTexture(GL_TEXTURE_2D, m_uiRenderID);
 	glTextureStorage2D(m_uiRenderID, 1, m_uiInternalFormat, m_iWidth, m_iHeight);
 
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+
+	glBindTexture(GL_TEXTURE_2D, 0);
 }
 
 OpenGLTexture2D::OpenGLTexture2D(const std::string& sPath):
@@ -71,25 +74,26 @@ OpenGLTexture2D::OpenGLTexture2D(const std::string& sPath):
 	glBindTexture(GL_TEXTURE_2D, m_uiRenderID);
 	glTexImage2D(GL_TEXTURE_2D, 0, m_uiInternalFormat, m_iWidth, m_iHeight, 0,
 		m_uiDataFormat, GL_UNSIGNED_BYTE, pImageData);
-	glGenerateMipmap(GL_TEXTURE_2D);
 
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
+	glBindTexture(GL_TEXTURE_2D, 0);
+
 	stbi_image_free(pImageData);
 }
 
 OpenGLTexture2D::~OpenGLTexture2D()
 {
-	//SAND_TABLE_PROFILE_FUNCTION();
 	glDeleteTextures(1, &m_uiRenderID);
 }
 
 void OpenGLTexture2D::Bind(unsigned int uiPos) const
 {
-	glBindTextureUnit(uiPos, m_uiRenderID);
+	glActiveTexture(GL_TEXTURE0 + uiPos);
+	glBindTexture(GL_TEXTURE_2D, m_uiRenderID);
 }
 
 void OpenGLTexture2D::SetData(void* pData, unsigned int uiSize)
