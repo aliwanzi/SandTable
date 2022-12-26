@@ -7,6 +7,16 @@
 
 SAND_TABLE_NAMESPACE_BEGIN
 
+struct OrthoGraphicCameraBounds
+{
+	float Left;
+	float Right;
+	float Bottom;
+	float Top;
+	float GetWidth() { return Right - Left; }
+	float GetHeight() { return Top - Bottom; }
+};
+
 class OrthoGraphicCameraController
 {
 public:
@@ -16,6 +26,7 @@ public:
 	float GetZoomLevel()const;
 	void OnUpdate(TimeStep timeStep);
 	void OnEvent(Event& event);
+	OrthoGraphicCameraBounds GetOrthoGraphicCameraBounds();
 private:
 	bool OnMouseScrolled(MouseScrolledEvent& event);
 	bool OnWindowResized(WindowResizedEvent& event);

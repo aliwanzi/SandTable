@@ -61,8 +61,8 @@ WindowsWindow::~WindowsWindow()
 
 void WindowsWindow::OnUpdate()
 {
-	glfwPollEvents();
 	m_spContext->SwapBuffers();
+	glfwPollEvents();
 }
 
 inline unsigned int WindowsWindow::GetWindowWidth() const

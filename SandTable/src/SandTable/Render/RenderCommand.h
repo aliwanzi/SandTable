@@ -10,7 +10,8 @@ public:
 	static void SetClearColor(const glm::vec4& vec4Color);
 	static void SetViewPort(unsigned int uiWidth, unsigned int uiHeight);
 	static void Clear();
-	static void DrawVertex(const Ref<VertexArray>& spVertexArray, uint32_t uiIndexCount = 0);
+	static void DrawVertex(const Ref<VertexArray>& spVertexArray, unsigned int uiIndexCount);
+	static void DrawVertex(const Ref<VertexArray>& spVertexArray);
 private:
 	static Ref<RenderAPI> m_spRenderAPI;
 };

@@ -121,7 +121,7 @@ void Render2D::DrawQuad(const glm::vec3& vec3Position, float fRotation, const gl
 		NextBatch();
 	}
 	glm::mat4 matTransform = glm::translate(glm::mat4(1.f), vec3Position)
-		* glm::rotate(glm::mat4(1.f), glm::radians(fRotation), glm::vec3(0.f, 0.f, 1.f))
+		* glm::rotate(glm::mat4(1.f), fRotation, glm::vec3(0.f, 0.f, 1.f))
 		* glm::scale(glm::mat4(1.f), glm::vec3(vec2Size, 1.f));
 
 	for (int i = 0; i < 4; i++)

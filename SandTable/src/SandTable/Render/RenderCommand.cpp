@@ -24,10 +24,16 @@ void RenderCommand::Clear()
 	m_spRenderAPI->Clear();
 }
 
-void RenderCommand::DrawVertex(const Ref<VertexArray>& spVertexArray,uint32_t uiIndexCount)
+void RenderCommand::DrawVertex(const Ref<VertexArray>& spVertexArray,unsigned int uiIndexCount)
 {
 	spVertexArray->Bind();
-	m_spRenderAPI->DrawVertex(spVertexArray, uiIndexCount);
+	m_spRenderAPI->DrawElements(uiIndexCount);
+}
+
+void RenderCommand::DrawVertex(const Ref<VertexArray>& spVertexArray)
+{
+	unsigned int uiIndexCount = spVertexArray->GetIndexBuffer()->GetIndex().size();
+	DrawVertex(spVertexArray, uiIndexCount);
 }
 
 SAND_TABLE_NAMESPACE_END

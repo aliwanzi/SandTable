@@ -29,10 +29,9 @@ void OpenGLRenderAPI::Clear()
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 }
 
-void OpenGLRenderAPI::DrawVertex(const Ref<VertexArray>& spVertexArray, uint32_t uiIndexCount)
+void OpenGLRenderAPI::DrawElements(unsigned int uiIndexCount)
 {
-	auto uiCount = uiIndexCount == 0 ? spVertexArray->GetIndexBuffer()->GetIndex().size() : uiIndexCount;
-	glDrawElements(GL_TRIANGLES, uiCount, GL_UNSIGNED_INT, nullptr);
+	glDrawElements(GL_TRIANGLES, uiIndexCount, GL_UNSIGNED_INT, nullptr);
 }
 
 SAND_TABLE_NAMESPACE_END

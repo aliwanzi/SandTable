@@ -80,6 +80,16 @@ void OrthoGraphicCameraController::OnEvent(Event& event)
 	dispatcher.Dispatch<WindowResizedEvent>(BIND_EVENT_FUN(OrthoGraphicCameraController::OnWindowResized));
 }
 
+OrthoGraphicCameraBounds OrthoGraphicCameraController::GetOrthoGraphicCameraBounds()
+{
+	OrthoGraphicCameraBounds orthoGraphicCameraBounds;
+	orthoGraphicCameraBounds.Left = -m_fAspectRatio * m_fZoomLevel;
+	orthoGraphicCameraBounds.Right = m_fAspectRatio * m_fZoomLevel;
+	orthoGraphicCameraBounds.Bottom = -m_fZoomLevel;
+	orthoGraphicCameraBounds.Top = m_fZoomLevel;
+	return orthoGraphicCameraBounds;
+}
+
 bool OrthoGraphicCameraController::OnMouseScrolled(MouseScrolledEvent& event)
 {
 	m_fZoomLevel -= event.GetYOffset() * m_fCameraZoomSpeed;

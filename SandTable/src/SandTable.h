@@ -21,3 +21,5 @@
 #include "SandTable/Render/Texture/Texture2D.h"
 #include "SandTable/Render/Camera/OrthoGraphicCameraController.h"
 
+#include "SandTable/ParticleSystem/ParticleSystem2D.h"
+

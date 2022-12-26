@@ -25,5 +25,8 @@ private:
 	glm::vec4 m_vec4Color;
 
 	std::vector<ProfileResult> m_vecProfileResult;
+
+	Ref<ParticleSystem2D> m_spParticleSystem2D;
+	ParticleProps m_Particle;
 };
 
