@@ -29,7 +29,6 @@ void Render2D::Init()
 	std::dynamic_pointer_cast<VertexBuffer>(m_spRender2DStroge->VertexBuffer)->SetVertexBufferLayout(spVertexBufferLayout);
 	m_spRender2DStroge->VertexArray->AddVertexBuffer(m_spRender2DStroge->VertexBuffer);
 
-	m_spRender2DStroge->Vertex.reserve(m_spRender2DStroge->MaxVertices);
 	m_spRender2DStroge->VertexPosition[0] = glm::vec4(-0.5f, -0.5f, 0.0f, 1.0f);
 	m_spRender2DStroge->VertexPosition[1] = glm::vec4( 0.5f, -0.5f, 0.0f, 1.0f);
 	m_spRender2DStroge->VertexPosition[2] = glm::vec4( 0.5f,  0.5f, 0.0f, 1.0f);
@@ -78,7 +77,6 @@ void Render2D::Init()
 	int uiWiteTextureData = 0xffffffff;
 	m_spRender2DStroge->WhiteTexture = Texture2D::Create(1, 1);
 	m_spRender2DStroge->WhiteTexture->SetData(&uiWiteTextureData, sizeof(uiWiteTextureData));
-	m_spRender2DStroge->TextureSlots[m_spRender2DStroge->WhiteTexture->GetRenderID()] = m_spRender2DStroge->WhiteTexture;
 }
 
 void Render2D::ShutDown()
@@ -89,13 +87,11 @@ void Render2D::BeginScene(const Ref<OrthoGraphicCamera>& spOrthoGraphicCamera)
 {
 	m_spRender2DStroge->Shader->Bind();
 	m_spRender2DStroge->Shader->SetMat4("ViewProjection", spOrthoGraphicCamera->GetViewProjectionMatrix());
-	m_spRender2DStroge->Vertex.clear();
+	StartBatch();
 }
 
 void Render2D::EndScene()
 {
-	std::dynamic_pointer_cast<VertexBuffer>(m_spRender2DStroge->VertexBuffer)->SetData
-	(&m_spRender2DStroge->Vertex[0], m_spRender2DStroge->Vertex.size() * sizeof(Vertex));
 	Flush();
 }
 
@@ -106,7 +102,11 @@ void Render2D::Flush()
 	{
 		iter.second->Bind(iIndex++);
 	}
+	std::dynamic_pointer_cast<VertexBuffer>(m_spRender2DStroge->VertexBuffer)->SetData
+	(&m_spRender2DStroge->Vertex[0], m_spRender2DStroge->Vertex.size() * sizeof(Vertex));
 	RenderCommand::DrawVertex(m_spRender2DStroge->VertexArray, m_spRender2DStroge->QuadIndexCount);
+
+	m_spRender2DStroge->Stats.DrawCalls++;
 }
 
 void Render2D::DrawQuad(const glm::vec2& vec2Position, float fRotation, const glm::vec2& vec2Size, const glm::vec4& vec4Color)
@@ -116,6 +116,10 @@ void Render2D::DrawQuad(const glm::vec2& vec2Position, float fRotation, const gl
 
 void Render2D::DrawQuad(const glm::vec3& vec3Position, float fRotation, const glm::vec2& vec2Size, const glm::vec4& vec4Color)
 {
+	if (m_spRender2DStroge->QuadIndexCount + 6 > m_spRender2DStroge->MaxIndices)
+	{
+		NextBatch();
+	}
 	glm::mat4 matTransform = glm::translate(glm::mat4(1.f), vec3Position)
 		* glm::rotate(glm::mat4(1.f), glm::radians(fRotation), glm::vec3(0.f, 0.f, 1.f))
 		* glm::scale(glm::mat4(1.f), glm::vec3(vec2Size, 1.f));
@@ -133,7 +137,7 @@ void Render2D::DrawQuad(const glm::vec3& vec3Position, float fRotation, const gl
 
 	m_spRender2DStroge->QuadIndexCount += 6;
 
-	SAND_TABLE_ASSERT(m_spRender2DStroge->Vertex.size() < m_spRender2DStroge->MaxVertices, "the vertices out of the side");
+	m_spRender2DStroge->Stats.QuadCount++;
 }
 
 void Render2D::DrawQuad(const glm::vec2& vec2Position, float fRotation, const glm::vec2& vec2Size, const Ref<Texture>& spTexture, 
@@ -145,9 +149,15 @@ void Render2D::DrawQuad(const glm::vec2& vec2Position, float fRotation, const gl
 void Render2D::DrawQuad(const glm::vec3& vec3Position, float fRotation, const glm::vec2& vec2Size, const Ref<Texture>& spTexture, 
 	float fFactor, const glm::vec4& vec4Color)
 {
-	if (m_spRender2DStroge->TextureSlots.find(spTexture->GetRenderID()) == m_spRender2DStroge->TextureSlots.end())
+	if (m_spRender2DStroge->TextureSlots.find(spTexture->GetRenderID()) 
+		== m_spRender2DStroge->TextureSlots.end())
 	{
 		m_spRender2DStroge->TextureSlots[spTexture->GetRenderID()] = spTexture;
+	}
+	if (m_spRender2DStroge->TextureSlots.size() == 31  //Texture0Î´Ê¹ÓÃ
+		|| m_spRender2DStroge->QuadIndexCount + 6 > m_spRender2DStroge->MaxIndices) 
+	{
+		NextBatch();
 	}
 
 	glm::mat4 matTransform = glm::translate(glm::mat4(1.f), vec3Position)
@@ -166,8 +176,32 @@ void Render2D::DrawQuad(const glm::vec3& vec3Position, float fRotation, const gl
 	}
 
 	m_spRender2DStroge->QuadIndexCount += 6;
+	m_spRender2DStroge->Stats.QuadCount++;
+}
 
-	SAND_TABLE_ASSERT(m_spRender2DStroge->Vertex.size() < m_spRender2DStroge->MaxVertices, "the vertices out of the side");
+void Render2D::ResetStats()
+{
+	m_spRender2DStroge->Stats.DrawCalls = m_spRender2DStroge->Stats.QuadCount = 0;
+}
+
+Render2D::Statistics Render2D::GetStats()
+{
+	return m_spRender2DStroge->Stats;
+}
+
+void Render2D::StartBatch()
+{
+	m_spRender2DStroge->QuadIndexCount = 0;
+	m_spRender2DStroge->Vertex.clear();
+	m_spRender2DStroge->Vertex.reserve(m_spRender2DStroge->MaxVertices);
+	m_spRender2DStroge->TextureSlots.clear();
+	m_spRender2DStroge->TextureSlots[m_spRender2DStroge->WhiteTexture->GetRenderID()] = m_spRender2DStroge->WhiteTexture;
+}
+
+void Render2D::NextBatch()
+{
+	Flush();
+	StartBatch();
 }
 
 SAND_TABLE_NAMESPACE_END

@@ -20,6 +20,15 @@ public:
 		float TilingFactor;
 	};
 
+	//Performance Test
+	struct Statistics
+	{
+		unsigned int DrawCalls;
+		unsigned int QuadCount;
+		unsigned int GetTotalVertexCount() { return QuadCount * 4; }
+		unsigned int GetTotalIndexCount() { return QuadCount * 6; }
+	};
+
 	struct Render2DStroge
 	{
 		unsigned int QuadIndexCount = 0;
@@ -38,6 +47,8 @@ public:
 		std::map<unsigned int, Ref<Texture>> TextureSlots;
 		Ref<Texture> WhiteTexture;
 		std::array<glm::vec2, 4> TextureCoord;
+
+		Statistics Stats;
 	};
 
 	static void Init();
@@ -52,7 +63,12 @@ public:
 		float fFactor = 1.0f, const glm::vec4& vec4Color = glm::vec4(1.0f));
 	static void DrawQuad(const glm::vec3& vec3Position, float fRotation, const glm::vec2& vec2Size, const Ref<Texture>& spTexture, 
 		float fFactor = 1.0f, const glm::vec4& vec4Color = glm::vec4(1.0f));
-private:																																			   
+
+	static void ResetStats();
+	static Statistics GetStats();
+private:
+	static void StartBatch();
+	static void NextBatch();
 	static Ref<Render2DStroge> m_spRender2DStroge;
 };
 
