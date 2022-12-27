@@ -21,6 +21,7 @@ private:
 	};
 	Ref<OrthoGraphicCameraController> m_spOrthoGraphicCameraController;
 	Ref<Texture> m_spTexture;
+	Ref<Texture> m_spTextureStar;
 
 	glm::vec4 m_vec4Color;
 

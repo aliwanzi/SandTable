@@ -12,5 +12,8 @@ in VS_OUT {
 
 void main()
 {
-    FragColor = texture(u_Textures[int(fs_in.v_TexIndex)], fs_in.v_TexCoord * fs_in.v_TilingFactor) * fs_in.v_Color;
+	vec4 texColor=texture(u_Textures[int(fs_in.v_TexIndex)], fs_in.v_TexCoord * fs_in.v_TilingFactor);
+	if(texColor.a < 0.1)
+		discard;
+    FragColor = texColor * fs_in.v_Color;
 }

@@ -97,10 +97,9 @@ void Render2D::EndScene()
 
 void Render2D::Flush()
 {
-	int iIndex(1);
 	for (auto iter : m_spRender2DStroge->TextureSlots)
 	{
-		iter.second->Bind(iIndex++);
+		iter.second->Bind(iter.first);
 	}
 	std::dynamic_pointer_cast<VertexBuffer>(m_spRender2DStroge->VertexBuffer)->SetData
 	(&m_spRender2DStroge->Vertex[0], m_spRender2DStroge->Vertex.size() * sizeof(Vertex));

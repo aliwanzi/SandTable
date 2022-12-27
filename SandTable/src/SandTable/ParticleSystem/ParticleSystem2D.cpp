@@ -47,7 +47,7 @@ void ParticleSystem2D::OnRender(const Ref<OrthoGraphicCamera>& spOrthoGraphicCam
 		glm::vec4 color = glm::lerp(particle.ColorEnd, particle.ColorBegin, life);
 
 		float size = glm::lerp(particle.SizeEnd, particle.SizeBegin, life);
-		Render2D::DrawQuad(glm::vec3(particle.Position.x, particle.Position.y, 0.2f), particle.Rotation, glm::vec2(size), color);
+		Render2D::DrawQuad(glm::vec3(particle.Position.x, particle.Position.y, 0.2f), particle.Rotation, glm::vec2(size), particle.RefTexture);
 	}
 	Render2D::EndScene();
 }
@@ -72,6 +72,8 @@ void ParticleSystem2D::Emit(const ParticleProps& particleProps)
 	particle.LifeRemaining = particleProps.LifeTime;
 	particle.SizeBegin = particleProps.SizeBegin + particleProps.SizeVariation * (Random::Float() - 0.5f);
 	particle.SizeEnd = particleProps.SizeEnd;
+
+	particle.RefTexture = particleProps.RefTexture;
 
 	m_vecParticlePool.emplace_back(particle);
 }

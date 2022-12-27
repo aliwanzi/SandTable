@@ -2,7 +2,7 @@
 #include "SandTable/Core/Core.h"
 #include "SandTable/Core/TimeStep.h"
 #include "SandTable/Render/Camera/OrthoGraphicCamera.h"
-#include "SandTable/Render/Shader.h"
+#include "SandTable/Render/Texture/Texture2D.h"
 #include <glm/glm.hpp>
 
 SAND_TABLE_NAMESPACE_BEGIN
@@ -18,6 +18,7 @@ struct ParticleProps
 	float SizeEnd;
 	float SizeVariation;
 	float LifeTime;
+	Ref<Texture> RefTexture;
 };
 
 class ParticleSystem2D
@@ -42,6 +43,8 @@ private:
 
 		float LifeTime;
 		float LifeRemaining;
+
+		Ref<Texture> RefTexture;
 
 		bool Active;
 	};

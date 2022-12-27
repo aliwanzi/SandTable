@@ -15,6 +15,7 @@ SandBox2DLayer::~SandBox2DLayer()
 void SandBox2DLayer::OnAttach()
 {
 	m_spTexture = Texture2D::Create("assets/textures/Checkerboard.png");
+	m_spTextureStar = Texture2D::Create("assets/textures/Star.png");
 
 	m_spParticleSystem2D = CreateRef<ParticleSystem2D>();
 
@@ -27,7 +28,7 @@ void SandBox2DLayer::OnAttach()
 	m_Particle.SizeEnd = 0.0f;
 	m_Particle.SizeVariation = 0.3f;
 	m_Particle.LifeTime = 1.0f;
-
+	m_Particle.RefTexture = m_spTextureStar;
 }
 
 void SandBox2DLayer::OnDetach()
