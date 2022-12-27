@@ -1,12 +1,12 @@
 #pragma once
 #include "SandTable/Render/Camera/OrthoGraphicCameraController.h"
+#include "SandTable/Render/Texture/SubTexture2D.h"
 #include <map>
 
 SAND_TABLE_NAMESPACE_BEGIN
 class VertexArray;
 class Buffer;
 class Shader;
-class Texture;
 
 class Render2D
 {
@@ -44,7 +44,7 @@ public:
 
 		Ref<Shader> Shader;
 
-		std::map<unsigned int, Ref<Texture>> TextureSlots;
+		std::unordered_map<unsigned int, Ref<Texture>> TextureSlots;
 		Ref<Texture> WhiteTexture;
 		std::array<glm::vec2, 4> TextureCoord;
 
@@ -62,6 +62,10 @@ public:
 	static void DrawQuad(const glm::vec2& vec2Position, float fRotation, const glm::vec2& vec2Size, const Ref<Texture>& spTexture, 
 		float fFactor = 1.0f, const glm::vec4& vec4Color = glm::vec4(1.0f));
 	static void DrawQuad(const glm::vec3& vec3Position, float fRotation, const glm::vec2& vec2Size, const Ref<Texture>& spTexture, 
+		float fFactor = 1.0f, const glm::vec4& vec4Color = glm::vec4(1.0f));
+	static void DrawQuad(const glm::vec2& vec2Position, float fRotation, const glm::vec2& vec2Size, const Ref<SubTexture2D>& spSubTexture2D,
+		float fFactor = 1.0f, const glm::vec4& vec4Color = glm::vec4(1.0f));
+	static void DrawQuad(const glm::vec3& vec3Position, float fRotation, const glm::vec2& vec2Size, const Ref<SubTexture2D>& spSubTexture2D,
 		float fFactor = 1.0f, const glm::vec4& vec4Color = glm::vec4(1.0f));
 
 	static void ResetStats();

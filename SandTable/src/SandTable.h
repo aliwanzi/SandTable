@@ -18,7 +18,7 @@
 #include "SandTable/Render/Buffer/VertexBuffer.h"
 #include "SandTable/Render/Buffer/IndexBuffer.h"
 #include "SandTable/Render/Shader.h"
-#include "SandTable/Render/Texture/Texture2D.h"
+#include "SandTable/Render/Texture/SubTexture2D.h"
 #include "SandTable/Render/Camera/OrthoGraphicCameraController.h"
 
 #include "SandTable/ParticleSystem/ParticleSystem2D.h"

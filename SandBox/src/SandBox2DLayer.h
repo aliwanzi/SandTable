@@ -23,6 +23,9 @@ private:
 	Ref<Texture> m_spTexture;
 	Ref<Texture> m_spTextureStar;
 
+	Ref<Texture> m_spTextureSprite;
+	Ref<SubTexture2D> m_spSubTexStairs, m_spSubTexBarrel, m_spSubTexTree;
+
 	glm::vec4 m_vec4Color;
 
 	std::vector<ProfileResult> m_vecProfileResult;

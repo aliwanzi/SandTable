@@ -17,6 +17,11 @@ void SandBox2DLayer::OnAttach()
 	m_spTexture = Texture2D::Create("assets/textures/Checkerboard.png");
 	m_spTextureStar = Texture2D::Create("assets/textures/Star.png");
 
+	m_spTextureSprite = Texture2D::Create("assets/games/textures/RPGpack_sheet_2X.png");
+	m_spSubTexStairs = CreateRef<SubTexture2D>(m_spTextureSprite, glm::vec2(7, 6), glm::vec2(128, 128));
+	m_spSubTexBarrel = CreateRef<SubTexture2D>(m_spTextureSprite, glm::vec2(1, 11), glm::vec2(128, 128));
+	m_spSubTexTree = CreateRef<SubTexture2D>(m_spTextureSprite, glm::vec2(2, 1), glm::vec2(128, 128), glm::vec2(1.f, 2.f));
+
 	m_spParticleSystem2D = CreateRef<ParticleSystem2D>();
 
 	m_Particle.Position = glm::vec2(0.0f);
@@ -52,29 +57,29 @@ void SandBox2DLayer::OnUpdate(const TimeStep& timeStep)
 		RenderCommand::Clear();
 	}
 
-	{
-		static float fRotation = 0.f;
-		fRotation += timeStep * 20.f;
-		SAND_TABLE_PROFILE_SCOPE("Render Draw");
-		Render2D::BeginScene(m_spOrthoGraphicCameraController->GetCamera());
-		Render2D::DrawQuad(glm::vec2( 1.f, 0.f), glm::radians(-45.f), glm::vec2(0.8f, 0.8f), glm::vec4(0.8f, 0.2f, 0.3f, 1.0f));
-		Render2D::DrawQuad(glm::vec2(-1.f, 0.f), 0.f, glm::vec2(0.8f, 0.8f), glm::vec4(0.8f, 0.2f, 0.3f, 1.0f));
-		Render2D::DrawQuad(glm::vec2(0.5f, -0.5f), 0.f, glm::vec2(0.5f, 0.75f), glm::vec4(0.2f, 0.3f, 0.8f, 1.0f));
-		Render2D::DrawQuad(glm::vec3(0.f, 0.f, -0.1f), 0.f, glm::vec2(20.f, 20.f), m_spTexture, 10.f);
-		Render2D::DrawQuad(glm::vec2(-2.f, 0.f), glm::radians(fRotation), glm::vec2(1.f, 1.f), m_spTexture, 20.f);
-		Render2D::EndScene();
+	//{
+	//	static float fRotation = 0.f;
+	//	fRotation += timeStep * 20.f;
+	//	SAND_TABLE_PROFILE_SCOPE("Render Draw");
+	//	Render2D::BeginScene(m_spOrthoGraphicCameraController->GetCamera());
+	//	Render2D::DrawQuad(glm::vec2( 1.f, 0.f), glm::radians(-45.f), glm::vec2(0.8f, 0.8f), glm::vec4(0.8f, 0.2f, 0.3f, 1.0f));
+	//	Render2D::DrawQuad(glm::vec2(-1.f, 0.f), 0.f, glm::vec2(0.8f, 0.8f), glm::vec4(0.8f, 0.2f, 0.3f, 1.0f));
+	//	Render2D::DrawQuad(glm::vec2(0.5f, -0.5f), 0.f, glm::vec2(0.5f, 0.75f), glm::vec4(0.2f, 0.3f, 0.8f, 1.0f));
+	//	Render2D::DrawQuad(glm::vec3(0.f, 0.f, -0.1f), 0.f, glm::vec2(20.f, 20.f), m_spTexture, 10.f);
+	//	Render2D::DrawQuad(glm::vec2(-2.f, 0.f), glm::radians(fRotation), glm::vec2(1.f, 1.f), m_spTexture, 20.f);
+	//	Render2D::EndScene();
 
-		Render2D::BeginScene(m_spOrthoGraphicCameraController->GetCamera());
-		for (float y = -5.f; y < 5.f; y += 0.5f)
-		{
-			for (float x = -5.f; x < 5.f; x += 0.5f)
-			{
-				glm::vec4 color = glm::vec4((x + 5.f) / 10.f, 0.4f, (y + 5.0f) / 10.0f,0.7f);
-				Render2D::DrawQuad(glm::vec2(x, y), 0.f, glm::vec2(0.45f), color);
-			}
-		}
-		Render2D::EndScene();
-	}
+	//	Render2D::BeginScene(m_spOrthoGraphicCameraController->GetCamera());
+	//	for (float y = -5.f; y < 5.f; y += 0.5f)
+	//	{
+	//		for (float x = -5.f; x < 5.f; x += 0.5f)
+	//		{
+	//			glm::vec4 color = glm::vec4((x + 5.f) / 10.f, 0.4f, (y + 5.0f) / 10.0f,0.7f);
+	//			Render2D::DrawQuad(glm::vec2(x, y), 0.f, glm::vec2(0.45f), color);
+	//		}
+	//	}
+	//	Render2D::EndScene();
+	//}
 
 	if (Input::IsMouseButtonPressed(Mouse::ButtonLeft))
 	{
@@ -91,6 +96,13 @@ void SandBox2DLayer::OnUpdate(const TimeStep& timeStep)
 			m_spParticleSystem2D->Emit(m_Particle);
 		}
 	}
+
+	Render2D::BeginScene(m_spOrthoGraphicCameraController->GetCamera());
+	Render2D::DrawQuad(glm::vec3(0.f, 0.f, 0.5f), 0.f, glm::vec2(1.f), m_spSubTexStairs);
+	Render2D::DrawQuad(glm::vec3(1.f, 0.f, 0.5f), 0.f, glm::vec2(1.f), m_spSubTexBarrel);
+	Render2D::DrawQuad(glm::vec3(-1.f, 0.f, 0.5f), 0.f, glm::vec2(1.f,2.f), m_spSubTexTree);
+	Render2D::EndScene();
+
 	m_spParticleSystem2D->OnUpdate(timeStep);
 	m_spParticleSystem2D->OnRender(m_spOrthoGraphicCameraController->GetCamera());
 }

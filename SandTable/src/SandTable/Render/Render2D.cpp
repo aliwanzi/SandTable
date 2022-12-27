@@ -3,7 +3,6 @@
 #include "SandTable/Render/VertexArray.h"
 #include "SandTable/Render/Shader.h"
 #include "SandTable/Render/RenderCommand.h"
-#include "SandTable/Render/Texture/Texture2D.h"
 #include "SandTable/Debug/Instrumentor.h"
 
 SAND_TABLE_NAMESPACE_BEGIN
@@ -177,6 +176,47 @@ void Render2D::DrawQuad(const glm::vec3& vec3Position, float fRotation, const gl
 	m_spRender2DStroge->QuadIndexCount += 6;
 	m_spRender2DStroge->Stats.QuadCount++;
 }
+
+void Render2D::DrawQuad(const glm::vec2& vec2Position, float fRotation, const glm::vec2& vec2Size, const Ref<SubTexture2D>& spSubTexture2D,
+	float fFactor, const glm::vec4& vec4Color)
+{
+	DrawQuad(glm::vec3(vec2Position, 0.f), fRotation, vec2Size, spSubTexture2D, fFactor, vec4Color);
+}
+
+void Render2D::DrawQuad(const glm::vec3& vec3Position, float fRotation, const glm::vec2& vec2Size, const Ref<SubTexture2D>& spSubTexture2D,
+	float fFactor, const glm::vec4& vec4Color)
+{
+	auto spRefTexture2D = spSubTexture2D->GetTexture();
+	if (m_spRender2DStroge->TextureSlots.find(spRefTexture2D->GetRenderID())
+		== m_spRender2DStroge->TextureSlots.end())
+	{
+		m_spRender2DStroge->TextureSlots[spRefTexture2D->GetRenderID()] = spRefTexture2D;
+	}
+	if (m_spRender2DStroge->TextureSlots.size() == 31  //Texture0Î´Ê¹ÓÃ
+		|| m_spRender2DStroge->QuadIndexCount + 6 > m_spRender2DStroge->MaxIndices)
+	{
+		NextBatch();
+	}
+
+	glm::mat4 matTransform = glm::translate(glm::mat4(1.f), vec3Position)
+		* glm::rotate(glm::mat4(1.f), glm::radians(fRotation), glm::vec3(0.f, 0.f, 1.f))
+		* glm::scale(glm::mat4(1.f), glm::vec3(vec2Size, 1.f));
+
+	for (int i = 0; i < 4; i++)
+	{
+		Vertex vertex;
+		vertex.Position = matTransform * m_spRender2DStroge->VertexPosition[i];
+		vertex.Color = vec4Color;
+		vertex.TexCoord = spSubTexture2D->GetTexCoord()[i];
+		vertex.TexIndex = spRefTexture2D->GetRenderID();
+		vertex.TilingFactor = fFactor;
+		m_spRender2DStroge->Vertex.emplace_back(vertex);
+	}
+
+	m_spRender2DStroge->QuadIndexCount += 6;
+	m_spRender2DStroge->Stats.QuadCount++;
+}
+
 
 void Render2D::ResetStats()
 {
