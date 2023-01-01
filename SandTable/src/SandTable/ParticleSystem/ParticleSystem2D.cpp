@@ -36,18 +36,31 @@ void ParticleSystem2D::OnRender(const Ref<OrthoGraphicCamera>& spOrthoGraphicCam
 {
 	Render2D::BeginScene(spOrthoGraphicCamera);
 
-	bool bDraw(false);
 	for (auto& particle : m_vecParticlePool)
 	{
 		if (!particle.Active)
 			continue;
-		bDraw = true;
 		// Fade away particles
 		float life = particle.LifeRemaining / particle.LifeTime;
-		glm::vec4 color = glm::lerp(particle.ColorEnd, particle.ColorBegin, life);
-
 		float size = glm::lerp(particle.SizeEnd, particle.SizeBegin, life);
-		Render2D::DrawQuad(glm::vec3(particle.Position.x, particle.Position.y, 0.2f), particle.Rotation, glm::vec2(size), particle.RefTexture);
+		switch (particle.ParticleType)
+		{
+			case ParticleRenderType::COLOR:
+			{
+				glm::vec4 color = glm::lerp(particle.ColorEnd, particle.ColorBegin, life);
+				Render2D::DrawQuad(glm::vec3(particle.Position.x, particle.Position.y, 0.2f), particle.Rotation, glm::vec2(size), color);
+				break;
+			}
+			case ParticleRenderType::TEXTURE:
+			{
+				SAND_TABLE_ASSERT(particle.RefTexture, "Texture is null in render particle");
+				Render2D::DrawQuad(glm::vec3(particle.Position.x, particle.Position.y, 0.2f), particle.Rotation, glm::vec2(size), particle.RefTexture);
+				break;
+			}
+			default:
+				break;
+		}
+		
 	}
 	Render2D::EndScene();
 }
@@ -73,6 +86,7 @@ void ParticleSystem2D::Emit(const ParticleProps& particleProps)
 	particle.SizeBegin = particleProps.SizeBegin + particleProps.SizeVariation * (Random::Float() - 0.5f);
 	particle.SizeEnd = particleProps.SizeEnd;
 
+	particle.ParticleType = particleProps.ParticleType;
 	particle.RefTexture = particleProps.RefTexture;
 
 	m_vecParticlePool.emplace_back(particle);

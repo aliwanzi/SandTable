@@ -33,6 +33,7 @@ void SandBox2DLayer::OnAttach()
 	m_Particle.SizeEnd = 0.0f;
 	m_Particle.SizeVariation = 0.3f;
 	m_Particle.LifeTime = 1.0f;
+	m_Particle.ParticleType = ParticleRenderType::TEXTURE;
 	m_Particle.RefTexture = m_spTextureStar;
 }
 
@@ -117,6 +118,7 @@ void SandBox2DLayer::OnImGuiRender()
 	ImGui::Text("Draw Vertices: %d", stats.GetTotalVertexCount());
 	ImGui::Text("Draw Indices: %d", stats.GetTotalIndexCount());
 	ImGui::End();
+	ImGui::ShowDemoWindow();
 }
 
 void SandBox2DLayer::OnEvent(Event& e)

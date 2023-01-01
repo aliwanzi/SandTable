@@ -7,6 +7,12 @@
 
 SAND_TABLE_NAMESPACE_BEGIN
 
+enum class ParticleRenderType
+{
+	COLOR = 0,
+	TEXTURE
+};
+
 struct ParticleProps
 {
 	glm::vec2 Position;
@@ -19,6 +25,7 @@ struct ParticleProps
 	float SizeVariation;
 	float LifeTime;
 	Ref<Texture> RefTexture;
+	ParticleRenderType ParticleType;
 };
 
 class ParticleSystem2D
@@ -44,6 +51,7 @@ private:
 		float LifeTime;
 		float LifeRemaining;
 
+		ParticleRenderType ParticleType;
 		Ref<Texture> RefTexture;
 
 		bool Active;
