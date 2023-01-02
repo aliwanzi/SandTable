@@ -9,9 +9,9 @@ Ref<Input> Input::m_spInput = Ref<WindowsInput>(new WindowsInput());
 
 bool WindowsInput::IsKeyPressedImpl(KeyCode keyCode)
 {
-	const auto& upWindow = Application::GetApplication()->GetWindow();
-	SAND_TABLE_ASSERT(upWindow, "WindowsInput get window failed");
-	auto glfwWindow = static_cast<GLFWwindow*>(upWindow->GetNativeWindow());
+	const auto& spWindow = Application::GetApplication()->GetWindow();
+	SAND_TABLE_ASSERT(spWindow, "WindowsInput get window failed");
+	auto glfwWindow = static_cast<GLFWwindow*>(spWindow->GetNativeWindow());
 	SAND_TABLE_ASSERT(glfwWindow, "WindowsInput get glfwWindow failed");
 
 	auto state = glfwGetKey(glfwWindow, keyCode);

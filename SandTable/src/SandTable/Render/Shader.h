@@ -1,6 +1,4 @@
 #pragma once
-#include "SandTable/Core/Core.h"
-#include <glm/glm.hpp>
 
 SAND_TABLE_NAMESPACE_BEGIN
 

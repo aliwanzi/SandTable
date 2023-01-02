@@ -1,5 +1,6 @@
 workspace "SandTable"
 	architecture "x64"
+	startproject "SandBox"
 
 	configurations
 	{
@@ -17,6 +18,7 @@ IncludeDir["GL3W"] = "SandTable/vendor/GL3W/include"
 IncludeDir["ImGui"] = "SandTable/vendor/imgui"
 IncludeDir["glm"] = "SandTable/vendor/glm"
 IncludeDir["stb_image"] = "SandTable/vendor/stb_image"
+IncludeDir["entt"]="SandTable/vendor/entt/include"
 
 include "SandTable/vendor/GLFW"
 include "SandTable/vendor/GL3W"
@@ -53,7 +55,8 @@ project "SandTable"
 		"%{IncludeDir.GL3W}",
 		"%{IncludeDir.ImGui}",
 		"%{IncludeDir.glm}",
-		"%{IncludeDir.stb_image}"
+		"%{IncludeDir.stb_image}",
+		"%{IncludeDir.entt}"
 	}
 
 	links
@@ -112,7 +115,8 @@ project "SandBox"
 		"SandTable/vendor/spdlog/include",
 		"SandTable/src",
 		"SandTable/vendor",
-		"%{IncludeDir.glm}"
+		"%{IncludeDir.glm}",
+		"%{IncludeDir.entt}"
 	}
 
 	links

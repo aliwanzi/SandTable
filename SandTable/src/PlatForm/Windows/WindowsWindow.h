@@ -21,7 +21,7 @@ public:
 	bool IsVSync() const override;
 	void* GetNativeWindow()const override;
 private:
-	virtual void Init(const WindowProps& windowPorps);
+	virtual void Init();
 	virtual void Shutdown();
 private:
 	static Ref<Context> m_spContext;

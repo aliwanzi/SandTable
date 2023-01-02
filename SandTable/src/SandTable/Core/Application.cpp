@@ -13,8 +13,8 @@ Ref<Application> Application::m_spApplication = nullptr;
 Application::Application() :m_bRunning(true), m_fLastFrameTime(0.f)
 {
 	SAND_TABLE_PROFILE_FUNCTION();
-	m_upWindow = Scope<Window>(Window::Create());
-	m_upWindow->SetEventCallback(BIND_EVENT_FUN(Application::OnEvent));
+	m_spWindow = Window::Create();
+	m_spWindow->SetEventCallback(BIND_EVENT_FUN(Application::OnEvent));
 }
 
 void Application::Init()
@@ -121,14 +121,14 @@ void Application::Run()
 
 			m_spImGuiLayer->EndNewFrame();
 		}
-		m_upWindow->OnUpdate();
+		m_spWindow->OnUpdate();
 	}
 }
 
-void Application::OnEvent(Event& event)
+void Application::OnEvent(Event& e)
 {
 	//SAND_TABLE_PROFILE_FUNCTION();
-	EventDispatcher dispatcher(event);
+	EventDispatcher dispatcher(e);
 	dispatcher.Dispatch<MouseButtonPressedEvent>(BIND_EVENT_FUN(Application::OnMouseButtonPressedEvent));
 	dispatcher.Dispatch<MouseButtonReleasedEvent>(BIND_EVENT_FUN(Application::OnMouseButtonReleasedEvent));
 	dispatcher.Dispatch<MouseMovedEvent>(BIND_EVENT_FUN(Application::OnMouseMovedEvent));
@@ -140,14 +140,19 @@ void Application::OnEvent(Event& event)
 	dispatcher.Dispatch<WindowCloseEvent>(BIND_EVENT_FUN(Application::OnWindowClosedEvent));
 
 	const auto& listLayers = m_spLayerStack->GetLayers();
-	for (auto iter = listLayers.begin(); iter != listLayers.end(); iter++)
+	for (auto iter = listLayers.rbegin(); iter != listLayers.rend(); iter++)
 	{
-		(*iter)->OnEvent(event);
-		if (event.Handle())
+		if (e.Handle)
 		{
 			break;
 		}
+		(*iter)->OnEvent(e);
 	}
+}
+
+void Application::BlockEvents(bool bBlock)
+{
+	m_spImGuiLayer->BlockEvents(bBlock);
 }
 
 void Application::PushLayer(Ref<Layer> spLayer)
@@ -166,19 +171,24 @@ void Application::PushOverlay(Ref<Layer> spLayer)
 	spLayer->OnAttach();
 }
 
+void Application::Close()
+{
+	m_bRunning = false;
+}
+
 int Application::GetWindowWidth() const
 {
-	return m_upWindow->GetWindowWidth();
+	return m_spWindow->GetWindowWidth();
 }
 
 int Application::GetWindowHeight() const
 {
-	return m_upWindow->GetWindowHeight();
+	return m_spWindow->GetWindowHeight();
 }
 
-const Scope<Window>& Application::GetWindow() const
+const Ref<Window>& Application::GetWindow() const
 {
-	return m_upWindow;
+	return m_spWindow;
 }
 
 Ref<Application> Application::GetApplication()

@@ -1,5 +1,4 @@
 #pragma once
-#include "SandTable/Core/Core.h"
 #include "SandTable/Core/Window.h"
 #include "SandTable/Core/LayerStack.h"
 #include "SandTable/ImGui/ImGuiLayer.h"
@@ -15,11 +14,13 @@ public:
 	virtual ~Application();
 	void Run();
 	void OnEvent(Event& event);
+	void BlockEvents(bool bBlock);
 	void PushLayer(Ref<Layer> spLayer);
 	void PushOverlay(Ref<Layer> spLayer);
+	void Close();
 	int GetWindowWidth() const;
 	int GetWindowHeight() const;
-	const Scope<Window>& GetWindow()const;
+	const Ref<Window>& GetWindow()const;
 
 	static Ref<Application> GetApplication();
 private:
@@ -44,7 +45,7 @@ private:
 	bool m_bMinimized;
 	float m_fLastFrameTime;
 
-	Scope<Window> m_upWindow;
+	Ref<Window> m_spWindow;
 	Ref<LayerStack> m_spLayerStack;
 	Ref<ImGuiLayer> m_spImGuiLayer;
 

@@ -7,7 +7,7 @@ SandBoxExampleLayer::SandBoxExampleLayer() :
 {
 	m_spOrthoGraphicCameraController = CreateRef<OrthoGraphicCameraController>
 		(static_cast<float>(Application::GetApplication()->GetWindowWidth()) /
-			static_cast<float>(Application::GetApplication()->GetWindowHeight()), true);
+			static_cast<float>(Application::GetApplication()->GetWindowHeight()));
 	//Texture
 	//VAO
 	m_spTextureArray = VertexArray::Create();

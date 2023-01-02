@@ -5,15 +5,15 @@
 
 SAND_TABLE_NAMESPACE_BEGIN
 
-OrthoGraphicCameraController::OrthoGraphicCameraController(float fAspectRatio, bool bRotation):
+OrthoGraphicCameraController::OrthoGraphicCameraController(float fAspectRatio):
 	m_fAspectRatio(fAspectRatio),
 	m_fZoomLevel(1.0f),
-	m_bRotation(bRotation),
 	m_vec3CameraPosition(glm::vec3(0.f)),
 	m_fCameraRotation(0.f),
 	m_fCameraTranslationSpeed(5.0f),
 	m_fCameraRotationSpeed(180.f),
-	m_fCameraZoomSpeed(0.25f)
+	m_fCameraZoomSpeed(0.25f),
+	m_fTimeStep(0.f)
 {
 	m_spOrthoGraphicCamera = CreateRef<OrthoGraphicCamera>(
 		-m_fAspectRatio * m_fZoomLevel, m_fAspectRatio * m_fZoomLevel, -m_fZoomLevel, m_fZoomLevel);
@@ -57,19 +57,16 @@ void OrthoGraphicCameraController::OnUpdate(TimeStep timeStep)
 		m_vec3CameraPosition.x += m_fCameraTranslationSpeed * timeStep;
 	}
 
-	if (m_bRotation)
+	if (Input::IsKeyPressed(Key::Q))
 	{
-		if (Input::IsKeyPressed(Key::Q))
-		{
-			m_fCameraRotation -= m_fCameraRotationSpeed * timeStep;
-		}
-		else if (Input::IsKeyPressed(Key::E))
-		{
-			m_fCameraRotation += m_fCameraRotationSpeed * timeStep;
-		}
-		m_spOrthoGraphicCamera->SetRotation(m_fCameraRotation);
+		m_fCameraRotation -= m_fCameraRotationSpeed * timeStep;
+	}
+	else if (Input::IsKeyPressed(Key::E))
+	{
+		m_fCameraRotation += m_fCameraRotationSpeed * timeStep;
 	}
 
+	m_spOrthoGraphicCamera->SetRotation(m_fCameraRotation);
 	m_spOrthoGraphicCamera->SetPosition(m_vec3CameraPosition);
 }
 
@@ -78,6 +75,13 @@ void OrthoGraphicCameraController::OnEvent(Event& event)
 	EventDispatcher dispatcher(event);
 	dispatcher.Dispatch<MouseScrolledEvent>(BIND_EVENT_FUN(OrthoGraphicCameraController::OnMouseScrolled));
 	dispatcher.Dispatch<WindowResizedEvent>(BIND_EVENT_FUN(OrthoGraphicCameraController::OnWindowResized));
+}
+
+void OrthoGraphicCameraController::OnResize(unsigned int uiWidth, unsigned int uiHeight)
+{
+	m_fAspectRatio = static_cast<float>(uiWidth) / static_cast<float>(uiHeight);
+	m_spOrthoGraphicCamera->SetProjection(-m_fAspectRatio * m_fZoomLevel,
+		m_fAspectRatio * m_fZoomLevel, -m_fZoomLevel, m_fZoomLevel);
 }
 
 OrthoGraphicCameraBounds OrthoGraphicCameraController::GetOrthoGraphicCameraBounds()
@@ -90,23 +94,20 @@ OrthoGraphicCameraBounds OrthoGraphicCameraController::GetOrthoGraphicCameraBoun
 	return orthoGraphicCameraBounds;
 }
 
-bool OrthoGraphicCameraController::OnMouseScrolled(MouseScrolledEvent& event)
+bool OrthoGraphicCameraController::OnMouseScrolled(MouseScrolledEvent& e)
 {
-	m_fZoomLevel -= event.GetYOffset() * m_fCameraZoomSpeed;
+	m_fZoomLevel -= e.GetYOffset() * m_fCameraZoomSpeed;
 	m_fZoomLevel = std::max(m_fZoomLevel, m_fCameraZoomSpeed);
 	m_spOrthoGraphicCamera->SetProjection(-m_fAspectRatio * m_fZoomLevel,
 		m_fAspectRatio * m_fZoomLevel, -m_fZoomLevel, m_fZoomLevel);
 	return false;
 }
 
-bool OrthoGraphicCameraController::OnWindowResized(WindowResizedEvent& event)
+bool OrthoGraphicCameraController::OnWindowResized(WindowResizedEvent& e)
 {
-	m_fAspectRatio = static_cast<float>(event.GetWidth()) / static_cast<float>(event.GetHeight());
-	m_spOrthoGraphicCamera->SetProjection(-m_fAspectRatio * m_fZoomLevel,
-		m_fAspectRatio * m_fZoomLevel, -m_fZoomLevel, m_fZoomLevel);
+	OnResize(e.GetWidth(), e.GetHeight());
 	return false;
 }
-
 
 SAND_TABLE_NAMESPACE_END
 

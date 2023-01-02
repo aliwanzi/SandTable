@@ -1,5 +1,4 @@
 #pragma once
-#include "SandTable/Core/Logger.h"
 
 SAND_TABLE_NAMESPACE_BEGIN
 
@@ -39,13 +38,12 @@ public:
 	virtual const char* GetName() const = 0;
 	virtual int GetCategoryFlags() const = 0;
 	virtual std::string ToString() const { return GetName(); }
-	bool Handle() { return m_Handled; }
 	inline bool IsInCategory(EventCategory category)
 	{
 		return GetCategoryFlags() & category;
 	}
-protected:
-	bool m_Handled = false;
+public:
+	bool Handle = false;
 };
 
 class EventDispatcher
@@ -63,7 +61,8 @@ public:
 	{
 		if (m_event.GetEventType() == T::GetStaticType())
 		{
-			m_event.m_Handled |= func(static_cast<T&>(m_event));
+			m_event.Handle |= func(static_cast<T&>(m_event));
+			return true;
 		}
 		return false;
 	}

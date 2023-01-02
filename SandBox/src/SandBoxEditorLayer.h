@@ -3,13 +3,14 @@
 #include <imgui/imgui.h>
 using namespace SandTable;
 
-class SandBox2DLayer :public Layer
+class SandBoxEditorLayer:public Layer
 {
 public:
-	SandBox2DLayer();
-	~SandBox2DLayer();
+	SandBoxEditorLayer();
+	~SandBoxEditorLayer();
 	virtual void OnAttach() override;
 	virtual void OnDetach() override;
+
 	virtual void OnUpdate(const TimeStep& timeStep) override;
 	virtual void OnImGuiRender() override;
 	void OnEvent(Event& e) override;
@@ -25,5 +26,9 @@ private:
 
 	Ref<ParticleSystem2D> m_spParticleSystem2D;
 	ParticleProps m_Particle;
+
+	Ref<Buffer> m_spFrameBuffer;
+
+	bool m_bRenderWindowActive;
 };
 

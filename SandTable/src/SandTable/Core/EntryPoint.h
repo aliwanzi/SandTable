@@ -1,6 +1,5 @@
 #pragma once
 #include "SandTable/Core/Application.h"
-#include "SandTable/Core/Logger.h"
 
 #ifdef SAND_TABLE_PLATFORM_WINDOWS
 

@@ -20,29 +20,32 @@ struct OrthoGraphicCameraBounds
 class OrthoGraphicCameraController
 {
 public:
-	OrthoGraphicCameraController(float fAspectRatio, bool bRotation = false);
+	OrthoGraphicCameraController(float fAspectRatio);
 	const std::shared_ptr<OrthoGraphicCamera>& GetCamera()const;
 	void SetZoomLevel(float fZoomLevel);
 	float GetZoomLevel()const;
 	void OnUpdate(TimeStep timeStep);
 	void OnEvent(Event& event);
+	void OnResize(unsigned int uiWidth, unsigned int uiHeight);
 	OrthoGraphicCameraBounds GetOrthoGraphicCameraBounds();
 private:
-	bool OnMouseScrolled(MouseScrolledEvent& event);
-	bool OnWindowResized(WindowResizedEvent& event);
+	bool OnMouseScrolled(MouseScrolledEvent& e);
+	bool OnWindowResized(WindowResizedEvent& e);
+
 private:
 	Ref<OrthoGraphicCamera> m_spOrthoGraphicCamera;
 
 	float m_fAspectRatio;
 	float m_fZoomLevel;
 
-	bool m_bRotation;
 	float m_fCameraRotation;
 	glm::vec3 m_vec3CameraPosition;
 
 	float m_fCameraTranslationSpeed;
 	float m_fCameraRotationSpeed;
 	float m_fCameraZoomSpeed;
+
+	float m_fTimeStep;
 };
 
 

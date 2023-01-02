@@ -1,5 +1,4 @@
 #pragma once
-#include <glm/glm.hpp>
 #include "SandTable/Render/VertexArray.h"
 
 SAND_TABLE_NAMESPACE_BEGIN

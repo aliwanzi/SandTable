@@ -15,6 +15,12 @@
 #include <unordered_map>
 #include <unordered_set>
 
+#include "SandTable/Core/Core.h"
+#include "SandTable/Core/Logger.h"
+#include "SandTable/Debug/Instrumentor.h"
+
+#include "glm/glm.hpp"
+
 #ifdef SAND_TABLE_PLATFORM_WINDOWS
 	#include <Windows.h>
 #endif // SAND_TABLE_PLATFORM_WINDOWS

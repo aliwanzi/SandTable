@@ -1,5 +1,4 @@
 #pragma once
-#include "SandTable/Core/Core.h"
 #include <random>
 
 SAND_TABLE_NAMESPACE_BEGIN

@@ -1,16 +1,8 @@
 #pragma once
-
-#include "SandTable/Core/Core.h"
-#include "SandTable/Core/Logger.h"
-
-#include <algorithm>
 #include <chrono>
-#include <fstream>
 #include <iomanip>
-#include <string>
 #include <thread>
 #include <mutex>
-#include <sstream>
 
 SAND_TABLE_NAMESPACE_BEGIN
 
@@ -71,14 +63,7 @@ private:
 
 SAND_TABLE_NAMESPACE_END
 
-#if SAND_TABLE_PROFILE
-	#define SAND_TABLE_PROFILE_BEGIN_SESSION(sName,sFilePath) ::SandTable::Instrumentor::GetInstrumentor()->BeginSession(sName,sFilePath);
-	#define SAND_TABLE_PROFILE_END_SESSION() ::SandTable::Instrumentor::GetInstrumentor()->EndSession();
-	#define SAND_TABLE_PROFILE_SCOPE(sName) ::SandTable::InstrumentationTimer timer##__LINE__(sName);
-	#define SAND_TABLE_PROFILE_FUNCTION() SAND_TABLE_PROFILE_SCOPE(__FUNCSIG__)
-#else
-	#define SAND_TABLE_PROFILE_BEGIN_SESSION(sName,sFilePath)
-	#define SAND_TABLE_PROFILE_END_SESSION()
-	#define SAND_TABLE_PROFILE_SCOPE(sName)
-	#define SAND_TABLE_PROFILE_FUNCTION()
-#endif
+#define SAND_TABLE_PROFILE_BEGIN_SESSION(sName,sFilePath) ::SandTable::Instrumentor::GetInstrumentor()->BeginSession(sName,sFilePath);
+#define SAND_TABLE_PROFILE_END_SESSION() ::SandTable::Instrumentor::GetInstrumentor()->EndSession();
+#define SAND_TABLE_PROFILE_SCOPE(sName) ::SandTable::InstrumentationTimer timer##__LINE__(sName);
+#define SAND_TABLE_PROFILE_FUNCTION() SAND_TABLE_PROFILE_SCOPE(__FUNCSIG__)

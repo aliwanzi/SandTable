@@ -8,7 +8,7 @@
 
 SAND_TABLE_NAMESPACE_BEGIN
 
-ImGuiLayer::ImGuiLayer() :Layer("ImguiLayer"), m_bShowDemoWindow(true), m_fTime(0.f)
+ImGuiLayer::ImGuiLayer() :Layer("ImguiLayer"), m_bBlockEvents(true)
 {
 
 }
@@ -63,6 +63,11 @@ void ImGuiLayer::OnDetach()
 	ImGui::DestroyContext();
 }
 
+void ImGuiLayer::OnEvent(Event& e)
+{
+	e.Handle = m_bBlockEvents;
+}
+
 void ImGuiLayer::BeginNewFrame()
 {
 	ImGui_ImplOpenGL3_NewFrame();
@@ -84,6 +89,11 @@ void ImGuiLayer::EndNewFrame()
 		ImGui::RenderPlatformWindowsDefault();
 		glfwMakeContextCurrent(backup_current_context);
 	}
+}
+
+void ImGuiLayer::BlockEvents(bool bBlock)
+{
+	m_bBlockEvents = bBlock;
 }
 
 SAND_TABLE_NAMESPACE_END

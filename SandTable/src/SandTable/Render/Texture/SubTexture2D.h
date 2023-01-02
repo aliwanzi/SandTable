@@ -1,6 +1,5 @@
 #pragma once
 #include "SandTable/Render/Texture/Texture2D.h"
-#include <glm/glm.hpp>
 
 SAND_TABLE_NAMESPACE_BEGIN
 class SubTexture2D

@@ -43,15 +43,10 @@ namespace
 
 }
 
-Window* Window::Create(const WindowProps& windowPorps)
-{
-	return new WindowsWindow(windowPorps);
-}
-
-WindowsWindow::WindowsWindow(const WindowProps& windowPorps)
+WindowsWindow::WindowsWindow(const WindowProps& m_WindowProps):Window(m_WindowProps)
 {
 	SAND_TABLE_PROFILE_FUNCTION();
-	Init(windowPorps);
+	Init();
 }
 
 WindowsWindow::~WindowsWindow()
@@ -97,29 +92,29 @@ void* WindowsWindow::GetNativeWindow() const
 	return m_pGLFWWindow;
 }
 
-void WindowsWindow::Init(const WindowProps& windowPorps)
+void WindowsWindow::Init()
 {
 	SAND_TABLE_PROFILE_FUNCTION();
 
 	LOG_DEV_INFO("Creating window {0} ({1}, {2})",
-		windowPorps.Title, windowPorps.Width, windowPorps.Height);
+		m_WindowProps.Title, m_WindowProps.Width, m_WindowProps.Height);
 	bool bInit = glfwInit();
 	SAND_TABLE_ASSERT(bInit, "Failed to initialize GLFW");
 
-	m_windowCallBack.Width = windowPorps.Width;
-	m_windowCallBack.Height = windowPorps.Height;
+	m_windowCallBack.Width = m_WindowProps.Width;
+	m_windowCallBack.Height = m_WindowProps.Height;
 
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, windowPorps.MajorVersion);
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, windowPorps.MinorVersion);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, m_WindowProps.MajorVersion);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, m_WindowProps.MinorVersion);
 
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
-	glfwWindowHint(GLFW_SAMPLES, windowPorps.Samples);
+	glfwWindowHint(GLFW_SAMPLES, m_WindowProps.Samples);
 
 	{
 		SAND_TABLE_PROFILE_SCOPE("glfw Create Window")
-		m_pGLFWWindow = glfwCreateWindow(windowPorps.Width,
-			windowPorps.Height, windowPorps.Title.c_str(), nullptr, nullptr);
+		m_pGLFWWindow = glfwCreateWindow(m_WindowProps.Width,
+			m_WindowProps.Height, m_WindowProps.Title.c_str(), nullptr, nullptr);
 	}
 
 	SAND_TABLE_ASSERT(m_pGLFWWindow, "Failed to creat GLFW window");

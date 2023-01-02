@@ -1,7 +1,6 @@
 #pragma once
 #include "SandTable/Render/Camera/OrthoGraphicCameraController.h"
 #include "SandTable/Render/Texture/SubTexture2D.h"
-#include <map>
 
 SAND_TABLE_NAMESPACE_BEGIN
 class VertexArray;

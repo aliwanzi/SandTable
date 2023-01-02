@@ -1,18 +1,17 @@
-#include "SandBox2DLayer.h"
-#include <glm/gtc/type_ptr.hpp>
+#include "SandBoxEditorLayer.h"
 
-SandBox2DLayer::SandBox2DLayer():m_vec4Color(glm::vec4(0.2f, 0.3f, 0.8f, 1.0f))
+SandBoxEditorLayer::SandBoxEditorLayer() :m_vec4Color(glm::vec4(0.2f, 0.3f, 0.8f, 1.0f)),m_bRenderWindowActive(true)
 {
 	m_spOrthoGraphicCameraController = CreateRef<OrthoGraphicCameraController>
 		(static_cast<float>(Application::GetApplication()->GetWindowWidth()) /
 			static_cast<float>(Application::GetApplication()->GetWindowHeight()));
 }
 
-SandBox2DLayer::~SandBox2DLayer()
+SandBoxEditorLayer::~SandBoxEditorLayer()
 {
 }
 
-void SandBox2DLayer::OnAttach()
+void SandBoxEditorLayer::OnAttach()
 {
 	m_spTexture = Texture2D::Create("assets/textures/Checkerboard.png");
 	m_spTextureStar = Texture2D::Create("assets/textures/Star.png");
@@ -35,21 +34,29 @@ void SandBox2DLayer::OnAttach()
 	m_Particle.LifeTime = 1.0f;
 	m_Particle.ParticleType = ParticleRenderType::TEXTURE;
 	m_Particle.RefTexture = m_spTextureStar;
+
+	auto spFrameBufferSpecification = CreateRef<FrameBufferSpecification>
+		(Application::GetApplication()->GetWindowWidth(), Application::GetApplication()->GetWindowHeight());
+
+	m_spFrameBuffer = FrameBuffer::Create(spFrameBufferSpecification);
 }
 
-void SandBox2DLayer::OnDetach()
+void SandBoxEditorLayer::OnDetach()
 {
 
 }
 
-void SandBox2DLayer::OnUpdate(const TimeStep& timeStep)
+void SandBoxEditorLayer::OnUpdate(const TimeStep& timeStep)
 {
-	SAND_TABLE_PROFILE_SCOPE("SandBox2DLayer::OnUpdate");
+	SAND_TABLE_PROFILE_SCOPE("SandBoxEditorLayer::OnUpdate");
 
+	if(m_bRenderWindowActive)
 	{
 		SAND_TABLE_PROFILE_SCOPE("CameraController::OnUpdate");
 		m_spOrthoGraphicCameraController->OnUpdate(timeStep);
 	}
+
+	m_spFrameBuffer->Bind();
 
 	Render2D::ResetStats();
 	{
@@ -84,7 +91,7 @@ void SandBox2DLayer::OnUpdate(const TimeStep& timeStep)
 
 	if (Input::IsMouseButtonPressed(Mouse::ButtonLeft))
 	{
-		auto mousePos= Input::GetMousePos();
+		auto mousePos = Input::GetMousePos();
 		float width = Application::GetApplication()->GetWindowWidth();
 		float height = Application::GetApplication()->GetWindowHeight();
 		auto cameraBound = m_spOrthoGraphicCameraController->GetOrthoGraphicCameraBounds();
@@ -101,15 +108,80 @@ void SandBox2DLayer::OnUpdate(const TimeStep& timeStep)
 	Render2D::BeginScene(m_spOrthoGraphicCameraController->GetCamera());
 	Render2D::DrawQuad(glm::vec3(0.f, 0.f, 0.5f), 0.f, glm::vec2(1.f), m_spSubTexStairs);
 	Render2D::DrawQuad(glm::vec3(1.f, 0.f, 0.5f), 0.f, glm::vec2(1.f), m_spSubTexBarrel);
-	Render2D::DrawQuad(glm::vec3(-1.f, 0.f, 0.5f), 0.f, glm::vec2(1.f,2.f), m_spSubTexTree);
+	Render2D::DrawQuad(glm::vec3(-1.f, 0.f, 0.5f), 0.f, glm::vec2(1.f, 2.f), m_spSubTexTree);
 	Render2D::EndScene();
 
 	m_spParticleSystem2D->OnUpdate(timeStep);
 	m_spParticleSystem2D->OnRender(m_spOrthoGraphicCameraController->GetCamera());
+
+	m_spFrameBuffer->UnBind();
 }
 
-void SandBox2DLayer::OnImGuiRender()
+void SandBoxEditorLayer::OnImGuiRender()
 {
+	static bool opt_dockSpaceOpen = true;
+	static bool opt_fullscreen = true;
+	static bool opt_padding = false;
+	static ImGuiDockNodeFlags dockspace_flags = ImGuiDockNodeFlags_None;
+
+	// We are using the ImGuiWindowFlags_NoDocking flag to make the parent window not dockable into,
+	// because it would be confusing to have two docking targets within each others.
+	ImGuiWindowFlags window_flags = ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoDocking;
+	if (opt_fullscreen)
+	{
+		ImGuiViewport* viewport = ImGui::GetMainViewport();
+		ImGui::SetNextWindowPos(viewport->GetWorkPos());
+		ImGui::SetNextWindowSize(viewport->GetWorkSize());
+		ImGui::SetNextWindowViewport(viewport->ID);
+		ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
+		ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
+		window_flags |= ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove;
+		window_flags |= ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoNavFocus;
+	}
+	else
+	{
+		dockspace_flags &= ~ImGuiDockNodeFlags_PassthruCentralNode;
+	}
+
+	// When using ImGuiDockNodeFlags_PassthruCentralNode, DockSpace() will render our background
+	// and handle the pass-thru hole, so we ask Begin() to not render a background.
+	if (dockspace_flags & ImGuiDockNodeFlags_PassthruCentralNode)
+		window_flags |= ImGuiWindowFlags_NoBackground;
+
+	// Important: note that we proceed even if Begin() returns false (aka window is collapsed).
+	// This is because we want to keep our DockSpace() active. If a DockSpace() is inactive,
+	// all active windows docked into it will lose their parent and become undocked.
+	// We cannot preserve the docking relationship between an active window and an inactive docking, otherwise
+	// any change of dockspace/settings would lead to windows being stuck in limbo and never being visible.
+	if (!opt_padding)
+		ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
+	ImGui::Begin("DockSpace Demo", &opt_dockSpaceOpen, window_flags);
+	if (!opt_padding)
+		ImGui::PopStyleVar();
+
+	if (opt_fullscreen)
+		ImGui::PopStyleVar(2);
+
+	// DockSpace
+	ImGuiIO& io = ImGui::GetIO();
+	if (io.ConfigFlags & ImGuiConfigFlags_DockingEnable)
+	{
+		ImGuiID dockspace_id = ImGui::GetID("MyDockSpace");
+		ImGui::DockSpace(dockspace_id, ImVec2(0.0f, 0.0f), dockspace_flags);
+	}
+
+	if (ImGui::BeginMenuBar())
+	{
+		if (ImGui::BeginMenu("File"))
+		{
+			if (ImGui::MenuItem("Exit")) { Application::GetApplication()->Close(); }
+			ImGui::EndMenu();
+		}
+		ImGui::EndMenuBar();
+	}
+
+	ImGui::End();
+
 	ImGui::Begin("Settings");
 	auto stats = Render2D::GetStats();
 	ImGui::Text("Renderer2D Stats:");
@@ -118,10 +190,24 @@ void SandBox2DLayer::OnImGuiRender()
 	ImGui::Text("Draw Vertices: %d", stats.GetTotalVertexCount());
 	ImGui::Text("Draw Indices: %d", stats.GetTotalIndexCount());
 	ImGui::End();
-	ImGui::ShowDemoWindow();
+
+	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
+	ImGui::Begin("viewport");
+	m_bRenderWindowActive = ImGui::IsWindowHovered();
+	Application::GetApplication()->BlockEvents(!m_bRenderWindowActive);
+	auto contentRegion = ImGui::GetContentRegionAvail();
+	//LOG_DEV_INFO("viewport size: {0},{1}", contentRegion.x, contentRegion.y);
+	auto spFrameBuffer = std::dynamic_pointer_cast<FrameBuffer>(m_spFrameBuffer);
+	SAND_TABLE_ASSERT(spFrameBuffer, "FrameBuffer is null in Edit Layer");
+	spFrameBuffer->Resize(contentRegion.x, contentRegion.y);
+	m_spOrthoGraphicCameraController->OnResize(contentRegion.x, contentRegion.y);
+	auto uiTextureID = spFrameBuffer->GetColorAttachment();
+	ImGui::Image((void*)uiTextureID, contentRegion, ImVec2(0, 1), ImVec2(1, 0));
+	ImGui::End();
+	ImGui::PopStyleVar();
 }
 
-void SandBox2DLayer::OnEvent(Event& e)
+void SandBoxEditorLayer::OnEvent(Event& e)
 {
 	m_spOrthoGraphicCameraController->OnEvent(e);
 }

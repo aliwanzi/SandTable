@@ -1,5 +1,4 @@
 #pragma once
-#include <functional>
 
 #include "SandTable/Events/MouseEvent.h"
 #include "SandTable/Events/KeyEvent.h"
@@ -45,7 +44,15 @@ public:
 
 	virtual void* GetNativeWindow()const = 0;
 
-	static Window* Create(const WindowProps& windowPorps = WindowProps());
+	static Ref<Window> Create(const WindowProps& windowPorps = WindowProps());
+protected:
+	Window(const WindowProps& windowPorps);
+private:
+	Window() = delete;
+	Window(Window&) = delete;
+	Window& operator=(const Window&) = delete;
+protected:
+	WindowProps m_WindowProps;
 };
 
 SAND_TABLE_NAMESPACE_END

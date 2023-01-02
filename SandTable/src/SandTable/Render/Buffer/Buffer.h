@@ -1,6 +1,4 @@
 #pragma once
-#include "SandTable/Core/Logger.h"
-
 SAND_TABLE_NAMESPACE_BEGIN
 
 class Buffer

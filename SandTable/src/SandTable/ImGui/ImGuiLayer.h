@@ -1,5 +1,4 @@
 #pragma once
-#include "SandTable/Core/Core.h"
 #include "SandTable/Core/Layer.h"
 
 SAND_TABLE_NAMESPACE_BEGIN
@@ -11,11 +10,12 @@ public:
 	~ImGuiLayer();
 	virtual void OnAttach() override;
 	virtual void OnDetach() override;
+	virtual void OnEvent(Event&) override;
 	void BeginNewFrame();
 	void EndNewFrame();
+	void BlockEvents(bool bBlock);
 private:
-	bool m_bShowDemoWindow;
-	float m_fTime;
+	bool m_bBlockEvents;
 };
 
 SAND_TABLE_NAMESPACE_END

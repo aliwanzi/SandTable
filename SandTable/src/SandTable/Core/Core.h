@@ -11,8 +11,6 @@
 
 #define BIND_EVENT_FUN(x) std::bind(&x, this, std::placeholders::_1)
 
-#define SAND_TABLE_PROFILE 1
-
 #ifndef SAND_TABLE_NAMESPACE_BEGIN
 #define SAND_TABLE_NAMESPACE_BEGIN \
 	namespace SandTable {
