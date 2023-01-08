@@ -18,8 +18,10 @@
 #include "SandTable/Core/Core.h"
 #include "SandTable/Core/Logger.h"
 #include "SandTable/Debug/Instrumentor.h"
+#include "SandTable/Core/TimeStep.h"
 
-#include "glm/glm.hpp"
+#include <glm/glm.hpp>
+#include <glm/gtc/type_ptr.hpp>
 
 #ifdef SAND_TABLE_PLATFORM_WINDOWS
 	#include <Windows.h>

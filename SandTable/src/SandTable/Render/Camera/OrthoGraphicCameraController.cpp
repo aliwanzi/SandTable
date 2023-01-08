@@ -5,8 +5,7 @@
 
 SAND_TABLE_NAMESPACE_BEGIN
 
-OrthoGraphicCameraController::OrthoGraphicCameraController(float fAspectRatio):
-	m_fAspectRatio(fAspectRatio),
+OrthoGraphicCameraController::OrthoGraphicCameraController(unsigned int uiWidth, unsigned int uiHeight):
 	m_fZoomLevel(1.0f),
 	m_vec3CameraPosition(glm::vec3(0.f)),
 	m_fCameraRotation(0.f),
@@ -15,8 +14,8 @@ OrthoGraphicCameraController::OrthoGraphicCameraController(float fAspectRatio):
 	m_fCameraZoomSpeed(0.25f),
 	m_fTimeStep(0.f)
 {
-	m_spOrthoGraphicCamera = CreateRef<OrthoGraphicCamera>(
-		-m_fAspectRatio * m_fZoomLevel, m_fAspectRatio * m_fZoomLevel, -m_fZoomLevel, m_fZoomLevel);
+	m_fAspectRatio = static_cast<float>(uiWidth) / static_cast<float>(uiHeight);
+	m_spOrthoGraphicCamera = CreateRef<OrthoGraphicCamera>(2 * m_fZoomLevel, m_fAspectRatio);
 }
 
 const std::shared_ptr<OrthoGraphicCamera>& OrthoGraphicCameraController::GetCamera() const

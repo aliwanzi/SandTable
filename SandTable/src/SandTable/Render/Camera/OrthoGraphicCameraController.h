@@ -3,7 +3,6 @@
 #include "SandTable/Events/ApplicationEvent.h"
 #include "SandTable/Events/KeyEvent.h"
 #include "SandTable/Events/MouseEvent.h"
-#include "SandTable/Core/TimeStep.h"
 
 SAND_TABLE_NAMESPACE_BEGIN
 
@@ -20,7 +19,7 @@ struct OrthoGraphicCameraBounds
 class OrthoGraphicCameraController
 {
 public:
-	OrthoGraphicCameraController(float fAspectRatio);
+	OrthoGraphicCameraController(unsigned int uiWidth, unsigned int uiHeight);
 	const std::shared_ptr<OrthoGraphicCamera>& GetCamera()const;
 	void SetZoomLevel(float fZoomLevel);
 	float GetZoomLevel()const;

@@ -30,5 +30,13 @@ private:
 	Ref<Buffer> m_spFrameBuffer;
 
 	bool m_bRenderWindowActive;
+	ImVec2 m_vec2RenderViewPort;
+
+	Ref<Scene> m_spScene;
+	Ref<Entity> m_spSquareEntity;
+	Ref<Entity> m_spCameraEntity;
+
+	//panel
+	Ref<SceneHierarchyPanel> m_spSceneHierarchyPanel;
 };
 

@@ -1,5 +1,4 @@
 #pragma once
-#include "SandTable/Core/TimeStep.h"
 #include "SandTable/Render/Camera/OrthoGraphicCamera.h"
 #include "SandTable/Render/Texture/Texture2D.h"
 

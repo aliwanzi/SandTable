@@ -9,6 +9,7 @@
 #include "SandTable/Core/Input.h"
 
 #include "SandTable/ImGui/ImGuiLayer.h"
+#include "SandTable/ImGui/SceneHierarchyPanel.h"
 
 #include "SandTable/Render/Render.h"
 #include "SandTable/Render/Render2D.h"
@@ -20,6 +21,10 @@
 #include "SandTable/Render/Shader.h"
 #include "SandTable/Render/Texture/SubTexture2D.h"
 #include "SandTable/Render/Camera/OrthoGraphicCameraController.h"
+
+#include "SandTable/Scene/Scene.h"
+#include "SandTable/Scene/Components.h"
+#include "SandTable/Scene/Entity.h"
 
 #include "SandTable/ParticleSystem/ParticleSystem2D.h"
 

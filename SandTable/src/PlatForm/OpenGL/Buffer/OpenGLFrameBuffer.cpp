@@ -55,10 +55,10 @@ void OpenGLFrameBuffer::UnBind() const
 
 void OpenGLFrameBuffer::Resize(unsigned int uiWidth, unsigned int uiHeight)
 {
-	if ((uiWidth == m_spFrameBufferSpecification->Width && uiHeight != m_spFrameBufferSpecification->Height)
+	if ((uiWidth == m_spFrameBufferSpecification->Width && uiHeight == m_spFrameBufferSpecification->Height)
 		|| (uiWidth <= 0 || uiHeight <= 0))
 	{
-		LOG_DEV_ERROR("Attachment to resize framebuffer to {0},{1}", uiWidth, uiHeight);
+		//LOG_DEV_ERROR("Attachment to resize framebuffer to {0},{1}", uiWidth, uiHeight);
 		return;
 	}
 

@@ -3,8 +3,10 @@
 SandBoxEditorLayer::SandBoxEditorLayer() :m_vec4Color(glm::vec4(0.2f, 0.3f, 0.8f, 1.0f)),m_bRenderWindowActive(true)
 {
 	m_spOrthoGraphicCameraController = CreateRef<OrthoGraphicCameraController>
-		(static_cast<float>(Application::GetApplication()->GetWindowWidth()) /
-			static_cast<float>(Application::GetApplication()->GetWindowHeight()));
+		(Application::GetApplication()->GetWindowWidth(), Application::GetApplication()->GetWindowHeight());
+
+	m_spScene = CreateRef<Scene>();
+	m_spSceneHierarchyPanel = CreateRef<SceneHierarchyPanel>(m_spScene);
 }
 
 SandBoxEditorLayer::~SandBoxEditorLayer()
@@ -21,24 +23,33 @@ void SandBoxEditorLayer::OnAttach()
 	m_spSubTexBarrel = CreateRef<SubTexture2D>(m_spTextureSprite, glm::vec2(1, 11), glm::vec2(128, 128));
 	m_spSubTexTree = CreateRef<SubTexture2D>(m_spTextureSprite, glm::vec2(2, 1), glm::vec2(128, 128), glm::vec2(1.f, 2.f));
 
-	m_spParticleSystem2D = CreateRef<ParticleSystem2D>();
-
-	m_Particle.Position = glm::vec2(0.0f);
-	m_Particle.Velocity = glm::vec2(0.0f);
-	m_Particle.VelocityVariation = glm::vec2(3.0f, 1.0f);
-	m_Particle.ColorBegin = glm::vec4(254 / 255.0f, 212 / 255.0f, 123 / 255.0f, 1.0f);
-	m_Particle.ColorEnd = glm::vec4(254 / 255.0f, 109 / 255.0f, 41 / 255.0f, 1.0f);
-	m_Particle.SizeBegin = 0.5f;
-	m_Particle.SizeEnd = 0.0f;
-	m_Particle.SizeVariation = 0.3f;
-	m_Particle.LifeTime = 1.0f;
-	m_Particle.ParticleType = ParticleRenderType::TEXTURE;
-	m_Particle.RefTexture = m_spTextureStar;
 
 	auto spFrameBufferSpecification = CreateRef<FrameBufferSpecification>
 		(Application::GetApplication()->GetWindowWidth(), Application::GetApplication()->GetWindowHeight());
 
 	m_spFrameBuffer = FrameBuffer::Create(spFrameBufferSpecification);
+
+	m_spSquareEntity = m_spScene->CreateEntity("Square Entity");
+	m_spSquareEntity->AddComponent<SpriteRenderComponent>(glm::vec4(0.f, 1.f, 0.f, 1.f));
+
+	m_spCameraEntity = m_spScene->CreateEntity("Camera Entity");
+	m_spCameraEntity->AddComponent<CameraComponent>(m_spOrthoGraphicCameraController->GetCamera());
+
+	class CameraController :public ScriptableEntity
+	{
+	public:
+		virtual void OnCreate()
+		{
+			LOG_DEV_INFO("On Create");
+		}
+
+		virtual void OnUpdate(TimeStep ts)
+		{
+			auto& transform = GetComponent<TransformComponent>().Transform;
+
+		}
+	};
+	m_spCameraEntity->AddComponent<NativeScriptComponent>().Bind<CameraController>();
 }
 
 void SandBoxEditorLayer::OnDetach()
@@ -50,69 +61,28 @@ void SandBoxEditorLayer::OnUpdate(const TimeStep& timeStep)
 {
 	SAND_TABLE_PROFILE_SCOPE("SandBoxEditorLayer::OnUpdate");
 
+	auto spFrameBuffer = std::dynamic_pointer_cast<FrameBuffer>(m_spFrameBuffer);
+	SAND_TABLE_ASSERT(spFrameBuffer, "FrameBuffer is null in Edit Layer");
+	auto spSpecification = spFrameBuffer->GetFrameBufferSpecification();
+	spFrameBuffer->Resize(m_vec2RenderViewPort.x, m_vec2RenderViewPort.y);
+	m_spOrthoGraphicCameraController->OnResize(m_vec2RenderViewPort.x, m_vec2RenderViewPort.y);
+
 	if(m_bRenderWindowActive)
 	{
 		SAND_TABLE_PROFILE_SCOPE("CameraController::OnUpdate");
 		m_spOrthoGraphicCameraController->OnUpdate(timeStep);
 	}
 
-	m_spFrameBuffer->Bind();
-
 	Render2D::ResetStats();
-	{
-		SAND_TABLE_PROFILE_SCOPE("Render Prep");
-		RenderCommand::SetClearColor(glm::vec4(glm::vec3(0.1f), 1.0f));
-		RenderCommand::Clear();
-	}
+	m_spFrameBuffer->Bind();
+	RenderCommand::SetClearColor(glm::vec4(glm::vec3(0.1f), 1.0f));
+	RenderCommand::Clear();
 
-	//{
-	//	static float fRotation = 0.f;
-	//	fRotation += timeStep * 20.f;
-	//	SAND_TABLE_PROFILE_SCOPE("Render Draw");
-	//	Render2D::BeginScene(m_spOrthoGraphicCameraController->GetCamera());
-	//	Render2D::DrawQuad(glm::vec2( 1.f, 0.f), glm::radians(-45.f), glm::vec2(0.8f, 0.8f), glm::vec4(0.8f, 0.2f, 0.3f, 1.0f));
-	//	Render2D::DrawQuad(glm::vec2(-1.f, 0.f), 0.f, glm::vec2(0.8f, 0.8f), glm::vec4(0.8f, 0.2f, 0.3f, 1.0f));
-	//	Render2D::DrawQuad(glm::vec2(0.5f, -0.5f), 0.f, glm::vec2(0.5f, 0.75f), glm::vec4(0.2f, 0.3f, 0.8f, 1.0f));
-	//	Render2D::DrawQuad(glm::vec3(0.f, 0.f, -0.1f), 0.f, glm::vec2(20.f, 20.f), m_spTexture, 10.f);
-	//	Render2D::DrawQuad(glm::vec2(-2.f, 0.f), glm::radians(fRotation), glm::vec2(1.f, 1.f), m_spTexture, 20.f);
-	//	Render2D::EndScene();
+	//Render2D::BeginScene(m_spOrthoGraphicCameraController->GetCamera());
 
-	//	Render2D::BeginScene(m_spOrthoGraphicCameraController->GetCamera());
-	//	for (float y = -5.f; y < 5.f; y += 0.5f)
-	//	{
-	//		for (float x = -5.f; x < 5.f; x += 0.5f)
-	//		{
-	//			glm::vec4 color = glm::vec4((x + 5.f) / 10.f, 0.4f, (y + 5.0f) / 10.0f,0.7f);
-	//			Render2D::DrawQuad(glm::vec2(x, y), 0.f, glm::vec2(0.45f), color);
-	//		}
-	//	}
-	//	Render2D::EndScene();
-	//}
+	m_spScene->OnUpdate(timeStep);
 
-	if (Input::IsMouseButtonPressed(Mouse::ButtonLeft))
-	{
-		auto mousePos = Input::GetMousePos();
-		float width = Application::GetApplication()->GetWindowWidth();
-		float height = Application::GetApplication()->GetWindowHeight();
-		auto cameraBound = m_spOrthoGraphicCameraController->GetOrthoGraphicCameraBounds();
-		auto cameraPos = m_spOrthoGraphicCameraController->GetCamera()->GetPositon();
-		auto x = (mousePos.x / width) * cameraBound.GetWidth() - cameraBound.GetWidth() * 0.5f;
-		auto y = cameraBound.GetHeight() * 0.5f - (mousePos.y / height) * cameraBound.GetHeight();
-		m_Particle.Position = glm::vec2(cameraPos.x + x, cameraPos.y + y);
-		for (int i = 0; i < 5; i++)
-		{
-			m_spParticleSystem2D->Emit(m_Particle);
-		}
-	}
-
-	Render2D::BeginScene(m_spOrthoGraphicCameraController->GetCamera());
-	Render2D::DrawQuad(glm::vec3(0.f, 0.f, 0.5f), 0.f, glm::vec2(1.f), m_spSubTexStairs);
-	Render2D::DrawQuad(glm::vec3(1.f, 0.f, 0.5f), 0.f, glm::vec2(1.f), m_spSubTexBarrel);
-	Render2D::DrawQuad(glm::vec3(-1.f, 0.f, 0.5f), 0.f, glm::vec2(1.f, 2.f), m_spSubTexTree);
-	Render2D::EndScene();
-
-	m_spParticleSystem2D->OnUpdate(timeStep);
-	m_spParticleSystem2D->OnRender(m_spOrthoGraphicCameraController->GetCamera());
+	//Render2D::EndScene();
 
 	m_spFrameBuffer->UnBind();
 }
@@ -182,6 +152,8 @@ void SandBoxEditorLayer::OnImGuiRender()
 
 	ImGui::End();
 
+	m_spSceneHierarchyPanel->OnImGuiRender();
+
 	ImGui::Begin("Settings");
 	auto stats = Render2D::GetStats();
 	ImGui::Text("Renderer2D Stats:");
@@ -189,20 +161,33 @@ void SandBoxEditorLayer::OnImGuiRender()
 	ImGui::Text("Draw Quads: %d", stats.QuadCount);
 	ImGui::Text("Draw Vertices: %d", stats.GetTotalVertexCount());
 	ImGui::Text("Draw Indices: %d", stats.GetTotalIndexCount());
+
+	if (m_spSquareEntity)
+	{
+		ImGui::Separator();
+		ImGui::Text("%s", m_spSquareEntity->GetComponent<TagComponent>().Tag.c_str());
+		auto& color = m_spSquareEntity->GetComponent<SpriteRenderComponent>().Color;
+		ImGui::ColorEdit4("Square Color", glm::value_ptr(color));
+		ImGui::Separator();
+	}
+
+	{
+		auto& vec4Pan = m_spCameraEntity->GetComponent<TransformComponent>().Transform[3];
+		ImGui::DragFloat3("Camera Transform",glm::value_ptr(vec4Pan));
+	}
+
 	ImGui::End();
 
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
 	ImGui::Begin("viewport");
 	m_bRenderWindowActive = ImGui::IsWindowHovered();
 	Application::GetApplication()->BlockEvents(!m_bRenderWindowActive);
-	auto contentRegion = ImGui::GetContentRegionAvail();
+	m_vec2RenderViewPort = ImGui::GetContentRegionAvail();
 	//LOG_DEV_INFO("viewport size: {0},{1}", contentRegion.x, contentRegion.y);
 	auto spFrameBuffer = std::dynamic_pointer_cast<FrameBuffer>(m_spFrameBuffer);
 	SAND_TABLE_ASSERT(spFrameBuffer, "FrameBuffer is null in Edit Layer");
-	spFrameBuffer->Resize(contentRegion.x, contentRegion.y);
-	m_spOrthoGraphicCameraController->OnResize(contentRegion.x, contentRegion.y);
 	auto uiTextureID = spFrameBuffer->GetColorAttachment();
-	ImGui::Image((void*)uiTextureID, contentRegion, ImVec2(0, 1), ImVec2(1, 0));
+	ImGui::Image((void*)uiTextureID, m_vec2RenderViewPort, ImVec2(0, 1), ImVec2(1, 0));
 	ImGui::End();
 	ImGui::PopStyleVar();
 }

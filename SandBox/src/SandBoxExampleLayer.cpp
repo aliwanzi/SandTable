@@ -1,13 +1,11 @@
 #include "SandBoxExampleLayer.h"
-#include <glm/gtc/type_ptr.hpp>
 
 SandBoxExampleLayer::SandBoxExampleLayer() :
 	Layer("SandBox"),
 	m_vec4Color(glm::vec4(0.2f, 0.3f, 0.8f,1.0f))
 {
 	m_spOrthoGraphicCameraController = CreateRef<OrthoGraphicCameraController>
-		(static_cast<float>(Application::GetApplication()->GetWindowWidth()) /
-			static_cast<float>(Application::GetApplication()->GetWindowHeight()));
+		(Application::GetApplication()->GetWindowWidth(), Application::GetApplication()->GetWindowHeight());
 	//Texture
 	//VAO
 	m_spTextureArray = VertexArray::Create();

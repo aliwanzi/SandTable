@@ -1,6 +1,5 @@
 #pragma once
 #include "SandTable/Events/Event.h"
-#include "SandTable/Core/TimeStep.h"
 
 SAND_TABLE_NAMESPACE_BEGIN
 

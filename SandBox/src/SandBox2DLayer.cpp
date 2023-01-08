@@ -1,11 +1,9 @@
 #include "SandBox2DLayer.h"
-#include <glm/gtc/type_ptr.hpp>
 
-SandBox2DLayer::SandBox2DLayer():m_vec4Color(glm::vec4(0.2f, 0.3f, 0.8f, 1.0f))
+SandBox2DLayer::SandBox2DLayer() :m_vec4Color(glm::vec4(0.2f, 0.3f, 0.8f, 1.0f))
 {
 	m_spOrthoGraphicCameraController = CreateRef<OrthoGraphicCameraController>
-		(static_cast<float>(Application::GetApplication()->GetWindowWidth()) /
-			static_cast<float>(Application::GetApplication()->GetWindowHeight()));
+		(Application::GetApplication()->GetWindowWidth(), Application::GetApplication()->GetWindowHeight());
 }
 
 SandBox2DLayer::~SandBox2DLayer()

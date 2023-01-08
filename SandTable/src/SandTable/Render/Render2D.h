@@ -52,19 +52,26 @@ public:
 
 	static void Init();
 	static void ShutDown();
-	static void BeginScene(const Ref<OrthoGraphicCamera>& spOrthoGraphicCamera);
+	static void BeginScene(const Ref<Camera>& spCamera);
+	static void BeginScene(const Ref<Camera>& spCamera, const glm::mat4& mat4Transform);
 	static void EndScene();
 	static void Flush();
 
 	static void DrawQuad(const glm::vec2& vec2Position, float fRotation, const glm::vec2& vec2Size, const glm::vec4& vec4Color);
 	static void DrawQuad(const glm::vec3& vec3Position, float fRotation, const glm::vec2& vec2Size, const glm::vec4& vec4Color);
+
 	static void DrawQuad(const glm::vec2& vec2Position, float fRotation, const glm::vec2& vec2Size, const Ref<Texture>& spTexture, 
 		float fFactor = 1.0f, const glm::vec4& vec4Color = glm::vec4(1.0f));
 	static void DrawQuad(const glm::vec3& vec3Position, float fRotation, const glm::vec2& vec2Size, const Ref<Texture>& spTexture, 
 		float fFactor = 1.0f, const glm::vec4& vec4Color = glm::vec4(1.0f));
+
 	static void DrawQuad(const glm::vec2& vec2Position, float fRotation, const glm::vec2& vec2Size, const Ref<SubTexture2D>& spSubTexture2D,
 		float fFactor = 1.0f, const glm::vec4& vec4Color = glm::vec4(1.0f));
 	static void DrawQuad(const glm::vec3& vec3Position, float fRotation, const glm::vec2& vec2Size, const Ref<SubTexture2D>& spSubTexture2D,
+		float fFactor = 1.0f, const glm::vec4& vec4Color = glm::vec4(1.0f));
+
+	static void DrawQuad(const glm::mat4& mat4Transform, const glm::vec4& vec4Color);
+	static void DrawQuad(const glm::mat4& mat4Transform, const Ref<Texture>& spTexture,
 		float fFactor = 1.0f, const glm::vec4& vec4Color = glm::vec4(1.0f));
 
 	static void ResetStats();
