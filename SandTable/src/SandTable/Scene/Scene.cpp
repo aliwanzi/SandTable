@@ -39,7 +39,7 @@ void Scene::OnUpdate(const TimeStep& timeStep)
 			if (nsc.Instance == nullptr)
 			{
 				nsc.InstantiateFunction();
-				nsc.Instance->SetEntity(CreateRef<Entity>(m_spRegistry, CreateRef<entt::entity>(entity)));
+				nsc.Instance->SetEntity(CreateRef<Entity>(m_spRegistry, entity));
 				nsc.Instance->OnCreate();
 			}
 

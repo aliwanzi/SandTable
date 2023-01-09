@@ -131,7 +131,7 @@ void SceneHierarchyPanel::OnImGuiRender()
 	auto spRegistry = m_spScene->Registry();
 	spRegistry->each([&](auto entity)
 		{
-			DrawEntityNode(CreateRef<Entity>(spRegistry, CreateRef<entt::entity>(entity)));
+			DrawEntityNode(CreateRef<Entity>(spRegistry, entity));
 		});
 
 	if (ImGui::IsMouseDown(0) && ImGui::IsWindowHovered())
@@ -186,7 +186,7 @@ void SceneHierarchyPanel::SetSelectedEntity(const Ref<Entity>& spEntity)
 void SceneHierarchyPanel::DrawEntityNode(const Ref<Entity>& spEntity)
 {
 	auto tagComponent = spEntity->GetComponent<TagComponent>();
-	ImGuiTreeNodeFlags flags = (*m_spSelectedEntity == spEntity ? ImGuiTreeNodeFlags_Selected : 0)
+	ImGuiTreeNodeFlags flags = (*m_spSelectedEntity == *spEntity ? ImGuiTreeNodeFlags_Selected : 0)
 		| ImGuiTreeNodeFlags_OpenOnArrow;
 	flags |= ImGuiTreeNodeFlags_SpanAvailWidth;
 	bool bOpened = ImGui::TreeNodeEx((void*)(uint64_t)(uint32_t)(*spEntity), flags, tagComponent.Tag.c_str());
@@ -199,7 +199,9 @@ void SceneHierarchyPanel::DrawEntityNode(const Ref<Entity>& spEntity)
 	if (ImGui::BeginPopupContextItem())
 	{
 		if (ImGui::MenuItem("Delete Entity"))
+		{
 			entityDeleted = true;
+		}
 
 		ImGui::EndPopup();
 	}
@@ -213,7 +215,7 @@ void SceneHierarchyPanel::DrawEntityNode(const Ref<Entity>& spEntity)
 	if (entityDeleted)
 	{
 		m_spScene->DestroyEntity(spEntity);
-		if (*m_spSelectedEntity == spEntity)
+		if (*m_spSelectedEntity == *spEntity)
 			m_spSelectedEntity = CreateRef<Entity>();
 	}
 

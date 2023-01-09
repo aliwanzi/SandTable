@@ -10,6 +10,13 @@ OrthoGraphicCamera::OrthoGraphicCamera(float fSize, float fAspectRatio, float fN
 	RecalculateProjectionMatrix();
 }
 
+OrthoGraphicCamera::OrthoGraphicCamera() :
+	m_fOrthoGraphicSize(10.f),
+	Camera(1.f, -1.f, 1.f, ProjectionType::Orthographic)
+{
+	RecalculateProjectionMatrix();
+}
+
 void OrthoGraphicCamera::SetOrthoSize(float fSize)
 {
 	m_fOrthoGraphicSize = fSize;
@@ -20,6 +27,8 @@ float OrthoGraphicCamera::GetOrthoSize() const
 {
 	return m_fOrthoGraphicSize;
 }
+
+
 
 void OrthoGraphicCamera::SetViewPortSize(unsigned int uiWidth, unsigned int uiHeight)
 {

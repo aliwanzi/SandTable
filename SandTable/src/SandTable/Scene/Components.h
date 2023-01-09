@@ -1,5 +1,6 @@
 #pragma once
-#include "SandTable/Render/Camera/Camera.h"
+#include "SandTable/Render/Camera/OrthoGraphicCamera.h"
+#include "SandTable/Render/Camera/PerspectiveGraphicCamera.h"
 #include "SandTable/Scene/Entity.h"
 #include "SandTable/Scene/ScriptableEntity.h"
 
@@ -58,9 +59,9 @@ struct SpriteRenderComponent
 
 struct CameraComponent
 {
-	Ref<SandTable::Camera> Camera;
-	bool Primary;
-	bool FixedAspectRation;
+	Ref<SandTable::Camera> Camera = CreateRef<OrthoGraphicCamera>();
+	bool Primary = true;
+	bool FixedAspectRation = false;
 	CameraComponent() = default;
 	CameraComponent(const CameraComponent&) = default;
 	CameraComponent& operator =(const CameraComponent&) = default;

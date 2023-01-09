@@ -7,6 +7,7 @@ class OrthoGraphicCamera :public Camera
 {
 public:
 	~OrthoGraphicCamera() = default;
+	OrthoGraphicCamera();
 	OrthoGraphicCamera(float fSize, float fAspectRatio, float fNearClip = -1.f, float fFarClip = 1.f);
 
 	void SetViewPortSize(unsigned int uiWidth, unsigned int uiHeight);

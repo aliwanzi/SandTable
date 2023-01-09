@@ -161,14 +161,14 @@ void SandBoxEditorLayer::OnImGuiRender()
 	ImGui::Text("Draw Vertices: %d", stats.GetTotalVertexCount());
 	ImGui::Text("Draw Indices: %d", stats.GetTotalIndexCount());
 
-	{
-		auto& vec4Pan = m_spCameraEntity->GetComponent<TransformComponent>().Translation;
-		if (ImGui::DragFloat3("Camera Transform", glm::value_ptr(vec4Pan)))
-		{
-			auto& spCamera = m_spCameraEntity->GetComponent<CameraComponent>().Camera;
-			spCamera->SetPosition(vec4Pan);
-		}
-	}
+	//{
+	//	auto& vec4Pan = m_spCameraEntity->GetComponent<TransformComponent>().Translation;
+	//	if (ImGui::DragFloat3("Camera Transform", glm::value_ptr(vec4Pan)))
+	//	{
+	//		auto& spCamera = m_spCameraEntity->GetComponent<CameraComponent>().Camera;
+	//		spCamera->SetPosition(vec4Pan);
+	//	}
+	//}
 
 	ImGui::End();
 
