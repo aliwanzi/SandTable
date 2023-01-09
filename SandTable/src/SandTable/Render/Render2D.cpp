@@ -89,13 +89,6 @@ void Render2D::BeginScene(const Ref<Camera>& spCamera)
 	StartBatch();
 }
 
-void Render2D::BeginScene(const Ref<Camera>& spCamera, const glm::mat4& mat4Transform)
-{
-	m_spRender2DStroge->Shader->Bind();
-	m_spRender2DStroge->Shader->SetMat4("ViewProjection", spCamera->GetViewProjectionMatrix() * mat4Transform);
-	StartBatch();
-}
-
 void Render2D::EndScene()
 {
 	Flush();

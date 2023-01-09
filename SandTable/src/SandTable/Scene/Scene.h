@@ -9,6 +9,7 @@ public:
 	Scene();
 	~Scene();
 	Ref<Entity> CreateEntity(const std::string& sName = std::string());
+	void DestroyEntity(const Ref<Entity>& spEntity);
 
 	void OnUpdate(const TimeStep& timeStep);
 	void OnViewPortResize(unsigned int uiWidth, unsigned int uiHeight);

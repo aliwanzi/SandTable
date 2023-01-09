@@ -26,6 +26,11 @@ Ref<Entity> Scene::CreateEntity(const std::string& sName)
 	return spEntity;
 }
 
+void Scene::DestroyEntity(const Ref<Entity>& spEntity)
+{
+	m_spRegistry->destroy(*spEntity);
+}
+
 void Scene::OnUpdate(const TimeStep& timeStep)
 {
 	{
@@ -49,13 +54,14 @@ void Scene::OnUpdate(const TimeStep& timeStep)
 			const auto& [cameraTransform, camera] = cameraView.get<TransformComponent, CameraComponent>(cameraComponent);
 			if (camera.Primary)
 			{
-				Render2D::BeginScene(camera.Camera, cameraTransform.Transform);
+				camera.Camera->SetViewMatrix(cameraTransform);
+				Render2D::BeginScene(camera.Camera);
 				auto spriteView = m_spRegistry->view<TransformComponent, SpriteRenderComponent>();
 				for (auto spriteComponent : spriteView)
 				{
 					const auto& [spriteTransform, sprite] = spriteView.get<TransformComponent, SpriteRenderComponent>(spriteComponent);
 
-					Render2D::DrawQuad(spriteTransform.Transform, sprite.Color);
+					Render2D::DrawQuad(spriteTransform, sprite.Color);
 				}
 
 				Render2D::EndScene();
@@ -92,5 +98,6 @@ const Ref<entt::registry>& Scene::Registry() const
 {
 	return m_spRegistry;
 }
+
 
 SAND_TABLE_NAMESPACE_END

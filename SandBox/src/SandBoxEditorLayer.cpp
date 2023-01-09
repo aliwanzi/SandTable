@@ -45,8 +45,6 @@ void SandBoxEditorLayer::OnAttach()
 
 		virtual void OnUpdate(TimeStep ts)
 		{
-			auto& transform = GetComponent<TransformComponent>().Transform;
-
 		}
 	};
 	m_spCameraEntity->AddComponent<NativeScriptComponent>().Bind<CameraController>();
@@ -65,24 +63,25 @@ void SandBoxEditorLayer::OnUpdate(const TimeStep& timeStep)
 	SAND_TABLE_ASSERT(spFrameBuffer, "FrameBuffer is null in Edit Layer");
 	auto spSpecification = spFrameBuffer->GetFrameBufferSpecification();
 	spFrameBuffer->Resize(m_vec2RenderViewPort.x, m_vec2RenderViewPort.y);
-	m_spOrthoGraphicCameraController->OnResize(m_vec2RenderViewPort.x, m_vec2RenderViewPort.y);
 
-	if(m_bRenderWindowActive)
-	{
-		SAND_TABLE_PROFILE_SCOPE("CameraController::OnUpdate");
-		m_spOrthoGraphicCameraController->OnUpdate(timeStep);
-	}
+	//if (m_vec2RenderViewPort.x > 0 && m_vec2RenderViewPort.y > 0)
+	//{
+	//	m_spOrthoGraphicCameraController->OnResize(m_vec2RenderViewPort.x, m_vec2RenderViewPort.y);
+	//}
+
+	//if(m_bRenderWindowActive)
+	//{
+	//	SAND_TABLE_PROFILE_SCOPE("CameraController::OnUpdate");
+	//	m_spOrthoGraphicCameraController->OnUpdate(timeStep);
+	//}
 
 	Render2D::ResetStats();
 	m_spFrameBuffer->Bind();
 	RenderCommand::SetClearColor(glm::vec4(glm::vec3(0.1f), 1.0f));
 	RenderCommand::Clear();
 
-	//Render2D::BeginScene(m_spOrthoGraphicCameraController->GetCamera());
-
+	m_spScene->OnViewPortResize(m_vec2RenderViewPort.x, m_vec2RenderViewPort.y);
 	m_spScene->OnUpdate(timeStep);
-
-	//Render2D::EndScene();
 
 	m_spFrameBuffer->UnBind();
 }
@@ -154,7 +153,7 @@ void SandBoxEditorLayer::OnImGuiRender()
 
 	m_spSceneHierarchyPanel->OnImGuiRender();
 
-	ImGui::Begin("Settings");
+	ImGui::Begin("Stats");
 	auto stats = Render2D::GetStats();
 	ImGui::Text("Renderer2D Stats:");
 	ImGui::Text("Draw Calls: %d", stats.DrawCalls);
@@ -162,18 +161,13 @@ void SandBoxEditorLayer::OnImGuiRender()
 	ImGui::Text("Draw Vertices: %d", stats.GetTotalVertexCount());
 	ImGui::Text("Draw Indices: %d", stats.GetTotalIndexCount());
 
-	if (m_spSquareEntity)
 	{
-		ImGui::Separator();
-		ImGui::Text("%s", m_spSquareEntity->GetComponent<TagComponent>().Tag.c_str());
-		auto& color = m_spSquareEntity->GetComponent<SpriteRenderComponent>().Color;
-		ImGui::ColorEdit4("Square Color", glm::value_ptr(color));
-		ImGui::Separator();
-	}
-
-	{
-		auto& vec4Pan = m_spCameraEntity->GetComponent<TransformComponent>().Transform[3];
-		ImGui::DragFloat3("Camera Transform",glm::value_ptr(vec4Pan));
+		auto& vec4Pan = m_spCameraEntity->GetComponent<TransformComponent>().Translation;
+		if (ImGui::DragFloat3("Camera Transform", glm::value_ptr(vec4Pan)))
+		{
+			auto& spCamera = m_spCameraEntity->GetComponent<CameraComponent>().Camera;
+			spCamera->SetPosition(vec4Pan);
+		}
 	}
 
 	ImGui::End();
@@ -183,7 +177,6 @@ void SandBoxEditorLayer::OnImGuiRender()
 	m_bRenderWindowActive = ImGui::IsWindowHovered();
 	Application::GetApplication()->BlockEvents(!m_bRenderWindowActive);
 	m_vec2RenderViewPort = ImGui::GetContentRegionAvail();
-	//LOG_DEV_INFO("viewport size: {0},{1}", contentRegion.x, contentRegion.y);
 	auto spFrameBuffer = std::dynamic_pointer_cast<FrameBuffer>(m_spFrameBuffer);
 	SAND_TABLE_ASSERT(spFrameBuffer, "FrameBuffer is null in Edit Layer");
 	auto uiTextureID = spFrameBuffer->GetColorAttachment();

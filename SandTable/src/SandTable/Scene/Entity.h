@@ -6,8 +6,9 @@ class Entity
 {
 public:
 	Entity();
-	Entity(const Ref<entt::registry>& spRegistry);
-	Entity(const Ref<entt::registry>& spRegistry, const Ref<entt::entity>& spEntity);
+	Entity(const entt::registry spRegistry);
+	Entity(const entt::registry spRegistry, const Ref<entt::entity>& spEntity);
+	//Entity& operator=(const Entity& entity);
 
 
 	template<typename T, typename... Args>
@@ -36,10 +37,12 @@ public:
 		m_spRegistry->remove<T>(*m_spEntity);
 	}
 
-	operator uint32_t() const;
+	bool operator==(const Ref<Entity>& spEntity) const;
+	bool operator!=(const Ref<Entity>& spEntity) const;
 
-	bool operator==(const Ref<Entity> spEntity) const;
-	bool operator!=(const Ref<Entity> spEntity) const;
+	operator uint32_t() const;
+	operator entt::entity()const;
+
 private:
 	Ref<entt::registry> m_spRegistry;
 	Ref<entt::entity> m_spEntity;

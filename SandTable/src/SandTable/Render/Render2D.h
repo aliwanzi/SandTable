@@ -53,7 +53,6 @@ public:
 	static void Init();
 	static void ShutDown();
 	static void BeginScene(const Ref<Camera>& spCamera);
-	static void BeginScene(const Ref<Camera>& spCamera, const glm::mat4& mat4Transform);
 	static void EndScene();
 	static void Flush();
 

@@ -13,14 +13,16 @@ static std::array<std::string, 2> ProjectionTypeStrings = { "Perspective","Ortho
 class Camera
 {
 public:
-	Camera(float fNear, float fFar, ProjectionType eProjectionType);
+	Camera(float fAspectRatio, float fNear, float fFar, ProjectionType eProjectionType);
 	~Camera() = default;
 	void SetPosition(const glm::vec3& vec3Position);
-	glm::vec3& GetPositon();
 	const glm::vec3& GetPositon()const;
 	void SetRotation(float fRotation);
-	const float GetRotaion()const;
+	float GetRotaion()const;
+
+	void SetProjectionMatrix(const glm::mat4& mat4ProjectionMatrix);
 	const glm::mat4& GetProjectionMatrix()const;
+	void SetViewMatrix(const glm::mat4& mat4ViewMatrix);
 	const glm::mat4& GetViewMatrix()const;
 	const glm::mat4& GetViewProjectionMatrix()const;
 	ProjectionType GetProjectionType();
@@ -28,13 +30,17 @@ public:
 
 	void SetNearAndFarClip(float fNear, float fFar);
 	void SetNearClip(float fNear);
-	float GetNearClip();
+	float GetNearClip() const;
 	void SetFarClip(float fFar);
-	float GetFarClip();
+	float GetFarClip() const;
 
 protected:
-	virtual void RecalculateViewMatrix() = 0;
 	virtual void RecalculateProjectionMatrix() = 0;
+	void RecalculateViewProjectionMatrix();
+
+private:
+	void RecalculateViewMatrix();
+
 protected:
 	ProjectionType m_eProjectionType;
 	glm::mat4 m_mat4ProjectionMatrix;
@@ -46,6 +52,7 @@ protected:
 
 	float m_fNearClip;
 	float m_fFarClip;
+	float m_fAspectRatio;
 };
 
 SAND_TABLE_NAMESPACE_END

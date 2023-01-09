@@ -15,7 +15,7 @@ OrthoGraphicCameraController::OrthoGraphicCameraController(unsigned int uiWidth,
 	m_fTimeStep(0.f)
 {
 	m_fAspectRatio = static_cast<float>(uiWidth) / static_cast<float>(uiHeight);
-	m_spOrthoGraphicCamera = CreateRef<OrthoGraphicCamera>(2 * m_fZoomLevel, m_fAspectRatio);
+	m_spOrthoGraphicCamera = CreateRef<OrthoGraphicCamera>(m_fZoomLevel, m_fAspectRatio);
 }
 
 const std::shared_ptr<OrthoGraphicCamera>& OrthoGraphicCameraController::GetCamera() const
@@ -26,8 +26,7 @@ const std::shared_ptr<OrthoGraphicCamera>& OrthoGraphicCameraController::GetCame
 void OrthoGraphicCameraController::SetZoomLevel(float fZoomLevel)
 {
 	m_fZoomLevel = fZoomLevel;
-	m_spOrthoGraphicCamera->SetProjection(-m_fAspectRatio * m_fZoomLevel,
-		m_fAspectRatio * m_fZoomLevel, -m_fZoomLevel, m_fZoomLevel);
+	m_spOrthoGraphicCamera->SetOrthoSize(m_fZoomLevel);
 }
 
 float OrthoGraphicCameraController::GetZoomLevel() const
@@ -78,9 +77,7 @@ void OrthoGraphicCameraController::OnEvent(Event& event)
 
 void OrthoGraphicCameraController::OnResize(unsigned int uiWidth, unsigned int uiHeight)
 {
-	m_fAspectRatio = static_cast<float>(uiWidth) / static_cast<float>(uiHeight);
-	m_spOrthoGraphicCamera->SetProjection(-m_fAspectRatio * m_fZoomLevel,
-		m_fAspectRatio * m_fZoomLevel, -m_fZoomLevel, m_fZoomLevel);
+	m_spOrthoGraphicCamera->SetViewPortSize(uiWidth, uiHeight);
 }
 
 OrthoGraphicCameraBounds OrthoGraphicCameraController::GetOrthoGraphicCameraBounds()
@@ -97,8 +94,7 @@ bool OrthoGraphicCameraController::OnMouseScrolled(MouseScrolledEvent& e)
 {
 	m_fZoomLevel -= e.GetYOffset() * m_fCameraZoomSpeed;
 	m_fZoomLevel = std::max(m_fZoomLevel, m_fCameraZoomSpeed);
-	m_spOrthoGraphicCamera->SetProjection(-m_fAspectRatio * m_fZoomLevel,
-		m_fAspectRatio * m_fZoomLevel, -m_fZoomLevel, m_fZoomLevel);
+	m_spOrthoGraphicCamera->SetOrthoSize(m_fZoomLevel);
 	return false;
 }
 

@@ -17,15 +17,30 @@ struct TagComponent
 
 struct TransformComponent
 {
-	glm::mat4 Transform{ 1.f };
+	glm::vec3 Translation = glm::vec3(0.f);
+	glm::vec3 Rotation = glm::vec3(0.f);
+	glm::vec3 Scale = glm::vec3(1.f);
 	TransformComponent() = default;
 	TransformComponent(const TransformComponent&) = default;
 	TransformComponent& operator =(const TransformComponent&) = default;
-	TransformComponent(const glm::mat4& mat4Transform) :Transform(mat4Transform)
+	TransformComponent(const glm::vec3 & translation, const glm::vec3 & rotation, const glm::vec3 & scale) :
+		Translation(translation),
+		Rotation(rotation),
+		Scale(scale)
 	{}
 
-	operator glm::mat4& () { return Transform; }
-	operator const glm::mat4& ()const { return Transform; }
+	operator glm::mat4() 
+	{
+		glm::mat4 mat4Translation = glm::translate(glm::mat4(1.f), Translation);
+
+		glm::mat4 mat4Rotation = glm::rotate(glm::mat4(1.f), Rotation.x, glm::vec3(1.0, 0.0, 0.0)) *
+			glm::rotate(glm::mat4(1.f), Rotation.y, glm::vec3(0.0, 1.0, 0.0)) *
+			glm::rotate(glm::mat4(1.f), Rotation.z, glm::vec3(0.0, 0.0, 1.0));
+
+		glm::mat4 mat4Scale = glm::scale(glm::mat4(1.f), Scale);
+
+		return mat4Translation * mat4Rotation * mat4Scale;
+	}
 };
 
 

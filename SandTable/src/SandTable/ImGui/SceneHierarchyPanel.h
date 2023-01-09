@@ -11,7 +11,7 @@ public:
 	void SetSelectedEntity(const Ref<Entity>& spEntity);
 private:
 	void DrawEntityNode(const Ref<Entity>& spEntity);
-	void DrawComponent(const Ref<Entity>& spEntity);
+	void DrawComponents(const Ref<Entity>& spEntity);
 private:
 	Ref<Scene> m_spScene;
 	Ref<Entity> m_spSelectedEntity;
