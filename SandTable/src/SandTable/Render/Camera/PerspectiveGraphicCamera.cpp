@@ -6,12 +6,19 @@ PerspectiveGraphicCamera::PerspectiveGraphicCamera(float fFOV, float fAspectRati
 	Camera(fAspectRatio, fNearClip, fFarClip, ProjectionType::Perspective),
 	m_fFOV(45.f)
 {
+	RecalculateProjectionMatrix();
+}
 
+PerspectiveGraphicCamera::PerspectiveGraphicCamera():
+	Camera(1.f, 0.01f, 1000.f, ProjectionType::Perspective),
+	m_fFOV(45.f)
+{
 }
 
 void PerspectiveGraphicCamera::SetPerspectiveFOV(float fFOV)
 {
 	m_fFOV = fFOV;
+	RecalculateProjectionMatrix();
 }
 
 float PerspectiveGraphicCamera::GetPerspectiveFOV()

@@ -206,7 +206,6 @@ void SceneHierarchyPanel::DrawEntityNode(const Ref<Entity>& spEntity)
 		ImGui::EndPopup();
 	}
 
-
 	if (bOpened)
 	{
 		ImGui::TreePop();
@@ -218,7 +217,6 @@ void SceneHierarchyPanel::DrawEntityNode(const Ref<Entity>& spEntity)
 		if (*m_spSelectedEntity == *spEntity)
 			m_spSelectedEntity = CreateRef<Entity>();
 	}
-
 }
 
 void SceneHierarchyPanel::DrawComponents(const Ref<Entity>& spEntity)
@@ -245,9 +243,7 @@ void SceneHierarchyPanel::DrawComponents(const Ref<Entity>& spEntity)
 
 	DrawComponent<CameraComponent>("Camera", spEntity, [](auto& component)
 		{
-			auto& spCamera = component.Camera;
-
-			auto sCurrentProjection = ProjectionTypeStrings[static_cast<unsigned int>(spCamera->GetProjectionType())];
+			auto sCurrentProjection = ProjectionTypeStrings[static_cast<unsigned int>(component.Projection)];
 
 			if (ImGui::BeginCombo("Projection", sCurrentProjection.c_str()))
 			{
@@ -256,62 +252,60 @@ void SceneHierarchyPanel::DrawComponents(const Ref<Entity>& spEntity)
 					bool bSelected = sCurrentProjection == ProjectionTypeStrings[i];
 					if (ImGui::Selectable(ProjectionTypeStrings[i].c_str(), bSelected))
 					{
-						sCurrentProjection = ProjectionTypeStrings[i];
-						//spCamera->SetProjectionType(static_cast<ProjectionType>(i));
-					}
-					if (bSelected)
-					{
+						component.Projection = static_cast<ProjectionType>(i);
 						ImGui::SetItemDefaultFocus();
 					}
 				}
 				ImGui::EndCombo();
 			}
 
-			switch (spCamera->GetProjectionType())
+			switch (component.Projection)
 			{
 			case SandTable::ProjectionType::Perspective:
 			{
-				auto spPerspectiveGraphicCamera = std::dynamic_pointer_cast<PerspectiveGraphicCamera>(spCamera);
+				auto spPerspecCamera = std::dynamic_pointer_cast<PerspectiveGraphicCamera>(component.PerspecCamera);
+				SAND_TABLE_ASSERT(spPerspecCamera, "Perspectiv Graphic Camera is null in Scene Hierarchy Panel");
 
-				float fPerFov = spPerspectiveGraphicCamera->GetPerspectiveFOV();
+				float fPerFov = spPerspecCamera->GetPerspectiveFOV();
 				if (ImGui::DragFloat("FOV", &fPerFov))
 				{
-					spPerspectiveGraphicCamera->SetPerspectiveFOV(fPerFov);
+					spPerspecCamera->SetPerspectiveFOV(fPerFov);
 				}
 
-				float fOrthoNear = spPerspectiveGraphicCamera->GetNearClip();
+				float fOrthoNear = spPerspecCamera->GetNearClip();
 				if (ImGui::DragFloat("Near", &fOrthoNear))
 				{
-					spPerspectiveGraphicCamera->SetNearClip(fOrthoNear);
+					spPerspecCamera->SetNearClip(fOrthoNear);
 				}
 
-				float fOrthoFar = spPerspectiveGraphicCamera->GetFarClip();
+				float fOrthoFar = spPerspecCamera->GetFarClip();
 				if (ImGui::DragFloat("Far", &fOrthoFar))
 				{
-					spPerspectiveGraphicCamera->SetFarClip(fOrthoFar);
+					spPerspecCamera->SetFarClip(fOrthoFar);
 				}
 				break;
 			}
 			case SandTable::ProjectionType::Orthographic:
 			{
-				auto spOrthoGraphicCamera = std::dynamic_pointer_cast<OrthoGraphicCamera>(spCamera);
+				auto spOrthoCamera = std::dynamic_pointer_cast<OrthoGraphicCamera>(component.OrthoCamera);
+				SAND_TABLE_ASSERT(spOrthoCamera, "Ortho Graphic Camera is null in Scene Hierarchy Panel");
 
-				float fOrthoSize = spOrthoGraphicCamera->GetOrthoSize();
+				float fOrthoSize = spOrthoCamera->GetOrthoSize();
 				if (ImGui::DragFloat("Size", &fOrthoSize))
 				{
-					spOrthoGraphicCamera->SetOrthoSize(fOrthoSize);
+					spOrthoCamera->SetOrthoSize(fOrthoSize);
 				}
 
-				float fOrthoNear = spOrthoGraphicCamera->GetNearClip();
+				float fOrthoNear = spOrthoCamera->GetNearClip();
 				if (ImGui::DragFloat("Near", &fOrthoNear))
 				{
-					spOrthoGraphicCamera->SetNearClip(fOrthoNear);
+					spOrthoCamera->SetNearClip(fOrthoNear);
 				}
 
-				float fOrthoFar = spOrthoGraphicCamera->GetFarClip();
+				float fOrthoFar = spOrthoCamera->GetFarClip();
 				if (ImGui::DragFloat("Far", &fOrthoFar))
 				{
-					spOrthoGraphicCamera->SetFarClip(fOrthoFar);
+					spOrthoCamera->SetFarClip(fOrthoFar);
 				}
 				break;
 			}

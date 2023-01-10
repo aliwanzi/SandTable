@@ -15,6 +15,8 @@ public:
 	void EndNewFrame();
 	void BlockEvents(bool bBlock);
 private:
+	void SetDarkThemeColors();
+private:
 	bool m_bBlockEvents;
 };
 

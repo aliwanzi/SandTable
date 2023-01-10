@@ -6,6 +6,7 @@ SAND_TABLE_NAMESPACE_BEGIN
 class PerspectiveGraphicCamera :public Camera
 {
 public:
+	PerspectiveGraphicCamera();
 	PerspectiveGraphicCamera(float fFOV, float fAspectRatio, float fNearClip = 0.01f, float fFarClip = 1000.f);
 	void SetPerspectiveFOV(float fFOV);
 	float GetPerspectiveFOV();

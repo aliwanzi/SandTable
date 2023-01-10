@@ -48,14 +48,30 @@ void Scene::OnUpdate(const TimeStep& timeStep)
 	}
 
 	{
-		auto cameraView = m_spRegistry->view<TransformComponent, CameraComponent>();
-		for (auto cameraComponent : cameraView)
+		auto cameraEntity = m_spRegistry->view<TransformComponent, CameraComponent>();
+		for (auto cameraComponent : cameraEntity)
 		{
-			const auto& [cameraTransform, camera] = cameraView.get<TransformComponent, CameraComponent>(cameraComponent);
+			const auto& [cameraTransform, camera] = cameraEntity.get<TransformComponent, CameraComponent>(cameraComponent);
 			if (camera.Primary)
 			{
-				camera.Camera->SetViewMatrix(cameraTransform);
-				Render2D::BeginScene(camera.Camera);
+				switch (camera.Projection)
+				{
+				case SandTable::ProjectionType::Perspective:
+				{
+					camera.PerspecCamera->SetViewMatrix(cameraTransform);
+					Render2D::BeginScene(camera.PerspecCamera);
+					break;
+				}
+				case SandTable::ProjectionType::Orthographic:
+				{
+					camera.OrthoCamera->SetViewMatrix(cameraTransform);
+					Render2D::BeginScene(camera.OrthoCamera);
+					break;
+				}
+				default:
+					break;
+				}
+
 				auto spriteView = m_spRegistry->view<TransformComponent, SpriteRenderComponent>();
 				for (auto spriteComponent : spriteView)
 				{
@@ -84,7 +100,7 @@ void Scene::OnViewPortResize(unsigned int uiWidth, unsigned int uiHeight)
 			auto cameraComponent = cameraView.get<CameraComponent>(component);
 			if (!cameraComponent.FixedAspectRation)
 			{
-				auto orthoCamera = std::dynamic_pointer_cast<OrthoGraphicCamera>(cameraComponent.Camera);
+				auto orthoCamera = std::dynamic_pointer_cast<OrthoGraphicCamera>(cameraComponent.OrthoCamera);
 				if (orthoCamera != nullptr)
 				{
 					orthoCamera->SetViewPortSize(uiWidth, uiHeight);

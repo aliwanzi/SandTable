@@ -8,7 +8,7 @@ SAND_TABLE_NAMESPACE_BEGIN
 
 struct TagComponent
 {
-	std::string Tag;
+	std::string Tag = "Entity";
 	TagComponent() = default;
 	TagComponent(const TagComponent&) = default;
 	TagComponent& operator =(const TagComponent&) = default;
@@ -59,14 +59,16 @@ struct SpriteRenderComponent
 
 struct CameraComponent
 {
-	Ref<SandTable::Camera> Camera = CreateRef<OrthoGraphicCamera>();
+	Ref<SandTable::Camera> OrthoCamera = CreateRef<OrthoGraphicCamera>();
+	Ref<SandTable::Camera> PerspecCamera = CreateRef<PerspectiveGraphicCamera>();
 	bool Primary = true;
 	bool FixedAspectRation = false;
+	ProjectionType Projection = ProjectionType::Orthographic;
 	CameraComponent() = default;
 	CameraComponent(const CameraComponent&) = default;
 	CameraComponent& operator =(const CameraComponent&) = default;
 	CameraComponent(const Ref<SandTable::Camera>& spCamera, bool bPrimary = true, bool bFixedAspectRation = false)
-		:Camera(spCamera), Primary(bPrimary), FixedAspectRation(bFixedAspectRation)
+		:OrthoCamera(spCamera), Primary(bPrimary), FixedAspectRation(bFixedAspectRation)
 	{}
 };
 
