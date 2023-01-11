@@ -82,7 +82,7 @@ project "SandTable"
 			"SAND_TABLE_RENDER_OPENGL"
 		}
 
-	filter "configurations:Degug"
+	filter "configurations:Debug"
 		defines "SAND_TABLE_DEBUG"
 		runtime "Debug"
 		symbols "on"
@@ -138,7 +138,7 @@ project "SandBox"
 			"SAND_TABLE_ENABLE_ASSERTS"
 		}
 
-	filter "configurations:Degug"
+	filter "configurations:Debug"
 		defines "SAND_TABLE_DEBUG"
 		runtime "Debug"
 		symbols "on"

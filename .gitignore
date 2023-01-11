@@ -368,3 +368,4 @@ MigrationBackup/
 FodyWeavers.xsd
 /SandBox/SandTableProfile-Startup.json
 /SandBox/SandTableProfile-Runtime.json
+*.idb
