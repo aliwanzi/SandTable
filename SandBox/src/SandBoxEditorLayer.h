@@ -1,6 +1,7 @@
 #pragma once
 #include "SandTable.h"
 #include <imgui/imgui.h>
+#include "SandTable/Scene/SceneSerializer.h"
 using namespace SandTable;
 
 class SandBoxEditorLayer:public Layer
@@ -38,5 +39,7 @@ private:
 
 	//panel
 	Ref<SceneHierarchyPanel> m_spSceneHierarchyPanel;
+
+	Ref<SceneSerializer> m_spSceneSerializer;
 };
 

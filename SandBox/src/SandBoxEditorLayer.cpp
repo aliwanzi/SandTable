@@ -45,9 +45,30 @@ void SandBoxEditorLayer::OnAttach()
 
 		virtual void OnUpdate(TimeStep ts)
 		{
+			auto& translation = GetComponent<TransformComponent>().Translation;
+			float speed = 5.f;
+			if (Input::IsKeyPressed(Key::A))
+			{
+				translation.x -= speed * ts;
+			}
+			if (Input::IsKeyPressed(Key::D))
+			{
+				translation.x += speed * ts;
+			}
+			if (Input::IsKeyPressed(Key::W))
+			{
+				translation.y += speed * ts;
+			}
+			if (Input::IsKeyPressed(Key::S))
+			{
+				translation.y -= speed * ts;
+			}
 		}
 	};
 	m_spCameraEntity->AddComponent<NativeScriptComponent>().Bind<CameraController>();
+
+	m_spSceneSerializer = CreateRef<SceneSerializer>(m_spScene);
+	//m_spSceneSerializer->Serialize("assets/scenes/Example.sandtable");
 }
 
 void SandBoxEditorLayer::OnDetach()

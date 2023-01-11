@@ -19,10 +19,12 @@ IncludeDir["ImGui"] = "SandTable/vendor/imgui"
 IncludeDir["glm"] = "SandTable/vendor/glm"
 IncludeDir["stb_image"] = "SandTable/vendor/stb_image"
 IncludeDir["entt"]="SandTable/vendor/entt/include"
+IncludeDir["yaml_cpp"]="SandTable/vendor/yaml-cpp/include"
 
 include "SandTable/vendor/GLFW"
 include "SandTable/vendor/GL3W"
 include "SandTable/vendor/imgui"
+include "SandTable/vendor/yaml-cpp"
 
 project "SandTable"
 	location "SandTable"
@@ -56,7 +58,8 @@ project "SandTable"
 		"%{IncludeDir.ImGui}",
 		"%{IncludeDir.glm}",
 		"%{IncludeDir.stb_image}",
-		"%{IncludeDir.entt}"
+		"%{IncludeDir.entt}",
+		"%{IncludeDir.yaml_cpp}"
 	}
 
 	links
@@ -64,6 +67,7 @@ project "SandTable"
 		"GLFW",
 		"GL3W",
 		"ImGui",
+		"yaml-cpp",
 		"opengl32.lib"
 	}
 
@@ -116,7 +120,8 @@ project "SandBox"
 		"SandTable/src",
 		"SandTable/vendor",
 		"%{IncludeDir.glm}",
-		"%{IncludeDir.entt}"
+		"%{IncludeDir.entt}",
+		"%{IncludeDir.yaml_cpp}"
 	}
 
 	links
