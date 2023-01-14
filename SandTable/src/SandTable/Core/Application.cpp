@@ -10,7 +10,7 @@ SAND_TABLE_NAMESPACE_BEGIN
 
 Ref<Application> Application::m_spApplication = nullptr;
 
-Application::Application() :m_bRunning(true), m_fLastFrameTime(0.f)
+Application::Application() :m_bRunning(true), m_fLastFrameTime(0.f),m_bMinimized(false)
 {
 	SAND_TABLE_PROFILE_FUNCTION();
 	m_spWindow = Window::Create();

@@ -62,13 +62,13 @@ struct CameraComponent
 	Ref<SandTable::Camera> OrthoCamera = CreateRef<OrthoGraphicCamera>();
 	Ref<SandTable::Camera> PerspecCamera = CreateRef<PerspectiveGraphicCamera>();
 	bool Primary = true;
-	bool FixedAspectRation = false;
+	bool FixedAspectRatio = false;
 	ProjectionType Projection = ProjectionType::Orthographic;
 	CameraComponent() = default;
 	CameraComponent(const CameraComponent&) = default;
 	CameraComponent& operator =(const CameraComponent&) = default;
-	CameraComponent(const Ref<SandTable::Camera>& spCamera, bool bPrimary = true, bool bFixedAspectRation = false)
-		:OrthoCamera(spCamera), Primary(bPrimary), FixedAspectRation(bFixedAspectRation)
+	CameraComponent(const Ref<SandTable::Camera>& spCamera, bool bPrimary = true, bool bFixedAspectRatio = false)
+		:OrthoCamera(spCamera), Primary(bPrimary), FixedAspectRatio(bFixedAspectRatio)
 	{}
 };
 

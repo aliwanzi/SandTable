@@ -7,6 +7,7 @@ SandBoxEditorLayer::SandBoxEditorLayer() :m_vec4Color(glm::vec4(0.2f, 0.3f, 0.8f
 
 	m_spScene = CreateRef<Scene>();
 	m_spSceneHierarchyPanel = CreateRef<SceneHierarchyPanel>(m_spScene);
+	m_spSceneSerializer = CreateRef<SceneSerializer>(m_spScene);
 }
 
 SandBoxEditorLayer::~SandBoxEditorLayer()
@@ -67,8 +68,6 @@ void SandBoxEditorLayer::OnAttach()
 	};
 	m_spCameraEntity->AddComponent<NativeScriptComponent>().Bind<CameraController>();
 
-	m_spSceneSerializer = CreateRef<SceneSerializer>(m_spScene);
-	//m_spSceneSerializer->Serialize("assets/scenes/Example.sandtable");
 }
 
 void SandBoxEditorLayer::OnDetach()
@@ -168,6 +167,18 @@ void SandBoxEditorLayer::OnImGuiRender()
 	{
 		if (ImGui::BeginMenu("File"))
 		{
+			if (ImGui::MenuItem("New", "Ctrl+O"))
+			{
+				NewScene();
+			}
+			if (ImGui::MenuItem("Open...","Ctrl+O"))
+			{
+				OpenScene();
+			}
+			if (ImGui::MenuItem("Save As...","Ctrl+Shift+S"))
+			{
+				SaveSceneAs();
+			}
 			if (ImGui::MenuItem("Exit")) { Application::GetApplication()->Close(); }
 			ImGui::EndMenu();
 		}
@@ -213,4 +224,77 @@ void SandBoxEditorLayer::OnImGuiRender()
 void SandBoxEditorLayer::OnEvent(Event& e)
 {
 	m_spOrthoGraphicCameraController->OnEvent(e);
+
+	EventDispatcher dispatcher(e);
+	dispatcher.Dispatch<KeyPressedEvent>(BIND_EVENT_FUN(SandBoxEditorLayer::OnKeyPressed));
+}
+
+bool SandBoxEditorLayer::OnKeyPressed(KeyPressedEvent& e)
+{
+	if (e.IsRepeat())
+	{
+		return false;
+	}
+
+	bool bControl = Input::IsKeyPressed(Key::LeftControl) || Input::IsKeyPressed(Key::RightControl);
+	bool bShift = Input::IsKeyPressed(Key::LeftShift) || Input::IsKeyPressed(Key::RightShift);
+
+	switch (e.GetKeyCode())
+	{
+	case Key::N:
+	{
+		if (bControl)
+		{
+			NewScene();
+		}
+		break;
+	}
+	case Key::O:
+	{
+		if (bControl)
+		{
+			OpenScene();
+		}
+		break;
+	}
+	case Key::S:
+	{
+		if (bControl && bShift)
+		{
+			SaveSceneAs();
+		}
+		break;
+	}
+	default:
+		break;
+	}
+}
+
+void SandBoxEditorLayer::NewScene()
+{
+	m_spScene = CreateRef<Scene>();
+	m_spScene->OnViewPortResize(m_vec2RenderViewPort.x, m_vec2RenderViewPort.y);
+	m_spSceneHierarchyPanel->SetSelectedScene(m_spScene);
+}
+
+void SandBoxEditorLayer::OpenScene()
+{
+	auto sFilePath = PlatformUtils::OpenFile("SandTable Scene (*.scene)\0*.scene\0");
+	if (!sFilePath.empty())
+	{
+		m_spScene = CreateRef<Scene>();
+		m_spScene->OnViewPortResize(m_vec2RenderViewPort.x, m_vec2RenderViewPort.y);
+		m_spSceneHierarchyPanel->SetSelectedScene(m_spScene);
+		m_spSceneSerializer->SetSelectedScene(m_spScene);
+		m_spSceneSerializer->DeSerialize(sFilePath);
+	}
+}
+
+void SandBoxEditorLayer::SaveSceneAs()
+{
+	auto sFilePath = PlatformUtils::SaveFile("SandTable Scene (*.scene)\0*.scene\0");
+	if (!sFilePath.empty())
+	{
+		m_spSceneSerializer->Serialize(sFilePath);
+	}
 }

@@ -96,15 +96,19 @@ void Render2D::EndScene()
 
 void Render2D::Flush()
 {
-	for (auto iter : m_spRender2DStroge->TextureSlots)
+	if (m_spRender2DStroge->QuadIndexCount)
 	{
-		iter.second->Bind(iter.first);
-	}
-	std::dynamic_pointer_cast<VertexBuffer>(m_spRender2DStroge->VertexBuffer)->SetData
-	(&m_spRender2DStroge->Vertex[0], m_spRender2DStroge->Vertex.size() * sizeof(Vertex));
-	RenderCommand::DrawVertex(m_spRender2DStroge->VertexArray, m_spRender2DStroge->QuadIndexCount);
+		for (auto iter : m_spRender2DStroge->TextureSlots)
+		{
+			iter.second->Bind(iter.first);
+		}
+		auto spVertexBuffer = std::dynamic_pointer_cast<VertexBuffer>(m_spRender2DStroge->VertexBuffer);
+		SAND_TABLE_ASSERT(spVertexBuffer, "Vertex Buffer is null in Render2D");
+		spVertexBuffer->SetData(&m_spRender2DStroge->Vertex[0], m_spRender2DStroge->Vertex.size() * sizeof(Vertex));
+		RenderCommand::DrawVertex(m_spRender2DStroge->VertexArray, m_spRender2DStroge->QuadIndexCount);
 
-	m_spRender2DStroge->Stats.DrawCalls++;
+		m_spRender2DStroge->Stats.DrawCalls++;
+	}
 }
 
 void Render2D::DrawQuad(const glm::vec2& vec2Position, float fRotation, const glm::vec2& vec2Size, const glm::vec4& vec4Color)

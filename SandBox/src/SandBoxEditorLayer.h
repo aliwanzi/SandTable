@@ -16,6 +16,11 @@ public:
 	virtual void OnImGuiRender() override;
 	void OnEvent(Event& e) override;
 private:
+	bool OnKeyPressed(KeyPressedEvent& e);
+	void NewScene();
+	void OpenScene();
+	void SaveSceneAs();
+private:
 	Ref<OrthoGraphicCameraController> m_spOrthoGraphicCameraController;
 	Ref<Texture> m_spTexture;
 	Ref<Texture> m_spTextureStar;

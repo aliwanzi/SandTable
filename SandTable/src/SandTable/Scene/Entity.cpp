@@ -21,13 +21,6 @@ Entity::Entity()
 	m_entity = m_spRegistry->create();
 }
 
-//Entity& Entity::operator=(const Entity& entity)
-//{
-//	m_spEntity = entity.m_spEntity;
-//	m_spRegistry = entity.m_spRegistry;
-//	return *this;
-//}
-//
 bool Entity::operator==(const Entity& entity) const
 {
 	return m_entity == entity.m_entity;

@@ -10,9 +10,9 @@ public:
 
 	void Serialize(const std::string& sFilePath);
 	void SerializeRuntime(const std::string& sFilePath);
-	void DeSerialize(const std::string& sFilePath);
-	void DeSerializeRuntime(const std::string& sFilePath);
-
+	bool DeSerialize(const std::string& sFilePath);
+	bool DeSerializeRuntime(const std::string& sFilePath);
+	void SetSelectedScene(const Ref<Scene>& spScene);
 private:
 	Ref<Scene> m_spScene;
 };

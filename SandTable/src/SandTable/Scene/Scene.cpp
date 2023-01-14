@@ -10,12 +10,12 @@ Scene::Scene():
 	m_uiWidth(0),
 	m_uiHeight(0)
 {
-
+	LOG_DEV_INFO("Scene Creat");
 }
 
 Scene::~Scene()
 {
-
+	LOG_DEV_INFO("Scene Destroy");
 }
 
 Ref<Entity> Scene::CreateEntity(const std::string& sName)
@@ -51,7 +51,7 @@ void Scene::OnUpdate(const TimeStep& timeStep)
 		auto cameraEntity = m_spRegistry->view<TransformComponent, CameraComponent>();
 		for (auto cameraComponent : cameraEntity)
 		{
-			const auto& [cameraTransform, camera] = cameraEntity.get<TransformComponent, CameraComponent>(cameraComponent);
+			const auto [cameraTransform, camera] = cameraEntity.get<TransformComponent, CameraComponent>(cameraComponent);
 			if (camera.Primary)
 			{
 				switch (camera.Projection)
@@ -75,7 +75,7 @@ void Scene::OnUpdate(const TimeStep& timeStep)
 				auto spriteView = m_spRegistry->view<TransformComponent, SpriteRenderComponent>();
 				for (auto spriteComponent : spriteView)
 				{
-					const auto& [spriteTransform, sprite] = spriteView.get<TransformComponent, SpriteRenderComponent>(spriteComponent);
+					const auto [spriteTransform, sprite] = spriteView.get<TransformComponent, SpriteRenderComponent>(spriteComponent);
 
 					Render2D::DrawQuad(spriteTransform, sprite.Color);
 				}
@@ -98,7 +98,7 @@ void Scene::OnViewPortResize(unsigned int uiWidth, unsigned int uiHeight)
 		for (auto component : cameraView)
 		{
 			auto cameraComponent = cameraView.get<CameraComponent>(component);
-			if (!cameraComponent.FixedAspectRation)
+			if (!cameraComponent.FixedAspectRatio)
 			{
 				auto orthoCamera = std::dynamic_pointer_cast<OrthoGraphicCamera>(cameraComponent.OrthoCamera);
 				if (orthoCamera != nullptr)

@@ -183,6 +183,12 @@ void SceneHierarchyPanel::SetSelectedEntity(const Ref<Entity>& spEntity)
 	m_spSelectedEntity = spEntity;
 }
 
+void SceneHierarchyPanel::SetSelectedScene(const Ref<Scene>& spScene)
+{
+	m_spScene = spScene;
+	m_spSelectedEntity = CreateRef<Entity>();
+}
+
 void SceneHierarchyPanel::DrawEntityNode(const Ref<Entity>& spEntity)
 {
 	auto tagComponent = spEntity->GetComponent<TagComponent>();
