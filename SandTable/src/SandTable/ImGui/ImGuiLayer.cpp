@@ -5,6 +5,7 @@
 #include "examples/imgui_impl_glfw.h"
 #include "examples/imgui_impl_opengl3.h"
 #include "SandTable/Debug/Instrumentor.h"
+#include "ImGuizmo.h"
 
 SAND_TABLE_NAMESPACE_BEGIN
 
@@ -79,6 +80,7 @@ void ImGuiLayer::BeginNewFrame()
 	ImGui_ImplOpenGL3_NewFrame();
 	ImGui_ImplGlfw_NewFrame();
 	ImGui::NewFrame();
+	//ImGuizmo::BeginFrame();
 }
 
 void ImGuiLayer::EndNewFrame()

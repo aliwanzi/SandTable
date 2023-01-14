@@ -1,4 +1,5 @@
 #include "SandBoxEditorLayer.h"
+#include "ImGuizmo/ImGuizmo.h"
 
 SandBoxEditorLayer::SandBoxEditorLayer() :m_vec4Color(glm::vec4(0.2f, 0.3f, 0.8f, 1.0f)),m_bRenderWindowActive(true)
 {
@@ -217,6 +218,17 @@ void SandBoxEditorLayer::OnImGuiRender()
 	SAND_TABLE_ASSERT(spFrameBuffer, "FrameBuffer is null in Edit Layer");
 	auto uiTextureID = spFrameBuffer->GetColorAttachment();
 	ImGui::Image((void*)uiTextureID, m_vec2RenderViewPort, ImVec2(0, 1), ImVec2(1, 0));
+
+
+	//Gizmos
+	auto spSelectedEntity = m_spSceneHierarchyPanel->GetSelectedEntity();
+	if (spSelectedEntity != nullptr)
+	{
+		ImGuizmo::SetOrthographic(false);
+		ImGuizmo::SetDrawlist();
+	}
+
+
 	ImGui::End();
 	ImGui::PopStyleVar();
 }

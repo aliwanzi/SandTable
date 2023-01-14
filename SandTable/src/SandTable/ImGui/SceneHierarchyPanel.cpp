@@ -183,6 +183,11 @@ void SceneHierarchyPanel::SetSelectedEntity(const Ref<Entity>& spEntity)
 	m_spSelectedEntity = spEntity;
 }
 
+const Ref<Entity>& SceneHierarchyPanel::GetSelectedEntity() const
+{
+	return m_spSelectedEntity;
+}
+
 void SceneHierarchyPanel::SetSelectedScene(const Ref<Scene>& spScene)
 {
 	m_spScene = spScene;
