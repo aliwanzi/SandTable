@@ -120,7 +120,7 @@ namespace
 
 SceneHierarchyPanel::SceneHierarchyPanel(const Ref<Scene>& spScene):
 	m_spScene(spScene),
-	m_spSelectedEntity(CreateRef<Entity>())
+	m_spSelectedEntity(nullptr)
 {
 
 }
@@ -136,7 +136,7 @@ void SceneHierarchyPanel::OnImGuiRender()
 
 	if (ImGui::IsMouseDown(0) && ImGui::IsWindowHovered())
 	{
-		m_spSelectedEntity = CreateRef<Entity>();
+		m_spSelectedEntity = nullptr;
 	}
 
 	if (ImGui::BeginPopupContextWindow(0, 1, false))
@@ -191,13 +191,13 @@ const Ref<Entity>& SceneHierarchyPanel::GetSelectedEntity() const
 void SceneHierarchyPanel::SetSelectedScene(const Ref<Scene>& spScene)
 {
 	m_spScene = spScene;
-	m_spSelectedEntity = CreateRef<Entity>();
+	m_spSelectedEntity = nullptr;
 }
 
 void SceneHierarchyPanel::DrawEntityNode(const Ref<Entity>& spEntity)
 {
 	auto tagComponent = spEntity->GetComponent<TagComponent>();
-	ImGuiTreeNodeFlags flags = (*m_spSelectedEntity == *spEntity ? ImGuiTreeNodeFlags_Selected : 0)
+	ImGuiTreeNodeFlags flags = (m_spSelectedEntity != nullptr ? ImGuiTreeNodeFlags_Selected : 0)
 		| ImGuiTreeNodeFlags_OpenOnArrow;
 	flags |= ImGuiTreeNodeFlags_SpanAvailWidth;
 	bool bOpened = ImGui::TreeNodeEx((void*)(uint64_t)(uint32_t)(*spEntity), flags, tagComponent.Tag.c_str());
@@ -226,7 +226,7 @@ void SceneHierarchyPanel::DrawEntityNode(const Ref<Entity>& spEntity)
 	{
 		m_spScene->DestroyEntity(spEntity);
 		if (*m_spSelectedEntity == *spEntity)
-			m_spSelectedEntity = CreateRef<Entity>();
+			m_spSelectedEntity = nullptr;
 	}
 }
 

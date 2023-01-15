@@ -49,35 +49,21 @@ void Scene::OnUpdate(const TimeStep& timeStep)
 
 	{
 		auto cameraEntity = m_spRegistry->view<TransformComponent, CameraComponent>();
-		for (auto cameraComponent : cameraEntity)
+		for (auto component : cameraEntity)
 		{
-			const auto [cameraTransform, camera] = cameraEntity.get<TransformComponent, CameraComponent>(cameraComponent);
-			if (camera.Primary)
+			const auto [cameraTransform, cameraComponent] = cameraEntity.get<TransformComponent, CameraComponent>(component);
+			if (cameraComponent.Primary)
 			{
-				switch (camera.Projection)
-				{
-				case SandTable::ProjectionType::Perspective:
-				{
-					camera.PerspecCamera->SetViewMatrix(cameraTransform);
-					Render2D::BeginScene(camera.PerspecCamera);
-					break;
-				}
-				case SandTable::ProjectionType::Orthographic:
-				{
-					camera.OrthoCamera->SetViewMatrix(cameraTransform);
-					Render2D::BeginScene(camera.OrthoCamera);
-					break;
-				}
-				default:
-					break;
-				}
+				auto camera = cameraComponent.GetCamera();
+				camera->SetViewMatrix(cameraTransform.GetTransform());
+				Render2D::BeginScene(camera);
 
 				auto spriteView = m_spRegistry->view<TransformComponent, SpriteRenderComponent>();
 				for (auto spriteComponent : spriteView)
 				{
 					const auto [spriteTransform, sprite] = spriteView.get<TransformComponent, SpriteRenderComponent>(spriteComponent);
 
-					Render2D::DrawQuad(spriteTransform, sprite.Color);
+					Render2D::DrawQuad(spriteTransform.GetTransform(), sprite.Color);
 				}
 
 				Render2D::EndScene();
@@ -113,6 +99,20 @@ void Scene::OnViewPortResize(unsigned int uiWidth, unsigned int uiHeight)
 const Ref<entt::registry>& Scene::Registry() const
 {
 	return m_spRegistry;
+}
+
+Ref<Entity> Scene::GetPrimaryCameraEntity()
+{
+	auto cameraView = m_spRegistry->view<CameraComponent>();
+	for (auto entity : cameraView)
+	{
+		const auto& cameraComponent = cameraView.get<CameraComponent>(entity);
+		if (cameraComponent.Primary)
+		{
+			return CreateRef<Entity>(m_spRegistry, entity);
+		}
+	}
+	return nullptr;
 }
 
 

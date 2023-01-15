@@ -30,13 +30,11 @@ struct TransformComponent
 		Scale(scale)
 	{}
 
-	operator glm::mat4() 
+	glm::mat4 GetTransform() const
 	{
 		glm::mat4 mat4Translation = glm::translate(glm::mat4(1.f), Translation);
 
-		glm::mat4 mat4Rotation = glm::rotate(glm::mat4(1.f), Rotation.x, glm::vec3(1.0, 0.0, 0.0)) *
-			glm::rotate(glm::mat4(1.f), Rotation.y, glm::vec3(0.0, 1.0, 0.0)) *
-			glm::rotate(glm::mat4(1.f), Rotation.z, glm::vec3(0.0, 0.0, 1.0));
+		glm::mat4 mat4Rotation = glm::toMat4(glm::quat(Rotation));
 
 		glm::mat4 mat4Scale = glm::scale(glm::mat4(1.f), Scale);
 
@@ -70,6 +68,21 @@ struct CameraComponent
 	CameraComponent(const Ref<SandTable::Camera>& spCamera, bool bPrimary = true, bool bFixedAspectRatio = false)
 		:OrthoCamera(spCamera), Primary(bPrimary), FixedAspectRatio(bFixedAspectRatio)
 	{}
+	Ref<SandTable::Camera> GetCamera()
+	{
+		switch (Projection)
+		{
+			case SandTable::ProjectionType::Perspective:
+			{
+				return PerspecCamera;
+			}
+			case SandTable::ProjectionType::Orthographic:
+			{
+				return OrthoCamera;
+			}
+		}
+		return nullptr;
+	}
 };
 
 struct NativeScriptComponent

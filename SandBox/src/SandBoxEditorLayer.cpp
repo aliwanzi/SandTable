@@ -1,7 +1,10 @@
 #include "SandBoxEditorLayer.h"
 #include "ImGuizmo/ImGuizmo.h"
 
-SandBoxEditorLayer::SandBoxEditorLayer() :m_vec4Color(glm::vec4(0.2f, 0.3f, 0.8f, 1.0f)),m_bRenderWindowActive(true)
+SandBoxEditorLayer::SandBoxEditorLayer() 
+	:m_vec4Color(glm::vec4(0.2f, 0.3f, 0.8f, 1.0f)),
+	m_bRenderWindowActive(true),
+	m_iGizmoType(-1)
 {
 	m_spOrthoGraphicCameraController = CreateRef<OrthoGraphicCameraController>
 		(Application::GetApplication()->GetWindowWidth(), Application::GetApplication()->GetWindowHeight());
@@ -37,37 +40,37 @@ void SandBoxEditorLayer::OnAttach()
 	m_spCameraEntity = m_spScene->CreateEntity("Camera Entity");
 	m_spCameraEntity->AddComponent<CameraComponent>(m_spOrthoGraphicCameraController->GetCamera());
 
-	class CameraController :public ScriptableEntity
-	{
-	public:
-		virtual void OnCreate()
-		{
-			LOG_DEV_INFO("On Create");
-		}
+	//class CameraController :public ScriptableEntity
+	//{
+	//public:
+	//	virtual void OnCreate()
+	//	{
+	//		LOG_DEV_INFO("On Create");
+	//	}
 
-		virtual void OnUpdate(TimeStep ts)
-		{
-			auto& translation = GetComponent<TransformComponent>().Translation;
-			float speed = 5.f;
-			if (Input::IsKeyPressed(Key::A))
-			{
-				translation.x -= speed * ts;
-			}
-			if (Input::IsKeyPressed(Key::D))
-			{
-				translation.x += speed * ts;
-			}
-			if (Input::IsKeyPressed(Key::W))
-			{
-				translation.y += speed * ts;
-			}
-			if (Input::IsKeyPressed(Key::S))
-			{
-				translation.y -= speed * ts;
-			}
-		}
-	};
-	m_spCameraEntity->AddComponent<NativeScriptComponent>().Bind<CameraController>();
+	//	virtual void OnUpdate(TimeStep ts)
+	//	{
+	//		auto& translation = GetComponent<TransformComponent>().Translation;
+	//		float speed = 5.f;
+	//		if (Input::IsKeyPressed(Key::A))
+	//		{
+	//			translation.x -= speed * ts;
+	//		}
+	//		if (Input::IsKeyPressed(Key::D))
+	//		{
+	//			translation.x += speed * ts;
+	//		}
+	//		if (Input::IsKeyPressed(Key::W))
+	//		{
+	//			translation.y += speed * ts;
+	//		}
+	//		if (Input::IsKeyPressed(Key::S))
+	//		{
+	//			translation.y -= speed * ts;
+	//		}
+	//	}
+	//};
+	//m_spCameraEntity->AddComponent<NativeScriptComponent>().Bind<CameraController>();
 
 }
 
@@ -219,13 +222,48 @@ void SandBoxEditorLayer::OnImGuiRender()
 	auto uiTextureID = spFrameBuffer->GetColorAttachment();
 	ImGui::Image((void*)uiTextureID, m_vec2RenderViewPort, ImVec2(0, 1), ImVec2(1, 0));
 
-
 	//Gizmos
 	auto spSelectedEntity = m_spSceneHierarchyPanel->GetSelectedEntity();
-	if (spSelectedEntity != nullptr)
+	if (spSelectedEntity != nullptr && m_iGizmoType != -1)
 	{
 		ImGuizmo::SetOrthographic(false);
 		ImGuizmo::SetDrawlist();
+		auto windowWidth = ImGui::GetWindowWidth();
+		auto windowHeight = ImGui::GetWindowHeight();
+		ImGuizmo::SetRect(ImGui::GetWindowPos().x, ImGui::GetWindowPos().y,
+			windowWidth, windowHeight);
+
+		auto cameraEntity = m_spScene->GetPrimaryCameraEntity();
+		auto spCamera = cameraEntity->GetComponent<CameraComponent>().GetCamera();
+		auto cameraProjection = spCamera->GetProjectionMatrix();
+		glm::mat4 cameraView = cameraEntity->GetComponent<TransformComponent>().GetTransform();
+
+		auto& transformComponent = spSelectedEntity->GetComponent<TransformComponent>();
+		auto transfrom = transformComponent.GetTransform();
+
+		//snapping
+		bool snap = Input::IsKeyPressed(Key::LeftControl);
+		float snapValue = 0.5f;
+		if (static_cast<ImGuizmo::OPERATION>(m_iGizmoType) == ImGuizmo::OPERATION::ROTATE)
+		{
+			snapValue = 45.f;
+		}
+		glm::vec3 snapValues(snapValue);
+
+		ImGuizmo::Manipulate(glm::value_ptr(cameraView), glm::value_ptr(cameraProjection),
+			static_cast<ImGuizmo::OPERATION>(m_iGizmoType), ImGuizmo::LOCAL, glm::value_ptr(transfrom),
+			nullptr, snap ? glm::value_ptr(snapValues) : nullptr);
+
+		if (ImGuizmo::IsUsing())
+		{
+			glm::vec3 translation, rotation, scale;
+			MathUtils::DecomposeTransform(transfrom, translation, rotation, scale);
+			glm::vec3 deltaRotation = rotation - transformComponent.Rotation;
+
+			transformComponent.Translation = translation;
+			transformComponent.Rotation += deltaRotation;
+			transformComponent.Scale = scale;
+		}
 	}
 
 
@@ -277,9 +315,30 @@ bool SandBoxEditorLayer::OnKeyPressed(KeyPressedEvent& e)
 		}
 		break;
 	}
+	case Key::Q:
+	{
+		m_iGizmoType = -1;
+		break;
+	}
+	case Key::W:
+	{
+		m_iGizmoType = ImGuizmo::OPERATION::TRANSLATE;
+		break;
+	}
+	case Key::E:
+	{
+		m_iGizmoType = ImGuizmo::OPERATION::ROTATE;
+		break;
+	}
+	case Key::R:
+	{
+		m_iGizmoType = ImGuizmo::OPERATION::SCALE;
+		break;
+	}
 	default:
 		break;
 	}
+	return true;
 }
 
 void SandBoxEditorLayer::NewScene()

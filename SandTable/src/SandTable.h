@@ -28,4 +28,5 @@
 
 #include "SandTable/ParticleSystem/ParticleSystem2D.h"
 #include "SandTable/Utils/PlatformUtils.h"
+#include "SandTable/Math/MathUtils.h"
 

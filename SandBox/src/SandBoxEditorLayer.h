@@ -43,6 +43,7 @@ private:
 	Ref<Entity> m_spCameraEntity;
 
 	//panel
+	int m_iGizmoType;
 	Ref<SceneHierarchyPanel> m_spSceneHierarchyPanel;
 
 	Ref<SceneSerializer> m_spSceneSerializer;

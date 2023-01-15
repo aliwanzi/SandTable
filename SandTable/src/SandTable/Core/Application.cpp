@@ -53,7 +53,7 @@ bool Application::OnKeyPressedEvent(KeyPressedEvent& event)
 	{
 		m_bRunning = false;
 	}
-	return true;
+	return false;
 }
 
 bool Application::OnKeyReleasedEvent(KeyReleasedEvent& event)

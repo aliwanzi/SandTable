@@ -15,12 +15,6 @@ Entity::Entity(const Ref<entt::registry>& spRegistry, const entt::entity& Entity
 
 }
 
-Entity::Entity()
-{
-	m_spRegistry = CreateRef<entt::registry>();
-	m_entity = m_spRegistry->create();
-}
-
 bool Entity::operator==(const Entity& entity) const
 {
 	return m_entity == entity.m_entity;

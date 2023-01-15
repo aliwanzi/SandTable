@@ -5,7 +5,6 @@ SAND_TABLE_NAMESPACE_BEGIN
 class Entity
 {
 public:
-	Entity();
 	Entity(const Ref<entt::registry>& spRegistry);
 	Entity(const Ref<entt::registry>& spRegistry, const entt::entity& Entity);
 

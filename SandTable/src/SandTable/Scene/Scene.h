@@ -14,6 +14,8 @@ public:
 	void OnUpdate(const TimeStep& timeStep);
 	void OnViewPortResize(unsigned int uiWidth, unsigned int uiHeight);
 	const Ref<entt::registry>& Registry()const;
+
+	Ref<Entity> GetPrimaryCameraEntity();
 private:
 	unsigned int m_uiWidth;
 	unsigned int m_uiHeight;
