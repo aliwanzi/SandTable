@@ -7,6 +7,7 @@ class Entity
 public:
 	Entity(const Ref<entt::registry>& spRegistry);
 	Entity(const Ref<entt::registry>& spRegistry, const entt::entity& Entity);
+	Entity(const Ref<entt::registry>& spRegistry, int iEntityID);
 
 	template<typename T, typename... Args>
 	T& AddComponent(Args&&... args)

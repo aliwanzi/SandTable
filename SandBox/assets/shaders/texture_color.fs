@@ -1,19 +1,25 @@
-#version 420 core
-out vec4 FragColor;
+#version 450 core
+layout(location = 0) out vec4 o_Color;
+layout(location = 1) out int o_EntityID;
 
-uniform sampler2D u_Textures[32];
+layout (binding = 0) uniform sampler2D u_Textures[32];
 
-in VS_OUT {
-	vec4 v_Color;
-	vec2 v_TexCoord;
-	float v_TexIndex;
-	float v_TilingFactor;
-} fs_in;
+struct VertexOutput
+{
+	vec4 Color;
+	vec2 TexCoord;
+	float TilingFactor;
+};
+
+layout (location = 0) in VertexOutput Input;
+layout (location = 3) in flat float v_TexIndex;
+layout (location = 4) in flat float v_EntityID;
 
 void main()
 {
-	vec4 texColor=texture(u_Textures[int(fs_in.v_TexIndex)], fs_in.v_TexCoord * fs_in.v_TilingFactor);
-	if(texColor.a < 0.1)
+	vec4 texColor = texture(u_Textures[int(v_TexIndex)], Input.TexCoord * Input.TilingFactor);
+	if(texColor.a < 0.00001)
 		discard;
-    FragColor = texColor * fs_in.v_Color;
+    o_Color = texColor * Input.Color;
+	o_EntityID = int(v_EntityID);
 }

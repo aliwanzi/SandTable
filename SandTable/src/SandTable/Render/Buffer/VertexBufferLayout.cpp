@@ -3,7 +3,7 @@
 
 SAND_TABLE_NAMESPACE_BEGIN
 
-VertexBufferLayout::VertexBufferLayout(std::vector<VertexBufferElement>& vecVertexBufferElement) :
+VertexBufferLayout::VertexBufferLayout(const std::vector<VertexBufferElement>& vecVertexBufferElement) :
 	m_vecVertexBufferElement(vecVertexBufferElement), m_iStride(0)
 {
 	int iOffset(0);

@@ -15,6 +15,12 @@ Entity::Entity(const Ref<entt::registry>& spRegistry, const entt::entity& Entity
 
 }
 
+Entity::Entity(const Ref<entt::registry>& spRegistry, int iEntityID) :
+	m_spRegistry(spRegistry)
+{
+	m_entity = static_cast<entt::entity>(iEntityID);
+}
+
 bool Entity::operator==(const Entity& entity) const
 {
 	return m_entity == entity.m_entity;

@@ -2,7 +2,8 @@
 #include "SandTable.h"
 #include <imgui/imgui.h>
 #include "SandTable/Scene/SceneSerializer.h"
-using namespace SandTable;
+
+SAND_TABLE_NAMESPACE_BEGIN
 
 class SandBoxEditorLayer:public Layer
 {
@@ -17,8 +18,10 @@ public:
 	void OnEvent(Event& e) override;
 private:
 	bool OnKeyPressed(KeyPressedEvent& e);
+	bool OnMousePressed(MouseButtonPressedEvent& e);
 	void NewScene();
 	void OpenScene();
+	void OpenScene(const std::filesystem::path& path);
 	void SaveSceneAs();
 private:
 	Ref<OrthoGraphicCameraController> m_spOrthoGraphicCameraController;
@@ -35,17 +38,23 @@ private:
 
 	Ref<Buffer> m_spFrameBuffer;
 
-	bool m_bRenderWindowActive;
-	ImVec2 m_vec2RenderViewPort;
+	bool m_bViewportHovered;
+	bool m_bViewportFocused;
+	ImVec2 m_vec2RenderViewPortSize;
+	std::array<ImVec2, 2> m_vec2RenderViewPortBounds;
 
 	Ref<Scene> m_spScene;
 	Ref<Entity> m_spSquareEntity;
 	Ref<Entity> m_spCameraEntity;
+	Ref<Entity> m_spHoveredEntity;
 
 	//panel
 	int m_iGizmoType;
 	Ref<SceneHierarchyPanel> m_spSceneHierarchyPanel;
+	Ref<ContentBrowserPanel> m_spContentBrowserPanel;
 
 	Ref<SceneSerializer> m_spSceneSerializer;
 };
+
+SAND_TABLE_NAMESPACE_END
 

@@ -1,9 +1,13 @@
 #include "SandBoxEditorLayer.h"
 #include "ImGuizmo/ImGuizmo.h"
 
+SAND_TABLE_NAMESPACE_BEGIN
+
+extern const std::filesystem::path sAssetsDirector;
+
 SandBoxEditorLayer::SandBoxEditorLayer() 
 	:m_vec4Color(glm::vec4(0.2f, 0.3f, 0.8f, 1.0f)),
-	m_bRenderWindowActive(true),
+	m_bViewportHovered(true),
 	m_iGizmoType(-1)
 {
 	m_spOrthoGraphicCameraController = CreateRef<OrthoGraphicCameraController>
@@ -11,6 +15,7 @@ SandBoxEditorLayer::SandBoxEditorLayer()
 
 	m_spScene = CreateRef<Scene>();
 	m_spSceneHierarchyPanel = CreateRef<SceneHierarchyPanel>(m_spScene);
+	m_spContentBrowserPanel = CreateRef<ContentBrowserPanel>();
 	m_spSceneSerializer = CreateRef<SceneSerializer>(m_spScene);
 }
 
@@ -28,9 +33,16 @@ void SandBoxEditorLayer::OnAttach()
 	m_spSubTexBarrel = CreateRef<SubTexture2D>(m_spTextureSprite, glm::vec2(1, 11), glm::vec2(128, 128));
 	m_spSubTexTree = CreateRef<SubTexture2D>(m_spTextureSprite, glm::vec2(2, 1), glm::vec2(128, 128), glm::vec2(1.f, 2.f));
 
-
+	std::vector<FrameBufferTextureSpecification> vecFrameBufferTextureSpecification =
+	{
+		FramebufferTextureFormat::RGBA8,
+		FramebufferTextureFormat::RED_INTERGER,
+		FramebufferTextureFormat::DEPTH24_STENCIL8
+	};
+	auto spFrameBufferAttachmentSpecification = CreateRef<FrameBufferAttachmentSpecification>(vecFrameBufferTextureSpecification);
 	auto spFrameBufferSpecification = CreateRef<FrameBufferSpecification>
-		(Application::GetApplication()->GetWindowWidth(), Application::GetApplication()->GetWindowHeight());
+		(Application::GetApplication()->GetWindowWidth(), Application::GetApplication()->GetWindowHeight(),
+			spFrameBufferAttachmentSpecification);
 
 	m_spFrameBuffer = FrameBuffer::Create(spFrameBufferSpecification);
 
@@ -86,11 +98,11 @@ void SandBoxEditorLayer::OnUpdate(const TimeStep& timeStep)
 	auto spFrameBuffer = std::dynamic_pointer_cast<FrameBuffer>(m_spFrameBuffer);
 	SAND_TABLE_ASSERT(spFrameBuffer, "FrameBuffer is null in Edit Layer");
 	auto spSpecification = spFrameBuffer->GetFrameBufferSpecification();
-	spFrameBuffer->Resize(m_vec2RenderViewPort.x, m_vec2RenderViewPort.y);
+	spFrameBuffer->Resize(m_vec2RenderViewPortSize.x, m_vec2RenderViewPortSize.y);
 
-	//if (m_vec2RenderViewPort.x > 0 && m_vec2RenderViewPort.y > 0)
+	//if (m_vec2RenderViewPortSize.x > 0 && m_vec2RenderViewPortSize.y > 0)
 	//{
-	//	m_spOrthoGraphicCameraController->OnResize(m_vec2RenderViewPort.x, m_vec2RenderViewPort.y);
+	//	m_spOrthoGraphicCameraController->OnResize(m_vec2RenderViewPortSize.x, m_vec2RenderViewPortSize.y);
 	//}
 
 	//if(m_bRenderWindowActive)
@@ -100,14 +112,28 @@ void SandBoxEditorLayer::OnUpdate(const TimeStep& timeStep)
 	//}
 
 	Render2D::ResetStats();
-	m_spFrameBuffer->Bind();
+	spFrameBuffer->Bind();
 	RenderCommand::SetClearColor(glm::vec4(glm::vec3(0.1f), 1.0f));
 	RenderCommand::Clear();
+	spFrameBuffer->ClearColorAttachment(1, -1);
 
-	m_spScene->OnViewPortResize(m_vec2RenderViewPort.x, m_vec2RenderViewPort.y);
+	m_spScene->OnViewPortResize(m_vec2RenderViewPortSize.x, m_vec2RenderViewPortSize.y);
 	m_spScene->OnUpdate(timeStep);
 
-	m_spFrameBuffer->UnBind();
+	ImVec2 vec2MousePos = ImGui::GetMousePos();
+	vec2MousePos.x -= m_vec2RenderViewPortBounds[0].x;
+	vec2MousePos.y = m_vec2RenderViewPortSize.y - (vec2MousePos.y - m_vec2RenderViewPortBounds[0].y);
+
+	if (vec2MousePos.x >= 0 && vec2MousePos.y >= 0 &&
+		vec2MousePos.x < m_vec2RenderViewPortSize.x && vec2MousePos.y < m_vec2RenderViewPortSize.y)
+	{
+		int iPixelData = spFrameBuffer->ReadPixel
+		(1, static_cast<unsigned int>(vec2MousePos.x), static_cast<unsigned int>(vec2MousePos.y));
+
+		m_spHoveredEntity = iPixelData != -1 ? CreateRef<Entity>(m_spScene->Registry(), iPixelData) : nullptr;
+	}
+
+	spFrameBuffer->UnBind();
 }
 
 void SandBoxEditorLayer::OnImGuiRender()
@@ -192,8 +218,15 @@ void SandBoxEditorLayer::OnImGuiRender()
 	ImGui::End();
 
 	m_spSceneHierarchyPanel->OnImGuiRender();
+	m_spContentBrowserPanel->OnImGuiRender();
 
 	ImGui::Begin("Stats");
+	std::string sEntityName("None");
+	if (m_spHoveredEntity != nullptr)
+	{
+		sEntityName = m_spHoveredEntity->GetComponent<TagComponent>().Tag;
+	}
+	ImGui::Text("Hovered Entity: %s", sEntityName.c_str());
 	auto stats = Render2D::GetStats();
 	ImGui::Text("Renderer2D Stats:");
 	ImGui::Text("Draw Calls: %d", stats.DrawCalls);
@@ -214,13 +247,32 @@ void SandBoxEditorLayer::OnImGuiRender()
 
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
 	ImGui::Begin("viewport");
-	m_bRenderWindowActive = ImGui::IsWindowHovered();
-	Application::GetApplication()->BlockEvents(!m_bRenderWindowActive);
-	m_vec2RenderViewPort = ImGui::GetContentRegionAvail();
+
+	ImVec2 vec2MinRegion = ImGui::GetWindowContentRegionMin();
+	ImVec2 vec2MaxRegion = ImGui::GetWindowContentRegionMax();
+	auto vec2WindowPos = ImGui::GetWindowPos();
+	m_vec2RenderViewPortBounds[0] = { vec2MinRegion.x + vec2WindowPos.x, vec2MinRegion.y + vec2WindowPos.y };
+	m_vec2RenderViewPortBounds[1] = { vec2MaxRegion.x + vec2WindowPos.x, vec2MaxRegion.y + vec2WindowPos.y };
+
+	m_bViewportHovered = ImGui::IsWindowHovered();
+	m_bViewportFocused = ImGui::IsWindowFocused();
+	Application::GetApplication()->BlockEvents(!m_bViewportHovered);
+
+	m_vec2RenderViewPortSize = ImGui::GetContentRegionAvail();
 	auto spFrameBuffer = std::dynamic_pointer_cast<FrameBuffer>(m_spFrameBuffer);
 	SAND_TABLE_ASSERT(spFrameBuffer, "FrameBuffer is null in Edit Layer");
 	auto uiTextureID = spFrameBuffer->GetColorAttachment();
-	ImGui::Image((void*)uiTextureID, m_vec2RenderViewPort, ImVec2(0, 1), ImVec2(1, 0));
+	ImGui::Image((void*)uiTextureID, m_vec2RenderViewPortSize, ImVec2(0, 1), ImVec2(1, 0));
+
+	if (ImGui::BeginDragDropTarget())
+	{
+		if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM"))
+		{
+			const wchar_t* path = (const wchar_t*)payload->Data;
+			OpenScene(std::filesystem::path(sAssetsDirector) / path);
+		}
+		ImGui::EndDragDropTarget();
+	}
 
 	//Gizmos
 	auto spSelectedEntity = m_spSceneHierarchyPanel->GetSelectedEntity();
@@ -277,6 +329,7 @@ void SandBoxEditorLayer::OnEvent(Event& e)
 
 	EventDispatcher dispatcher(e);
 	dispatcher.Dispatch<KeyPressedEvent>(BIND_EVENT_FUN(SandBoxEditorLayer::OnKeyPressed));
+	dispatcher.Dispatch<MouseButtonPressedEvent>(BIND_EVENT_FUN(SandBoxEditorLayer::OnMousePressed));
 }
 
 bool SandBoxEditorLayer::OnKeyPressed(KeyPressedEvent& e)
@@ -341,10 +394,21 @@ bool SandBoxEditorLayer::OnKeyPressed(KeyPressedEvent& e)
 	return true;
 }
 
+bool SandBoxEditorLayer::OnMousePressed(MouseButtonPressedEvent& e)
+{
+	if (e.GetMouseButton() == Mouse::ButtonLeft && m_bViewportHovered
+		&& !ImGuizmo::IsOver() && !Input::IsKeyPressed(Key::LeftAlt))
+	{
+		m_spSceneHierarchyPanel->SetSelectedEntity(m_spHoveredEntity);
+	}
+
+	return false;
+}
+
 void SandBoxEditorLayer::NewScene()
 {
 	m_spScene = CreateRef<Scene>();
-	m_spScene->OnViewPortResize(m_vec2RenderViewPort.x, m_vec2RenderViewPort.y);
+	m_spScene->OnViewPortResize(m_vec2RenderViewPortSize.x, m_vec2RenderViewPortSize.y);
 	m_spSceneHierarchyPanel->SetSelectedScene(m_spScene);
 }
 
@@ -353,12 +417,17 @@ void SandBoxEditorLayer::OpenScene()
 	auto sFilePath = PlatformUtils::OpenFile("SandTable Scene (*.scene)\0*.scene\0");
 	if (!sFilePath.empty())
 	{
-		m_spScene = CreateRef<Scene>();
-		m_spScene->OnViewPortResize(m_vec2RenderViewPort.x, m_vec2RenderViewPort.y);
-		m_spSceneHierarchyPanel->SetSelectedScene(m_spScene);
-		m_spSceneSerializer->SetSelectedScene(m_spScene);
-		m_spSceneSerializer->DeSerialize(sFilePath);
+		OpenScene(sFilePath);
 	}
+}
+
+void SandBoxEditorLayer::OpenScene(const std::filesystem::path& path)
+{
+	m_spScene = CreateRef<Scene>();
+	m_spScene->OnViewPortResize(m_vec2RenderViewPortSize.x, m_vec2RenderViewPortSize.y);
+	m_spSceneHierarchyPanel->SetSelectedScene(m_spScene);
+	m_spSceneSerializer->SetSelectedScene(m_spScene);
+	m_spSceneSerializer->DeSerialize(path.string());
 }
 
 void SandBoxEditorLayer::SaveSceneAs()
@@ -369,3 +438,5 @@ void SandBoxEditorLayer::SaveSceneAs()
 		m_spSceneSerializer->Serialize(sFilePath);
 	}
 }
+
+SAND_TABLE_NAMESPACE_END

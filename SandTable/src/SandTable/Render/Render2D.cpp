@@ -4,6 +4,7 @@
 #include "SandTable/Render/Shader.h"
 #include "SandTable/Render/RenderCommand.h"
 #include "SandTable/Debug/Instrumentor.h"
+#include "SandTable/Scene/Components.h"
 
 SAND_TABLE_NAMESPACE_BEGIN
 
@@ -20,6 +21,7 @@ void Render2D::Init()
 		{ VertexDataType::Float3 },
 		{ VertexDataType::Float4 },
 		{ VertexDataType::Float2 },
+		{ VertexDataType::Float },
 		{ VertexDataType::Float },
 		{ VertexDataType::Float }
 	};
@@ -67,7 +69,7 @@ void Render2D::Init()
 		vecTextures[i] = i;
 	}
 	m_spRender2DStroge->Shader->Bind();
-	m_spRender2DStroge->Shader->SetIntArray("u_Textures", &vecTextures[0], vecTextures.size());
+	m_spRender2DStroge->Shader->SetIntArray("u_Textures", vecTextures.data(), vecTextures.size());
 	m_spRender2DStroge->TextureCoord[0] = glm::vec2(0.f, 0.f);
 	m_spRender2DStroge->TextureCoord[1] = glm::vec2(1.f, 0.f);
 	m_spRender2DStroge->TextureCoord[2] = glm::vec2(1.f, 1.f);
@@ -104,11 +106,16 @@ void Render2D::Flush()
 		}
 		auto spVertexBuffer = std::dynamic_pointer_cast<VertexBuffer>(m_spRender2DStroge->VertexBuffer);
 		SAND_TABLE_ASSERT(spVertexBuffer, "Vertex Buffer is null in Render2D");
-		spVertexBuffer->SetData(&m_spRender2DStroge->Vertex[0], m_spRender2DStroge->Vertex.size() * sizeof(Vertex));
+		spVertexBuffer->SetData(m_spRender2DStroge->Vertex.data(), m_spRender2DStroge->Vertex.size() * sizeof(Vertex));
 		RenderCommand::DrawVertex(m_spRender2DStroge->VertexArray, m_spRender2DStroge->QuadIndexCount);
 
 		m_spRender2DStroge->Stats.DrawCalls++;
 	}
+}
+
+void Render2D::DrawSprite(const glm::mat4& mat4Transform, const SpriteRenderComponent& spriteRenderComponent, int iEntityID)
+{
+	DrawQuad(mat4Transform, spriteRenderComponent.Color, iEntityID);
 }
 
 void Render2D::DrawQuad(const glm::vec2& vec2Position, float fRotation, const glm::vec2& vec2Size, const glm::vec4& vec4Color)
@@ -158,7 +165,7 @@ void Render2D::DrawQuad(const glm::vec3& vec3Position, float fRotation, const gl
 	DrawQuad(matTransform, spRefTexture2D, fFactor, vec4Color);
 }
 
-void Render2D::DrawQuad(const glm::mat4& mat4Transform, const glm::vec4& vec4Color)
+void Render2D::DrawQuad(const glm::mat4& mat4Transform, const glm::vec4& vec4Color, int iEntityID)
 {
 	if (m_spRender2DStroge->QuadIndexCount + 6 > m_spRender2DStroge->MaxIndices)
 	{
@@ -172,6 +179,7 @@ void Render2D::DrawQuad(const glm::mat4& mat4Transform, const glm::vec4& vec4Col
 		vertex.TexCoord = m_spRender2DStroge->TextureCoord[i];
 		vertex.TexIndex = m_spRender2DStroge->WhiteTexture->GetRenderID();
 		vertex.TilingFactor = 1.0f;
+		vertex.EntityID = iEntityID;
 		m_spRender2DStroge->Vertex.emplace_back(vertex);
 	}
 

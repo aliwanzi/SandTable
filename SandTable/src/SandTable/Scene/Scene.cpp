@@ -63,7 +63,8 @@ void Scene::OnUpdate(const TimeStep& timeStep)
 				{
 					const auto [spriteTransform, sprite] = spriteView.get<TransformComponent, SpriteRenderComponent>(spriteComponent);
 
-					Render2D::DrawQuad(spriteTransform.GetTransform(), sprite.Color);
+					Render2D::DrawSprite(spriteTransform.GetTransform(), sprite, static_cast<int>(spriteComponent));
+					//Render2D::DrawQuad(spriteTransform.GetTransform(), sprite.Color);
 				}
 
 				Render2D::EndScene();

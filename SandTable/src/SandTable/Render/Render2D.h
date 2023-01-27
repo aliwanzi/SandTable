@@ -6,6 +6,7 @@ SAND_TABLE_NAMESPACE_BEGIN
 class VertexArray;
 class Buffer;
 class Shader;
+struct SpriteRenderComponent;
 
 class Render2D
 {
@@ -17,6 +18,8 @@ public:
 		glm::vec2 TexCoord;
 		float TexIndex;
 		float TilingFactor;
+
+		float EntityID;
 	};
 
 	//Performance Test
@@ -56,6 +59,8 @@ public:
 	static void EndScene();
 	static void Flush();
 
+	static void DrawSprite(const glm::mat4& mat4Transform, const SpriteRenderComponent& spriteRenderComponent, int iEntityID);
+
 	static void DrawQuad(const glm::vec2& vec2Position, float fRotation, const glm::vec2& vec2Size, const glm::vec4& vec4Color);
 	static void DrawQuad(const glm::vec3& vec3Position, float fRotation, const glm::vec2& vec2Size, const glm::vec4& vec4Color);
 
@@ -69,7 +74,7 @@ public:
 	static void DrawQuad(const glm::vec3& vec3Position, float fRotation, const glm::vec2& vec2Size, const Ref<SubTexture2D>& spSubTexture2D,
 		float fFactor = 1.0f, const glm::vec4& vec4Color = glm::vec4(1.0f));
 
-	static void DrawQuad(const glm::mat4& mat4Transform, const glm::vec4& vec4Color);
+	static void DrawQuad(const glm::mat4& mat4Transform, const glm::vec4& vec4Color, int iEntityID = -1);
 	static void DrawQuad(const glm::mat4& mat4Transform, const Ref<Texture>& spTexture,
 		float fFactor = 1.0f, const glm::vec4& vec4Color = glm::vec4(1.0f));
 

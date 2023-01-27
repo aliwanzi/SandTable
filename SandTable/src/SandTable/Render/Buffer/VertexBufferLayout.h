@@ -74,7 +74,7 @@ class VertexBufferLayout
 {
 public:
 	~VertexBufferLayout() = default;
-	VertexBufferLayout(std::vector<VertexBufferElement>& vecVertexBufferElement);
+	VertexBufferLayout(const std::vector<VertexBufferElement>& vecVertexBufferElement);
 	const std::vector<VertexBufferElement>& GetVertexBufferElements()const;
 	int GetStride()const;
 

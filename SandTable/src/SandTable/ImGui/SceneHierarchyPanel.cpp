@@ -9,6 +9,8 @@
 
 SAND_TABLE_NAMESPACE_BEGIN
 
+extern const std::filesystem::path sAssetsDirector;
+
 namespace 
 {
 	static void DrawVec3Control(const std::string& sLabel, glm::vec3& values, float resetValue = 0.0f, float columnWidth = 100.0f)

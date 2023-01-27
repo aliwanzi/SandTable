@@ -10,6 +10,7 @@
 
 #include "SandTable/ImGui/ImGuiLayer.h"
 #include "SandTable/ImGui/SceneHierarchyPanel.h"
+#include "SandTable/ImGui/ContentBrowserPanel.h"
 
 #include "SandTable/Render/Render.h"
 #include "SandTable/Render/Render2D.h"

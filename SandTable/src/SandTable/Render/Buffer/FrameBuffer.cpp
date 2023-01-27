@@ -26,9 +26,9 @@ const Ref<FrameBufferSpecification>& FrameBuffer::GetFrameBufferSpecification() 
 	return m_spFrameBufferSpecification;
 }
 
-unsigned int FrameBuffer::GetColorAttachment() const
+unsigned int FrameBuffer::GetColorAttachment(unsigned int uiIndex) const
 {
-	return m_uiColorAttachment;
+	return m_vecColorAttachment[uiIndex];
 }
 
 unsigned int FrameBuffer::GetDepthAttachment() const
