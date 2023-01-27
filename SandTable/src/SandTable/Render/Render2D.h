@@ -76,7 +76,7 @@ public:
 
 	static void DrawQuad(const glm::mat4& mat4Transform, const glm::vec4& vec4Color, int iEntityID = -1);
 	static void DrawQuad(const glm::mat4& mat4Transform, const Ref<Texture>& spTexture,
-		float fFactor = 1.0f, const glm::vec4& vec4Color = glm::vec4(1.0f));
+		float fFactor = 1.0f, const glm::vec4& vec4Color = glm::vec4(1.0f), int iEntityID = -1);
 
 	static void ResetStats();
 	static Statistics GetStats();

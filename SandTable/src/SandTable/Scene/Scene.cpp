@@ -64,7 +64,6 @@ void Scene::OnUpdate(const TimeStep& timeStep)
 					const auto [spriteTransform, sprite] = spriteView.get<TransformComponent, SpriteRenderComponent>(spriteComponent);
 
 					Render2D::DrawSprite(spriteTransform.GetTransform(), sprite, static_cast<int>(spriteComponent));
-					//Render2D::DrawQuad(spriteTransform.GetTransform(), sprite.Color);
 				}
 
 				Render2D::EndScene();
@@ -87,10 +86,23 @@ void Scene::OnViewPortResize(unsigned int uiWidth, unsigned int uiHeight)
 			auto cameraComponent = cameraView.get<CameraComponent>(component);
 			if (!cameraComponent.FixedAspectRatio)
 			{
-				auto orthoCamera = std::dynamic_pointer_cast<OrthoGraphicCamera>(cameraComponent.OrthoCamera);
-				if (orthoCamera != nullptr)
+				switch (cameraComponent.Projection)
 				{
-					orthoCamera->SetViewPortSize(uiWidth, uiHeight);
+					case SandTable::ProjectionType::Perspective:
+					{
+						auto spPerspecCamera = std::dynamic_pointer_cast<PerspectiveGraphicCamera>(cameraComponent.PerspecCamera);
+						SAND_TABLE_ASSERT(spPerspecCamera, "Perspectiv Graphic Camera is null in Scene OnViewPortResize");
+						spPerspecCamera->SetPerspectiveFOV(static_cast<float>(uiWidth) / static_cast<float>(uiHeight));
+						break;
+					}
+					case SandTable::ProjectionType::Orthographic:
+					{
+						auto spOrthoCamera = std::dynamic_pointer_cast<OrthoGraphicCamera>(cameraComponent.OrthoCamera);
+						SAND_TABLE_ASSERT(spOrthoCamera, "Ortho Graphic Camera is null in Scene OnViewPortResize");
+						spOrthoCamera->SetViewPortSize(uiWidth, uiHeight);
+						break;
+
+					}
 				}
 			}
 		}

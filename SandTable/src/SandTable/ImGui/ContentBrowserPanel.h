@@ -1,5 +1,4 @@
 #pragma once
-#include <filesystem>
 SAND_TABLE_NAMESPACE_BEGIN
 
 class Texture;

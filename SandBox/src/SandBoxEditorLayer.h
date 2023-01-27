@@ -23,13 +23,14 @@ private:
 	void OpenScene();
 	void OpenScene(const std::filesystem::path& path);
 	void SaveSceneAs();
+	void OnScenePlay();
+	void OnSceneStop();
+
+	void UIToolbar();
 private:
 	Ref<OrthoGraphicCameraController> m_spOrthoGraphicCameraController;
-	Ref<Texture> m_spTexture;
-	Ref<Texture> m_spTextureStar;
-
-	Ref<Texture> m_spTextureSprite;
-	Ref<SubTexture2D> m_spSubTexStairs, m_spSubTexBarrel, m_spSubTexTree;
+	Ref<Texture> m_spIconPlay;
+	Ref<Texture> m_spIconStop;
 
 	glm::vec4 m_vec4Color;
 
@@ -54,6 +55,8 @@ private:
 	Ref<ContentBrowserPanel> m_spContentBrowserPanel;
 
 	Ref<SceneSerializer> m_spSceneSerializer;
+
+	SceneState m_eSceneState;
 };
 
 SAND_TABLE_NAMESPACE_END

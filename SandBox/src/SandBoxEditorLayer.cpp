@@ -7,8 +7,10 @@ extern const std::filesystem::path sAssetsDirector;
 
 SandBoxEditorLayer::SandBoxEditorLayer() 
 	:m_vec4Color(glm::vec4(0.2f, 0.3f, 0.8f, 1.0f)),
-	m_bViewportHovered(true),
-	m_iGizmoType(-1)
+	m_bViewportHovered(false),
+	m_bViewportFocused(false),
+	m_iGizmoType(-1),
+	m_eSceneState(SceneState::PLAY)
 {
 	m_spOrthoGraphicCameraController = CreateRef<OrthoGraphicCameraController>
 		(Application::GetApplication()->GetWindowWidth(), Application::GetApplication()->GetWindowHeight());
@@ -17,21 +19,6 @@ SandBoxEditorLayer::SandBoxEditorLayer()
 	m_spSceneHierarchyPanel = CreateRef<SceneHierarchyPanel>(m_spScene);
 	m_spContentBrowserPanel = CreateRef<ContentBrowserPanel>();
 	m_spSceneSerializer = CreateRef<SceneSerializer>(m_spScene);
-}
-
-SandBoxEditorLayer::~SandBoxEditorLayer()
-{
-}
-
-void SandBoxEditorLayer::OnAttach()
-{
-	m_spTexture = Texture2D::Create("assets/textures/Checkerboard.png");
-	m_spTextureStar = Texture2D::Create("assets/textures/Star.png");
-
-	m_spTextureSprite = Texture2D::Create("assets/games/textures/RPGpack_sheet_2X.png");
-	m_spSubTexStairs = CreateRef<SubTexture2D>(m_spTextureSprite, glm::vec2(7, 6), glm::vec2(128, 128));
-	m_spSubTexBarrel = CreateRef<SubTexture2D>(m_spTextureSprite, glm::vec2(1, 11), glm::vec2(128, 128));
-	m_spSubTexTree = CreateRef<SubTexture2D>(m_spTextureSprite, glm::vec2(2, 1), glm::vec2(128, 128), glm::vec2(1.f, 2.f));
 
 	std::vector<FrameBufferTextureSpecification> vecFrameBufferTextureSpecification =
 	{
@@ -46,44 +33,21 @@ void SandBoxEditorLayer::OnAttach()
 
 	m_spFrameBuffer = FrameBuffer::Create(spFrameBufferSpecification);
 
+	m_spIconPlay = Texture2D::Create("Resources/Icons/PlayButton.png");
+	m_spIconStop = Texture2D::Create("Resources/Icons/StopButton.png");
+}
+
+SandBoxEditorLayer::~SandBoxEditorLayer()
+{
+}
+
+void SandBoxEditorLayer::OnAttach()
+{
 	m_spSquareEntity = m_spScene->CreateEntity("Square Entity");
 	m_spSquareEntity->AddComponent<SpriteRenderComponent>(glm::vec4(0.f, 1.f, 0.f, 1.f));
 
 	m_spCameraEntity = m_spScene->CreateEntity("Camera Entity");
 	m_spCameraEntity->AddComponent<CameraComponent>(m_spOrthoGraphicCameraController->GetCamera());
-
-	//class CameraController :public ScriptableEntity
-	//{
-	//public:
-	//	virtual void OnCreate()
-	//	{
-	//		LOG_DEV_INFO("On Create");
-	//	}
-
-	//	virtual void OnUpdate(TimeStep ts)
-	//	{
-	//		auto& translation = GetComponent<TransformComponent>().Translation;
-	//		float speed = 5.f;
-	//		if (Input::IsKeyPressed(Key::A))
-	//		{
-	//			translation.x -= speed * ts;
-	//		}
-	//		if (Input::IsKeyPressed(Key::D))
-	//		{
-	//			translation.x += speed * ts;
-	//		}
-	//		if (Input::IsKeyPressed(Key::W))
-	//		{
-	//			translation.y += speed * ts;
-	//		}
-	//		if (Input::IsKeyPressed(Key::S))
-	//		{
-	//			translation.y -= speed * ts;
-	//		}
-	//	}
-	//};
-	//m_spCameraEntity->AddComponent<NativeScriptComponent>().Bind<CameraController>();
-
 }
 
 void SandBoxEditorLayer::OnDetach()
@@ -94,31 +58,34 @@ void SandBoxEditorLayer::OnDetach()
 void SandBoxEditorLayer::OnUpdate(const TimeStep& timeStep)
 {
 	SAND_TABLE_PROFILE_SCOPE("SandBoxEditorLayer::OnUpdate");
+	m_spScene->OnViewPortResize(m_vec2RenderViewPortSize.x, m_vec2RenderViewPortSize.y);
 
 	auto spFrameBuffer = std::dynamic_pointer_cast<FrameBuffer>(m_spFrameBuffer);
 	SAND_TABLE_ASSERT(spFrameBuffer, "FrameBuffer is null in Edit Layer");
-	auto spSpecification = spFrameBuffer->GetFrameBufferSpecification();
 	spFrameBuffer->Resize(m_vec2RenderViewPortSize.x, m_vec2RenderViewPortSize.y);
-
-	//if (m_vec2RenderViewPortSize.x > 0 && m_vec2RenderViewPortSize.y > 0)
-	//{
-	//	m_spOrthoGraphicCameraController->OnResize(m_vec2RenderViewPortSize.x, m_vec2RenderViewPortSize.y);
-	//}
-
-	//if(m_bRenderWindowActive)
-	//{
-	//	SAND_TABLE_PROFILE_SCOPE("CameraController::OnUpdate");
-	//	m_spOrthoGraphicCameraController->OnUpdate(timeStep);
-	//}
 
 	Render2D::ResetStats();
 	spFrameBuffer->Bind();
 	RenderCommand::SetClearColor(glm::vec4(glm::vec3(0.1f), 1.0f));
 	RenderCommand::Clear();
 	spFrameBuffer->ClearColorAttachment(1, -1);
-
-	m_spScene->OnViewPortResize(m_vec2RenderViewPortSize.x, m_vec2RenderViewPortSize.y);
 	m_spScene->OnUpdate(timeStep);
+	//switch (m_eSceneState)
+	//{
+	//case SandTable::SceneState::PLAY:
+	//{
+	//	m_spScene->OnUpdate(timeStep);
+	//	break;
+	//}
+	//case SandTable::SceneState::STOP:
+	//{
+	//	m_spScene->
+	//}
+	//}
+
+
+
+
 
 	ImVec2 vec2MousePos = ImGui::GetMousePos();
 	vec2MousePos.x -= m_vec2RenderViewPortBounds[0].x;
@@ -215,8 +182,6 @@ void SandBoxEditorLayer::OnImGuiRender()
 		ImGui::EndMenuBar();
 	}
 
-	ImGui::End();
-
 	m_spSceneHierarchyPanel->OnImGuiRender();
 	m_spContentBrowserPanel->OnImGuiRender();
 
@@ -233,16 +198,6 @@ void SandBoxEditorLayer::OnImGuiRender()
 	ImGui::Text("Draw Quads: %d", stats.QuadCount);
 	ImGui::Text("Draw Vertices: %d", stats.GetTotalVertexCount());
 	ImGui::Text("Draw Indices: %d", stats.GetTotalIndexCount());
-
-	//{
-	//	auto& vec4Pan = m_spCameraEntity->GetComponent<TransformComponent>().Translation;
-	//	if (ImGui::DragFloat3("Camera Transform", glm::value_ptr(vec4Pan)))
-	//	{
-	//		auto& spCamera = m_spCameraEntity->GetComponent<CameraComponent>().Camera;
-	//		spCamera->SetPosition(vec4Pan);
-	//	}
-	//}
-
 	ImGui::End();
 
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
@@ -318,9 +273,12 @@ void SandBoxEditorLayer::OnImGuiRender()
 		}
 	}
 
-
 	ImGui::End();
 	ImGui::PopStyleVar();
+
+	UIToolbar();
+
+	ImGui::End();
 }
 
 void SandBoxEditorLayer::OnEvent(Event& e)
@@ -437,6 +395,60 @@ void SandBoxEditorLayer::SaveSceneAs()
 	{
 		m_spSceneSerializer->Serialize(sFilePath);
 	}
+}
+
+void SandBoxEditorLayer::OnScenePlay()
+{
+	m_eSceneState = SceneState::PLAY;
+}
+
+void SandBoxEditorLayer::OnSceneStop()
+{
+	m_eSceneState = SceneState::STOP;
+}
+
+void SandBoxEditorLayer::UIToolbar()
+{
+	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 2));
+	ImGui::PushStyleVar(ImGuiStyleVar_ItemInnerSpacing, ImVec2(0, 0));
+	ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0, 0, 0, 0));
+
+	auto& colors = ImGui::GetStyle().Colors;
+	const auto& buttonHovered = colors[ImGuiCol_ButtonHovered];
+	ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(buttonHovered.x, buttonHovered.y, buttonHovered.z, 0.5f));
+	const auto& buttonActive = colors[ImGuiCol_ButtonActive];
+	ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(buttonActive.x, buttonActive.y, buttonActive.z, 0.5f));
+
+	ImGui::Begin("#toolbar", nullptr, ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse);
+	
+	float size = ImGui::GetWindowHeight() - 4.0f;
+	ImVec4 tintColor = ImVec4(1, 1, 1, 1);
+	auto spIconTexture = m_eSceneState == SceneState::PLAY ? m_spIconPlay : m_spIconStop;
+
+	ImGui::SetCursorPosX(ImGui::GetWindowContentRegionMax().x * 0.5f - size * 0.5f);
+	if (ImGui::ImageButton((ImTextureID)(uint64_t)spIconTexture->GetRenderID(), ImVec2(size, size),
+		ImVec2(0, 0), ImVec2(1, 1), 0, ImVec4(0.0f, 0.0f, 0.0f, 0.0f), tintColor))
+	{
+		switch (m_eSceneState)
+		{
+		case SandTable::SceneState::PLAY:
+		{
+			OnSceneStop();
+			break;
+		}
+		case SandTable::SceneState::STOP:
+		{
+			OnScenePlay();
+			break;
+		}
+		default:
+			break;
+		}
+	}
+	ImGui::PopStyleVar(2);
+	ImGui::PopStyleColor(3);
+	ImGui::End();
+
 }
 
 SAND_TABLE_NAMESPACE_END

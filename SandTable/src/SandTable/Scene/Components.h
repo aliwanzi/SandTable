@@ -3,6 +3,7 @@
 #include "SandTable/Render/Camera/PerspectiveGraphicCamera.h"
 #include "SandTable/Scene/Entity.h"
 #include "SandTable/Scene/ScriptableEntity.h"
+#include "SandTable/Render/Texture/Texture.h"
 
 SAND_TABLE_NAMESPACE_BEGIN
 
@@ -46,6 +47,8 @@ struct TransformComponent
 struct SpriteRenderComponent
 {
 	glm::vec4 Color{ 1.f };
+	Ref<Texture> spTexture;
+	float TilingFactor = 1.0f;
 	SpriteRenderComponent() = default;
 	SpriteRenderComponent(const SpriteRenderComponent&) = default;
 	SpriteRenderComponent& operator =(const SpriteRenderComponent&) = default;

@@ -3,6 +3,13 @@
 #include "SandTable/Scene/Components.h"
 
 SAND_TABLE_NAMESPACE_BEGIN
+
+enum class SceneState
+{
+	PLAY = 0,
+	STOP,
+};
+
 class Scene
 {
 public:

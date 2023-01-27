@@ -115,7 +115,14 @@ void Render2D::Flush()
 
 void Render2D::DrawSprite(const glm::mat4& mat4Transform, const SpriteRenderComponent& spriteRenderComponent, int iEntityID)
 {
-	DrawQuad(mat4Transform, spriteRenderComponent.Color, iEntityID);
+	if (spriteRenderComponent.spTexture != nullptr)
+	{
+		DrawQuad(mat4Transform, spriteRenderComponent.spTexture, spriteRenderComponent.TilingFactor, spriteRenderComponent.Color, iEntityID);
+	}
+	else
+	{
+		DrawQuad(mat4Transform, spriteRenderComponent.Color, iEntityID);
+	}
 }
 
 void Render2D::DrawQuad(const glm::vec2& vec2Position, float fRotation, const glm::vec2& vec2Size, const glm::vec4& vec4Color)
@@ -188,7 +195,7 @@ void Render2D::DrawQuad(const glm::mat4& mat4Transform, const glm::vec4& vec4Col
 	m_spRender2DStroge->Stats.QuadCount++;
 }
 
-void Render2D::DrawQuad(const glm::mat4& mat4Transform, const Ref<Texture>& spTexture, float fFactor, const glm::vec4& vec4Color)
+void Render2D::DrawQuad(const glm::mat4& mat4Transform, const Ref<Texture>& spTexture, float fFactor, const glm::vec4& vec4Color, int iEntityID)
 {
 	if (m_spRender2DStroge->TextureSlots.find(spTexture->GetRenderID())
 		== m_spRender2DStroge->TextureSlots.end())
@@ -209,6 +216,7 @@ void Render2D::DrawQuad(const glm::mat4& mat4Transform, const Ref<Texture>& spTe
 		vertex.TexCoord = m_spRender2DStroge->TextureCoord[i];
 		vertex.TexIndex = spTexture->GetRenderID();
 		vertex.TilingFactor = fFactor;
+		vertex.EntityID = iEntityID;
 		m_spRender2DStroge->Vertex.emplace_back(vertex);
 	}
 
