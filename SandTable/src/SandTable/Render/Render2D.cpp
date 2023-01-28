@@ -5,6 +5,7 @@
 #include "SandTable/Render/RenderCommand.h"
 #include "SandTable/Debug/Instrumentor.h"
 #include "SandTable/Scene/Components.h"
+#include "SandTable/Render/Buffer/UniformBuffer.h"
 
 SAND_TABLE_NAMESPACE_BEGIN
 
@@ -68,8 +69,6 @@ void Render2D::Init()
 	{
 		vecTextures[i] = i;
 	}
-	m_spRender2DStroge->Shader->Bind();
-	m_spRender2DStroge->Shader->SetIntArray("u_Textures", vecTextures.data(), vecTextures.size());
 	m_spRender2DStroge->TextureCoord[0] = glm::vec2(0.f, 0.f);
 	m_spRender2DStroge->TextureCoord[1] = glm::vec2(1.f, 0.f);
 	m_spRender2DStroge->TextureCoord[2] = glm::vec2(1.f, 1.f);
@@ -78,6 +77,12 @@ void Render2D::Init()
 	int uiWiteTextureData = 0xffffffff;
 	m_spRender2DStroge->WhiteTexture = Texture2D::Create(1, 1);
 	m_spRender2DStroge->WhiteTexture->SetData(&uiWiteTextureData, sizeof(uiWiteTextureData));
+
+	m_spRender2DStroge->CameraUniformBuffer = UniformBuffer::Create(sizeof(Render2DStroge::CameraData), 2);
+
+	m_spRender2DStroge->Shader->Bind();
+	m_spRender2DStroge->Shader->SetIntArray("u_Textures", vecTextures.data(), vecTextures.size());
+	m_spRender2DStroge->Shader->SetUniformBlock("Camera", 2);
 }
 
 void Render2D::ShutDown()
@@ -86,8 +91,10 @@ void Render2D::ShutDown()
 
 void Render2D::BeginScene(const Ref<Camera>& spCamera)
 {
-	m_spRender2DStroge->Shader->Bind();
-	m_spRender2DStroge->Shader->SetMat4("ViewProjection", spCamera->GetViewProjectionMatrix());
+	m_spRender2DStroge->CameraBuffer.ViewProjection = spCamera->GetViewProjectionMatrix();
+
+	auto spCameraUniformBuffer = std::dynamic_pointer_cast<UniformBuffer>(m_spRender2DStroge->CameraUniformBuffer);
+	spCameraUniformBuffer->SetData(&m_spRender2DStroge->CameraBuffer, sizeof(Render2DStroge::CameraData));
 	StartBatch();
 }
 

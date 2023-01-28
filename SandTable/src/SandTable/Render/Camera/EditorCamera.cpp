@@ -23,7 +23,7 @@ EditorCamera::EditorCamera(float fFOV, float fAspectRatio, float fNearClip, floa
 
 void EditorCamera::OnUpdate(const TimeStep& ts)
 {
-	//if (Input::IsKeyPressed(Key::LeftAlt))
+	if (Input::IsKeyPressed(Key::LeftAlt))
 	{
 		glm::vec2 delta = (Input::GetMousePos() - m_vec2MousePosition) * 0.003f;
 		m_vec2MousePosition = Input::GetMousePos();
@@ -35,25 +35,6 @@ void EditorCamera::OnUpdate(const TimeStep& ts)
 		else if (Input::IsMouseButtonPressed(Mouse::ButtonRight))
 			MouseZoom(delta.y);
 	}
-
-	if (Input::IsKeyPressed(Key::W))
-	{
-		m_vec3FocalPoint += -GetForwardDirection() * RotationSpeed();
-	}
-	else if (Input::IsKeyPressed(Key::S))
-	{
-		m_vec3FocalPoint += GetForwardDirection() * RotationSpeed();
-	}
-
-	if (Input::IsKeyPressed(Key::A))
-	{
-		m_vec3FocalPoint += GetRightDirection() * RotationSpeed();
-	}
-	else if (Input::IsKeyPressed(Key::D))
-	{
-		m_vec3FocalPoint += -GetRightDirection() * RotationSpeed();
-	}
-
 	UpdateView();
 }
 

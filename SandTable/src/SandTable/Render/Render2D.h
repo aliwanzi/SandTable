@@ -51,6 +51,13 @@ public:
 		std::array<glm::vec2, 4> TextureCoord;
 
 		Statistics Stats;
+
+		struct CameraData
+		{
+			glm::mat4 ViewProjection;
+		};
+		CameraData CameraBuffer;
+		Ref<Buffer> CameraUniformBuffer;
 	};
 
 	static void Init();

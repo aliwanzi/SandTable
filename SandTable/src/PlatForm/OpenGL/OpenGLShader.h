@@ -26,6 +26,7 @@ private:
 	virtual void SetInt4(const std::string& sName, const glm::ivec4& vec4Value) override;
 	virtual void SetIntArray(const std::string& sName, const int* pValues,unsigned int uiCount) override;
 	virtual void SetBool(const std::string& sName, bool bValue) override;
+	virtual void SetUniformBlock(const std::string& sName, int iBlockBinding) override;
 	virtual const std::string& GetName() const override;
 private:
 	unsigned int m_uiRenderID;

@@ -37,7 +37,6 @@ private:
 	glm::vec3 CalculatePosition();
 
 	glm::vec2 PanSpeed();
-	float PanSpeed();
 	float RotationSpeed();
 	float ZoomSpeed();
 

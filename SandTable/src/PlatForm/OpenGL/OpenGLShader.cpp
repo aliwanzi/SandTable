@@ -200,6 +200,12 @@ void OpenGLShader::SetBool(const std::string& sName, bool bValue)
 	glUniform1i(iLocation, bValue);
 }
 
+void OpenGLShader::SetUniformBlock(const std::string& sName, int iBlockBinding)
+{
+	auto uiBlockIndex = glGetUniformBlockIndex(m_uiRenderID, sName.c_str());
+	glUniformBlockBinding(m_uiRenderID, uiBlockIndex, iBlockBinding);
+}
+
 const std::string& OpenGLShader::GetName() const
 {
 	return m_sShaderName;

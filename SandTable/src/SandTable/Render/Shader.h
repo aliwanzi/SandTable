@@ -46,6 +46,9 @@ public:
 	virtual void SetIntArray(const std::string& sName, const int* pValues, unsigned int uiCount) = 0;
 
 	virtual void SetBool(const std::string& sName, bool bValue) = 0;
+
+	virtual void SetUniformBlock(const std::string& sName, int iBlockBinding) = 0;
+
 	virtual const std::string& GetName() const = 0;
 
 	static Ref<Shader> Create(const std::vector<ShaderInfo>& vecShaderInfo, const std::string& sShaderName = "shader");

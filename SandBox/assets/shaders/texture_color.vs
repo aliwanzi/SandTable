@@ -7,7 +7,10 @@ layout (location = 3) in float a_TexIndex;
 layout (location = 4) in float a_TilingFactor;
 layout (location = 5) in float a_EntityID;
 
-uniform mat4 ViewProjection;
+layout(std140) uniform Camera
+{
+	mat4 u_ViewProjection;
+};
 
 struct VertexOutput
 {
@@ -22,7 +25,7 @@ layout (location = 4) out flat float v_EntityID;
 
 void main()
 {
-	gl_Position = ViewProjection * vec4(a_Position, 1.0);
+	gl_Position = u_ViewProjection * vec4(a_Position, 1.0);
 
 	Output.Color = a_Color;
 	Output.TexCoord = a_TexCoord;
