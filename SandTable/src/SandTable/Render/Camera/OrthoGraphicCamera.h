@@ -10,7 +10,6 @@ public:
 	OrthoGraphicCamera();
 	OrthoGraphicCamera(float fSize, float fAspectRatio, float fNearClip = -1.f, float fFarClip = 1.f);
 
-	void SetViewPortSize(unsigned int uiWidth, unsigned int uiHeight);
 	void SetOrthoSize(float fSize);
 	float GetOrthoSize()const;
 

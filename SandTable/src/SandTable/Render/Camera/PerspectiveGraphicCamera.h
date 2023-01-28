@@ -7,11 +7,11 @@ class PerspectiveGraphicCamera :public Camera
 {
 public:
 	PerspectiveGraphicCamera();
-	PerspectiveGraphicCamera(float fFOV, float fAspectRatio, float fNearClip = 0.01f, float fFarClip = 1000.f);
+	PerspectiveGraphicCamera(float fFOV, float fAspectRatio, float fNearClip = 0.1f, float fFarClip = 1000.f);
 	void SetPerspectiveFOV(float fFOV);
 	float GetPerspectiveFOV();
 private:
-	virtual void RecalculateProjectionMatrix() override;
+	void RecalculateProjectionMatrix() override;
 private:
 	float m_fFOV;
 };

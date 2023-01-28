@@ -28,14 +28,10 @@ private:
 
 	void UIToolbar();
 private:
-	Ref<OrthoGraphicCameraController> m_spOrthoGraphicCameraController;
 	Ref<Texture> m_spIconPlay;
 	Ref<Texture> m_spIconStop;
 
 	glm::vec4 m_vec4Color;
-
-	Ref<ParticleSystem2D> m_spParticleSystem2D;
-	ParticleProps m_Particle;
 
 	Ref<Buffer> m_spFrameBuffer;
 
@@ -57,6 +53,8 @@ private:
 	Ref<SceneSerializer> m_spSceneSerializer;
 
 	SceneState m_eSceneState;
+
+	Ref<Camera> m_spEditCamera;
 };
 
 SAND_TABLE_NAMESPACE_END

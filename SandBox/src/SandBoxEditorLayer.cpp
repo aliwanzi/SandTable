@@ -10,10 +10,11 @@ SandBoxEditorLayer::SandBoxEditorLayer()
 	m_bViewportHovered(false),
 	m_bViewportFocused(false),
 	m_iGizmoType(-1),
-	m_eSceneState(SceneState::PLAY)
+	m_eSceneState(SceneState::STOP)
 {
-	m_spOrthoGraphicCameraController = CreateRef<OrthoGraphicCameraController>
-		(Application::GetApplication()->GetWindowWidth(), Application::GetApplication()->GetWindowHeight());
+	auto uiWindowWidth = Application::GetApplication()->GetWindowWidth();
+	auto uiWindowHeight = Application::GetApplication()->GetWindowHeight();
+	m_spEditCamera = CreateRef<EditorCamera>(30.f, static_cast<float>(uiWindowWidth) / static_cast<float>(uiWindowHeight));
 
 	m_spScene = CreateRef<Scene>();
 	m_spSceneHierarchyPanel = CreateRef<SceneHierarchyPanel>(m_spScene);
@@ -28,8 +29,7 @@ SandBoxEditorLayer::SandBoxEditorLayer()
 	};
 	auto spFrameBufferAttachmentSpecification = CreateRef<FrameBufferAttachmentSpecification>(vecFrameBufferTextureSpecification);
 	auto spFrameBufferSpecification = CreateRef<FrameBufferSpecification>
-		(Application::GetApplication()->GetWindowWidth(), Application::GetApplication()->GetWindowHeight(),
-			spFrameBufferAttachmentSpecification);
+		(uiWindowHeight, uiWindowHeight, spFrameBufferAttachmentSpecification);
 
 	m_spFrameBuffer = FrameBuffer::Create(spFrameBufferSpecification);
 
@@ -47,7 +47,7 @@ void SandBoxEditorLayer::OnAttach()
 	m_spSquareEntity->AddComponent<SpriteRenderComponent>(glm::vec4(0.f, 1.f, 0.f, 1.f));
 
 	m_spCameraEntity = m_spScene->CreateEntity("Camera Entity");
-	m_spCameraEntity->AddComponent<CameraComponent>(m_spOrthoGraphicCameraController->GetCamera());
+	m_spCameraEntity->AddComponent<CameraComponent>();
 }
 
 void SandBoxEditorLayer::OnDetach()
@@ -63,29 +63,29 @@ void SandBoxEditorLayer::OnUpdate(const TimeStep& timeStep)
 	auto spFrameBuffer = std::dynamic_pointer_cast<FrameBuffer>(m_spFrameBuffer);
 	SAND_TABLE_ASSERT(spFrameBuffer, "FrameBuffer is null in Edit Layer");
 	spFrameBuffer->Resize(m_vec2RenderViewPortSize.x, m_vec2RenderViewPortSize.y);
+	m_spEditCamera->SetViewPortSize(m_vec2RenderViewPortSize.x, m_vec2RenderViewPortSize.y);
 
 	Render2D::ResetStats();
 	spFrameBuffer->Bind();
 	RenderCommand::SetClearColor(glm::vec4(glm::vec3(0.1f), 1.0f));
 	RenderCommand::Clear();
 	spFrameBuffer->ClearColorAttachment(1, -1);
-	m_spScene->OnUpdate(timeStep);
-	//switch (m_eSceneState)
-	//{
-	//case SandTable::SceneState::PLAY:
-	//{
-	//	m_spScene->OnUpdate(timeStep);
-	//	break;
-	//}
-	//case SandTable::SceneState::STOP:
-	//{
-	//	m_spScene->
-	//}
-	//}
 
-
-
-
+	switch (m_eSceneState)
+	{
+		case SandTable::SceneState::PLAY:
+		{
+			m_spScene->OnUpdate(timeStep);
+			break;
+		}
+		case SandTable::SceneState::STOP:
+		{
+			auto spEditorCamera = std::dynamic_pointer_cast<EditorCamera>(m_spEditCamera);
+			spEditorCamera->OnUpdate(timeStep);
+			m_spScene->OnUpdate(spEditorCamera);
+			break;
+		}
+	}
 
 	ImVec2 vec2MousePos = ImGui::GetMousePos();
 	vec2MousePos.x -= m_vec2RenderViewPortBounds[0].x;
@@ -240,13 +240,12 @@ void SandBoxEditorLayer::OnImGuiRender()
 		ImGuizmo::SetRect(ImGui::GetWindowPos().x, ImGui::GetWindowPos().y,
 			windowWidth, windowHeight);
 
-		auto cameraEntity = m_spScene->GetPrimaryCameraEntity();
-		auto spCamera = cameraEntity->GetComponent<CameraComponent>().GetCamera();
-		auto cameraProjection = spCamera->GetProjectionMatrix();
-		glm::mat4 cameraView = cameraEntity->GetComponent<TransformComponent>().GetTransform();
+		const glm::mat4& cameraProjection = m_spEditCamera->GetProjectionMatrix();
+		glm::mat4 cameraView = m_spEditCamera->GetViewMatrix();
 
+		// Entity transform
 		auto& transformComponent = spSelectedEntity->GetComponent<TransformComponent>();
-		auto transfrom = transformComponent.GetTransform();
+		glm::mat4 transform = transformComponent.GetTransform();
 
 		//snapping
 		bool snap = Input::IsKeyPressed(Key::LeftControl);
@@ -258,15 +257,15 @@ void SandBoxEditorLayer::OnImGuiRender()
 		glm::vec3 snapValues(snapValue);
 
 		ImGuizmo::Manipulate(glm::value_ptr(cameraView), glm::value_ptr(cameraProjection),
-			static_cast<ImGuizmo::OPERATION>(m_iGizmoType), ImGuizmo::LOCAL, glm::value_ptr(transfrom),
+			static_cast<ImGuizmo::OPERATION>(m_iGizmoType), ImGuizmo::LOCAL, glm::value_ptr(transform),
 			nullptr, snap ? glm::value_ptr(snapValues) : nullptr);
 
 		if (ImGuizmo::IsUsing())
 		{
 			glm::vec3 translation, rotation, scale;
-			MathUtils::DecomposeTransform(transfrom, translation, rotation, scale);
-			glm::vec3 deltaRotation = rotation - transformComponent.Rotation;
+			MathUtils::DecomposeTransform(transform, translation, rotation, scale);
 
+			glm::vec3 deltaRotation = rotation - transformComponent.Rotation;
 			transformComponent.Translation = translation;
 			transformComponent.Rotation += deltaRotation;
 			transformComponent.Scale = scale;
@@ -283,7 +282,11 @@ void SandBoxEditorLayer::OnImGuiRender()
 
 void SandBoxEditorLayer::OnEvent(Event& e)
 {
-	m_spOrthoGraphicCameraController->OnEvent(e);
+	if (m_eSceneState == SceneState::STOP)
+	{
+		auto spEditorCamera = std::dynamic_pointer_cast<EditorCamera>(m_spEditCamera);
+		spEditorCamera->OnEvent(e);
+	}
 
 	EventDispatcher dispatcher(e);
 	dispatcher.Dispatch<KeyPressedEvent>(BIND_EVENT_FUN(SandBoxEditorLayer::OnKeyPressed));
@@ -399,12 +402,12 @@ void SandBoxEditorLayer::SaveSceneAs()
 
 void SandBoxEditorLayer::OnScenePlay()
 {
-	m_eSceneState = SceneState::PLAY;
+	m_eSceneState = SceneState::STOP;
 }
 
 void SandBoxEditorLayer::OnSceneStop()
 {
-	m_eSceneState = SceneState::STOP;
+	m_eSceneState = SceneState::PLAY;
 }
 
 void SandBoxEditorLayer::UIToolbar()
@@ -423,7 +426,7 @@ void SandBoxEditorLayer::UIToolbar()
 	
 	float size = ImGui::GetWindowHeight() - 4.0f;
 	ImVec4 tintColor = ImVec4(1, 1, 1, 1);
-	auto spIconTexture = m_eSceneState == SceneState::PLAY ? m_spIconPlay : m_spIconStop;
+	auto spIconTexture = m_eSceneState == SceneState::STOP ? m_spIconPlay : m_spIconStop;
 
 	ImGui::SetCursorPosX(ImGui::GetWindowContentRegionMax().x * 0.5f - size * 0.5f);
 	if (ImGui::ImageButton((ImTextureID)(uint64_t)spIconTexture->GetRenderID(), ImVec2(size, size),
@@ -433,12 +436,12 @@ void SandBoxEditorLayer::UIToolbar()
 		{
 		case SandTable::SceneState::PLAY:
 		{
-			OnSceneStop();
+			OnScenePlay();
 			break;
 		}
 		case SandTable::SceneState::STOP:
 		{
-			OnScenePlay();
+			OnSceneStop();
 			break;
 		}
 		default:

@@ -22,12 +22,15 @@
 #include "SandTable/Render/Shader.h"
 #include "SandTable/Render/Texture/SubTexture2D.h"
 #include "SandTable/Render/Camera/OrthoGraphicCameraController.h"
+#include "SandTable/Render/Camera/EditorCamera.h"
 
 #include "SandTable/Scene/Scene.h"
 #include "SandTable/Scene/Components.h"
 #include "SandTable/Scene/Entity.h"
 
 #include "SandTable/ParticleSystem/ParticleSystem2D.h"
+
 #include "SandTable/Utils/PlatformUtils.h"
+
 #include "SandTable/Math/MathUtils.h"
 

@@ -7,11 +7,13 @@ Camera::Camera(float fAspectRatio, float fNear, float fFar, ProjectionType eProj
 	m_mat4ProjectionMatrix(glm::mat4(1.f)),
 	m_mat4ViewMatrix(glm::mat4(1.f)),
 	m_vec3Position(glm::vec3(0.f)),
-	m_fRotation(0.f),
+	m_quatRotation(glm::quat(0.f,0.f,0.f,0.f)),
 	m_fAspectRatio(fAspectRatio),
 	m_fNearClip(fNear),
 	m_fFarClip(fFar),
-	m_eProjectionType(eProjectionType)
+	m_eProjectionType(eProjectionType),
+	m_uiWidth(0),
+	m_uiHeight(0)
 {
 }
 
@@ -26,15 +28,14 @@ const glm::vec3& Camera::GetPositon() const
 	return m_vec3Position;
 }
 
-void Camera::SetRotation(float fRotation)
+void Camera::SetRotation(const glm::quat& quatRotation)
 {
-	m_fRotation = fRotation;
-	RecalculateViewMatrix();
+	m_quatRotation = quatRotation;
 }
 
-float Camera::GetRotaion() const
+const glm::quat& Camera::GetRotaion()const
 {
-	return m_fRotation;
+	return m_quatRotation;
 }
 
 void Camera::SetProjectionMatrix(const glm::mat4& mat4ProjectionMatrix)
@@ -103,12 +104,36 @@ float Camera::GetFarClip() const
 	return m_fFarClip;
 }
 
+void Camera::SetViewPortSize(unsigned int uiWidth, unsigned int uiHeight)
+{
+	if (m_uiWidth != uiWidth || m_uiHeight != uiHeight)
+	{
+		m_uiWidth = uiWidth;
+		m_uiHeight = uiHeight;
+		m_fAspectRatio = static_cast<float>(m_uiWidth) / static_cast<float>(m_uiHeight);
+		RecalculateProjectionMatrix();
+	}
+}
+
+void Camera::SetAspectRatio(float fAspectRatio)
+{
+	m_fAspectRatio = fAspectRatio;
+	RecalculateProjectionMatrix();
+}
+
+float Camera::GetAspectRatio()
+{
+	return m_fAspectRatio;
+}
+
 void Camera::RecalculateViewMatrix()
 {
-	auto mat4Transform = glm::translate(glm::mat4(1.f), m_vec3Position);
-	mat4Transform = glm::rotate(mat4Transform, glm::radians(m_fRotation), glm::vec3(0.f, 0.f, 1.f));
+	glm::mat4 mat4Translation = glm::translate(glm::mat4(1.f), m_vec3Position);
 
-	m_mat4ViewMatrix = mat4Transform;
+	glm::mat4 mat4Rotation = glm::toMat4(m_quatRotation);
+
+	m_mat4ViewMatrix = glm::inverse(mat4Translation * mat4Rotation);
+
 	RecalculateViewProjectionMatrix();
 }
 

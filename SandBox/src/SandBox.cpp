@@ -1,6 +1,7 @@
 #include "SandBoxExampleLayer.h"
 #include "SandBox2DLayer.h"
 #include "SandBoxEditorLayer.h"
+#include "SandBoxParticleLayer.h"
 #include "SandTable/Core/EntryPoint.h"
 
 void SandTable::Application::CreateApplication()

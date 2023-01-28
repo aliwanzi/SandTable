@@ -146,6 +146,7 @@ namespace
 			out << YAML::Key << "OrthographicSize" << YAML::Value << spOrthoCamera->GetOrthoSize();
 			out << YAML::Key << "OrthographicNear" << YAML::Value << spOrthoCamera->GetNearClip();
 			out << YAML::Key << "OrthographicFar" << YAML::Value << spOrthoCamera->GetFarClip();
+			out << YAML::Key << "AspectRatio" << YAML::Value << spOrthoCamera->GetAspectRatio();
 			out << YAML::EndMap; // Camera
 
 			out << YAML::Key << "Perspective Camera" << YAML::Value;
@@ -157,6 +158,7 @@ namespace
 			out << YAML::Key << "PerspectiveFOV" << YAML::Value << spPerspecCamera->GetPerspectiveFOV();
 			out << YAML::Key << "PerspectiveNear" << YAML::Value << spPerspecCamera->GetNearClip();
 			out << YAML::Key << "PerspectiveFar" << YAML::Value << spPerspecCamera->GetFarClip();
+			out << YAML::Key << "AspectRatio" << YAML::Value << spPerspecCamera->GetAspectRatio();
 			out << YAML::EndMap; // Camera
 
 			out << YAML::Key << "Primary" << YAML::Value << cameraComponent.Primary;
@@ -263,6 +265,7 @@ bool SceneSerializer::DeSerialize(const std::string& sFilePath)
 				spOrthoCamera->SetOrthoSize(orthoCameraProps["OrthographicSize"].as<float>());
 				spOrthoCamera->SetNearClip(orthoCameraProps["OrthographicNear"].as<float>());
 				spOrthoCamera->SetFarClip(orthoCameraProps["OrthographicFar"].as<float>());
+				spOrthoCamera->SetAspectRatio(orthoCameraProps["AspectRatio"].as<float>());
 
 				auto& persCameraProps = cameraComponent["Perspective Camera"];
 				auto spPerspecCamera = std::dynamic_pointer_cast<PerspectiveGraphicCamera>(cc.PerspecCamera);
@@ -271,6 +274,7 @@ bool SceneSerializer::DeSerialize(const std::string& sFilePath)
 				spPerspecCamera->SetPerspectiveFOV(persCameraProps["PerspectiveFOV"].as<float>());
 				spPerspecCamera->SetNearClip(persCameraProps["PerspectiveNear"].as<float>());
 				spPerspecCamera->SetFarClip(persCameraProps["PerspectiveFar"].as<float>());
+				spPerspecCamera->SetAspectRatio(orthoCameraProps["AspectRatio"].as<float>());
 
 				cc.Primary = cameraComponent["Primary"].as<bool>();
 				cc.FixedAspectRatio = cameraComponent["FixedAspectRatio"].as<bool>();

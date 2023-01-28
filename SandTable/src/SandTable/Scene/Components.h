@@ -68,9 +68,6 @@ struct CameraComponent
 	CameraComponent() = default;
 	CameraComponent(const CameraComponent&) = default;
 	CameraComponent& operator =(const CameraComponent&) = default;
-	CameraComponent(const Ref<SandTable::Camera>& spCamera, bool bPrimary = true, bool bFixedAspectRatio = false)
-		:OrthoCamera(spCamera), Primary(bPrimary), FixedAspectRatio(bFixedAspectRatio)
-	{}
 	Ref<SandTable::Camera> GetCamera()
 	{
 		switch (Projection)

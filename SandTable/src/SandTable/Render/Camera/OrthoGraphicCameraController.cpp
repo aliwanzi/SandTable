@@ -64,7 +64,8 @@ void OrthoGraphicCameraController::OnUpdate(TimeStep timeStep)
 		m_fCameraRotation += m_fCameraRotationSpeed * timeStep;
 	}
 
-	m_spOrthoGraphicCamera->SetRotation(m_fCameraRotation);
+	auto cameraRotation = glm::quat(glm::vec3(0.f, 0.f, m_fCameraRotation));
+	m_spOrthoGraphicCamera->SetRotation(cameraRotation);
 	m_spOrthoGraphicCamera->SetPosition(m_vec3CameraPosition);
 }
 

@@ -1,4 +1,4 @@
-#include "pch.h"
+﻿#include "pch.h"
 #include "Render2D.h"
 #include "SandTable/Render/VertexArray.h"
 #include "SandTable/Render/Shader.h"
@@ -165,11 +165,34 @@ void Render2D::DrawQuad(const glm::vec3& vec3Position, float fRotation, const gl
 	float fFactor, const glm::vec4& vec4Color)
 {
 	auto spRefTexture2D = spSubTexture2D->GetTexture();
+	if (m_spRender2DStroge->TextureSlots.find(spRefTexture2D->GetRenderID())
+		== m_spRender2DStroge->TextureSlots.end())
+	{
+		m_spRender2DStroge->TextureSlots[spRefTexture2D->GetRenderID()] = spRefTexture2D;
+	}
+	if (m_spRender2DStroge->TextureSlots.size() == 31  //Texture0未使用
+		|| m_spRender2DStroge->QuadIndexCount + 6 > m_spRender2DStroge->MaxIndices)
+	{
+		NextBatch();
+	}
+
 	glm::mat4 matTransform = glm::translate(glm::mat4(1.f), vec3Position)
 		* glm::rotate(glm::mat4(1.f), glm::radians(fRotation), glm::vec3(0.f, 0.f, 1.f))
 		* glm::scale(glm::mat4(1.f), glm::vec3(vec2Size, 1.f));
 
-	DrawQuad(matTransform, spRefTexture2D, fFactor, vec4Color);
+	for (int i = 0; i < 4; i++)
+	{
+		Vertex vertex;
+		vertex.Position = matTransform * m_spRender2DStroge->VertexPosition[i];
+		vertex.Color = vec4Color;
+		vertex.TexCoord = spSubTexture2D->GetTexCoord()[i];
+		vertex.TexIndex = spRefTexture2D->GetRenderID();
+		vertex.TilingFactor = fFactor;
+		m_spRender2DStroge->Vertex.emplace_back(vertex);
+	}
+
+	m_spRender2DStroge->QuadIndexCount += 6;
+	m_spRender2DStroge->Stats.QuadCount++;
 }
 
 void Render2D::DrawQuad(const glm::mat4& mat4Transform, const glm::vec4& vec4Color, int iEntityID)
@@ -202,7 +225,7 @@ void Render2D::DrawQuad(const glm::mat4& mat4Transform, const Ref<Texture>& spTe
 	{
 		m_spRender2DStroge->TextureSlots[spTexture->GetRenderID()] = spTexture;
 	}
-	if (m_spRender2DStroge->TextureSlots.size() == 31  //Texture0δʹ��
+	if (m_spRender2DStroge->TextureSlots.size() == 31  //Texture0未使用
 		|| m_spRender2DStroge->QuadIndexCount + 6 > m_spRender2DStroge->MaxIndices)
 	{
 		NextBatch();

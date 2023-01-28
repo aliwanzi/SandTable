@@ -17,8 +17,8 @@ public:
 	~Camera() = default;
 	void SetPosition(const glm::vec3& vec3Position);
 	const glm::vec3& GetPositon()const;
-	void SetRotation(float fRotation);
-	float GetRotaion()const;
+	void SetRotation(const glm::quat& quatRotation);
+	const glm::quat& GetRotaion()const;
 
 	void SetProjectionMatrix(const glm::mat4& mat4ProjectionMatrix);
 	const glm::mat4& GetProjectionMatrix()const;
@@ -34,11 +34,13 @@ public:
 	void SetFarClip(float fFar);
 	float GetFarClip() const;
 
+	void SetViewPortSize(unsigned int uiWidth, unsigned int uiHeight);
+	void SetAspectRatio(float fAspectRatio);
+	float GetAspectRatio();
+
 protected:
 	virtual void RecalculateProjectionMatrix() = 0;
 	void RecalculateViewProjectionMatrix();
-
-private:
 	void RecalculateViewMatrix();
 
 protected:
@@ -48,11 +50,13 @@ protected:
 	glm::mat4 m_mat4ViewMatrix;
 	glm::mat4 m_mat4ViewProjectionMatrix;
 	glm::vec3 m_vec3Position;
-	float m_fRotation;
+	glm::quat m_quatRotation;
 
 	float m_fNearClip;
 	float m_fFarClip;
 	float m_fAspectRatio;
+	unsigned int m_uiWidth;
+	unsigned int m_uiHeight;
 };
 
 SAND_TABLE_NAMESPACE_END

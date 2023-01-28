@@ -2,9 +2,18 @@ Scene: Untitled
 Entities:
   - Entity: 12837
     TagComponent:
-      Tag: Camera Entity
+      Tag: Square Entity
     TransformComponent:
       Translation: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    SpriteRenderComponent:
+      Color: [0, 1, 0, 1]
+  - Entity: 12837
+    TagComponent:
+      Tag: Camera Entity
+    TransformComponent:
+      Translation: [0, 0, -0.5]
       Rotation: [0, 0, 0]
       Scale: [1, 1, 1]
     CameraComponent:
@@ -13,19 +22,12 @@ Entities:
         OrthographicSize: 1
         OrthographicNear: -1
         OrthographicFar: 1
+        AspectRatio: 1.94059408
       Perspective Camera:
         ProjectionType: 0
         PerspectiveFOV: 45
         PerspectiveNear: 0.00999999978
         PerspectiveFar: 1000
+        AspectRatio: 1.94059408
       Primary: true
       FixedAspectRatio: false
-  - Entity: 12837
-    TagComponent:
-      Tag: Square Entity
-    TransformComponent:
-      Translation: [0, 0, 0]
-      Rotation: [0, 0, 0]
-      Scale: [1, 1, 1]
-    SpriteRenderComponent:
-      Color: [0, 1, 0, 1]

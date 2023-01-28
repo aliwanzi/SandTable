@@ -56,22 +56,17 @@ void Scene::OnUpdate(const TimeStep& timeStep)
 			{
 				auto camera = cameraComponent.GetCamera();
 				camera->SetViewMatrix(cameraTransform.GetTransform());
-				Render2D::BeginScene(camera);
-
-				auto spriteView = m_spRegistry->view<TransformComponent, SpriteRenderComponent>();
-				for (auto spriteComponent : spriteView)
-				{
-					const auto [spriteTransform, sprite] = spriteView.get<TransformComponent, SpriteRenderComponent>(spriteComponent);
-
-					Render2D::DrawSprite(spriteTransform.GetTransform(), sprite, static_cast<int>(spriteComponent));
-				}
-
-				Render2D::EndScene();
+				RenderScene(camera);
 				break;
 			}
 		}
 	}
 
+}
+
+void Scene::OnUpdate(const Ref<Camera>& spCamera)
+{
+	RenderScene(spCamera);
 }
 
 void Scene::OnViewPortResize(unsigned int uiWidth, unsigned int uiHeight)
@@ -86,24 +81,8 @@ void Scene::OnViewPortResize(unsigned int uiWidth, unsigned int uiHeight)
 			auto cameraComponent = cameraView.get<CameraComponent>(component);
 			if (!cameraComponent.FixedAspectRatio)
 			{
-				switch (cameraComponent.Projection)
-				{
-					case SandTable::ProjectionType::Perspective:
-					{
-						auto spPerspecCamera = std::dynamic_pointer_cast<PerspectiveGraphicCamera>(cameraComponent.PerspecCamera);
-						SAND_TABLE_ASSERT(spPerspecCamera, "Perspectiv Graphic Camera is null in Scene OnViewPortResize");
-						spPerspecCamera->SetPerspectiveFOV(static_cast<float>(uiWidth) / static_cast<float>(uiHeight));
-						break;
-					}
-					case SandTable::ProjectionType::Orthographic:
-					{
-						auto spOrthoCamera = std::dynamic_pointer_cast<OrthoGraphicCamera>(cameraComponent.OrthoCamera);
-						SAND_TABLE_ASSERT(spOrthoCamera, "Ortho Graphic Camera is null in Scene OnViewPortResize");
-						spOrthoCamera->SetViewPortSize(uiWidth, uiHeight);
-						break;
-
-					}
-				}
+				cameraComponent.PerspecCamera->SetViewPortSize(uiWidth, uiHeight);
+				cameraComponent.OrthoCamera->SetViewPortSize(uiWidth, uiHeight);
 			}
 		}
 	}
@@ -126,6 +105,21 @@ Ref<Entity> Scene::GetPrimaryCameraEntity()
 		}
 	}
 	return nullptr;
+}
+
+void Scene::RenderScene(const Ref<Camera>& spCamera)
+{
+	Render2D::BeginScene(spCamera);
+
+	auto spriteView = m_spRegistry->view<TransformComponent, SpriteRenderComponent>();
+	for (auto spriteComponent : spriteView)
+	{
+		const auto [spriteTransform, sprite] = spriteView.get<TransformComponent, SpriteRenderComponent>(spriteComponent);
+
+		Render2D::DrawSprite(spriteTransform.GetTransform(), sprite, static_cast<int>(spriteComponent));
+	}
+
+	Render2D::EndScene();
 }
 
 

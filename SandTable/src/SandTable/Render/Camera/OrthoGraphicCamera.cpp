@@ -28,14 +28,6 @@ float OrthoGraphicCamera::GetOrthoSize() const
 	return m_fOrthoGraphicSize;
 }
 
-
-
-void OrthoGraphicCamera::SetViewPortSize(unsigned int uiWidth, unsigned int uiHeight)
-{
-	m_fAspectRatio = static_cast<float>(uiWidth) / static_cast<float>(uiHeight);
-	RecalculateProjectionMatrix();
-}
-
 void OrthoGraphicCamera::RecalculateProjectionMatrix()
 {
 	float fOrthoLeft = -m_fOrthoGraphicSize * m_fAspectRatio;
