@@ -8,7 +8,7 @@ class OrthoGraphicCamera :public Camera
 public:
 	~OrthoGraphicCamera() = default;
 	OrthoGraphicCamera();
-	OrthoGraphicCamera(float fSize, float fAspectRatio, float fNearClip = -1.f, float fFarClip = 1.f);
+	OrthoGraphicCamera(float fSize, float fAspectRatio, float fNearClip = -10.f, float fFarClip = 10.f);
 
 	void SetOrthoSize(float fSize);
 	float GetOrthoSize()const;

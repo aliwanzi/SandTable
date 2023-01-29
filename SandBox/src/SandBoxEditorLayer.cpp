@@ -231,7 +231,7 @@ void SandBoxEditorLayer::OnImGuiRender()
 
 	//Gizmos
 	auto spSelectedEntity = m_spSceneHierarchyPanel->GetSelectedEntity();
-	if (spSelectedEntity != nullptr && m_iGizmoType != -1)
+	if (spSelectedEntity != nullptr && m_iGizmoType != -1 && m_eSceneState == SceneState::STOP)
 	{
 		ImGuizmo::SetOrthographic(false);
 		ImGuizmo::SetDrawlist();
@@ -241,7 +241,7 @@ void SandBoxEditorLayer::OnImGuiRender()
 			windowWidth, windowHeight);
 
 		const glm::mat4& cameraProjection = m_spEditCamera->GetProjectionMatrix();
-		glm::mat4 cameraView = m_spEditCamera->GetViewMatrix();
+		const glm::mat4& cameraView = m_spEditCamera->GetViewMatrix();
 
 		// Entity transform
 		auto& transformComponent = spSelectedEntity->GetComponent<TransformComponent>();

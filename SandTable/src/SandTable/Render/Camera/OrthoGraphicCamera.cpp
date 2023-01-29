@@ -12,7 +12,7 @@ OrthoGraphicCamera::OrthoGraphicCamera(float fSize, float fAspectRatio, float fN
 
 OrthoGraphicCamera::OrthoGraphicCamera() :
 	m_fOrthoGraphicSize(1.f),
-	Camera(1.f, -1.f, 1.f, ProjectionType::Orthographic)
+	Camera(1.f, -10.f, 10.f, ProjectionType::Orthographic)
 {
 	RecalculateProjectionMatrix();
 }

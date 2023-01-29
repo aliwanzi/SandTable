@@ -17,6 +17,8 @@ public:
 	~Camera() = default;
 	void SetPosition(const glm::vec3& vec3Position);
 	const glm::vec3& GetPositon()const;
+	void SetScale(const glm::vec3& vec3Scale);
+	const glm::vec3& GetScale()const;
 	void SetRotation(const glm::quat& quatRotation);
 	const glm::quat& GetRotaion()const;
 
@@ -50,6 +52,7 @@ protected:
 	glm::mat4 m_mat4ViewMatrix;
 	glm::mat4 m_mat4ViewProjectionMatrix;
 	glm::vec3 m_vec3Position;
+	glm::vec3 m_vec3Scale;
 	glm::quat m_quatRotation;
 
 	float m_fNearClip;

@@ -7,6 +7,7 @@ Camera::Camera(float fAspectRatio, float fNear, float fFar, ProjectionType eProj
 	m_mat4ProjectionMatrix(glm::mat4(1.f)),
 	m_mat4ViewMatrix(glm::mat4(1.f)),
 	m_vec3Position(glm::vec3(0.f)),
+	m_vec3Scale(glm::vec3(1.f)),
 	m_quatRotation(glm::quat(0.f,0.f,0.f,0.f)),
 	m_fAspectRatio(fAspectRatio),
 	m_fNearClip(fNear),
@@ -26,6 +27,17 @@ void Camera::SetPosition(const glm::vec3& vec3Position)
 const glm::vec3& Camera::GetPositon() const
 {
 	return m_vec3Position;
+}
+
+void Camera::SetScale(const glm::vec3& vec3Scale)
+{
+	m_vec3Scale = vec3Scale;
+	RecalculateViewMatrix();
+}
+
+const glm::vec3& Camera::GetScale() const
+{
+	return m_vec3Scale;
 }
 
 void Camera::SetRotation(const glm::quat& quatRotation)
@@ -51,7 +63,7 @@ const glm::mat4& Camera::GetProjectionMatrix() const
 
 void Camera::SetViewMatrix(const glm::mat4& mat4ViewMatrix)
 {
-	m_mat4ViewMatrix = mat4ViewMatrix;
+	m_mat4ViewMatrix = glm::inverse(mat4ViewMatrix);
 	RecalculateViewProjectionMatrix();
 }
 
@@ -132,7 +144,9 @@ void Camera::RecalculateViewMatrix()
 
 	glm::mat4 mat4Rotation = glm::toMat4(m_quatRotation);
 
-	m_mat4ViewMatrix = glm::inverse(mat4Translation * mat4Rotation);
+	glm::mat4 mat4Scale = glm::scale(glm::mat4(1.f), m_vec3Scale);
+
+	m_mat4ViewMatrix = glm::inverse(mat4Translation * mat4Rotation * mat4Scale);
 
 	RecalculateViewProjectionMatrix();
 }
