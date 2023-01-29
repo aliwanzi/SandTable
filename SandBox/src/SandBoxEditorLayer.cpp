@@ -402,12 +402,13 @@ void SandBoxEditorLayer::SaveSceneAs()
 
 void SandBoxEditorLayer::OnScenePlay()
 {
-	m_eSceneState = SceneState::STOP;
+	m_eSceneState = SceneState::PLAY;
+	m_spScene->OnRuntimeStart();
 }
 
 void SandBoxEditorLayer::OnSceneStop()
 {
-	m_eSceneState = SceneState::PLAY;
+	m_eSceneState = SceneState::STOP;
 }
 
 void SandBoxEditorLayer::UIToolbar()
@@ -436,12 +437,12 @@ void SandBoxEditorLayer::UIToolbar()
 		{
 		case SandTable::SceneState::PLAY:
 		{
-			OnScenePlay();
+			OnSceneStop();
 			break;
 		}
 		case SandTable::SceneState::STOP:
 		{
-			OnSceneStop();
+			OnScenePlay();
 			break;
 		}
 		default:

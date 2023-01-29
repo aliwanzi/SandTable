@@ -1,6 +1,6 @@
 #include "pch.h"
 #include "ParticleSystem2D.h"
-#include "SandTable/ParticleSystem/Random.h"
+#include "SandTable/System/Random.h"
 #include <glm/gtc/constants.hpp>
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtx/compatibility.hpp>

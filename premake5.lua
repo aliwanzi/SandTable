@@ -3,7 +3,7 @@ include "Dependencies.lua"
 
 workspace "SandTable"
 	architecture "x86_64"
-	startproject "SandBox"
+	startproject "Sandbox"
 
 	configurations
 	{
@@ -20,6 +20,7 @@ group "Dependencies"
 	include "SandTable/vendor/GL3W"
 	include "SandTable/vendor/imgui"
 	include "SandTable/vendor/yaml-cpp"
+	include "SandTable/vendor/Box2D"
 group ""
 
 group "Core"

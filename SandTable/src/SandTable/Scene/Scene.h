@@ -1,6 +1,5 @@
 #pragma once
-#include "entt.hpp"
-#include "SandTable/Scene/Components.h"
+#include "SandTable/System/PhysicsSystem2D.h"
 
 SAND_TABLE_NAMESPACE_BEGIN
 
@@ -10,6 +9,7 @@ enum class SceneState
 	STOP,
 };
 
+//class b2World;
 class Scene
 {
 public:
@@ -17,6 +17,9 @@ public:
 	~Scene();
 	Ref<Entity> CreateEntity(const std::string& sName = std::string());
 	void DestroyEntity(const Ref<Entity>& spEntity);
+
+	void OnRuntimeStart();
+	void OnRuntimeStop();
 
 	void OnUpdate(const TimeStep& timeStep);
 	void OnUpdate(const Ref<Camera>& spCamera);
@@ -31,6 +34,7 @@ private:
 	unsigned int m_uiWidth;
 	unsigned int m_uiHeight;
 	Ref<entt::registry> m_spRegistry;
+	Ref<PhysicsSystem2D> m_spPhysicsSystem2D;
 };
 
 SAND_TABLE_NAMESPACE_END

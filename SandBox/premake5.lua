@@ -19,7 +19,8 @@ project "Sandbox"
 		"%{wks.location}/SandTable/src",
 		"%{wks.location}/SandTable/vendor",
 		"%{IncludeDir.glm}",
-		"%{IncludeDir.entt}"
+		"%{IncludeDir.entt}",
+		"%{IncludeDir.Box2D}"
 	}
 
 	links

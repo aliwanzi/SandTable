@@ -100,5 +100,4 @@ struct NativeScriptComponent
 		};
 	}
 };
-
 SAND_TABLE_NAMESPACE_END

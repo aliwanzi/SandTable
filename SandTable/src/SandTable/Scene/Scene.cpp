@@ -8,7 +8,8 @@ SAND_TABLE_NAMESPACE_BEGIN
 Scene::Scene():
 	m_spRegistry(CreateRef<entt::registry>()),
 	m_uiWidth(0),
-	m_uiHeight(0)
+	m_uiHeight(0),
+	m_spPhysicsSystem2D(nullptr)
 {
 	LOG_DEV_INFO("Scene Creat");
 }
@@ -31,6 +32,34 @@ void Scene::DestroyEntity(const Ref<Entity>& spEntity)
 	m_spRegistry->destroy(*spEntity);
 }
 
+void Scene::OnRuntimeStart()
+{
+	m_spPhysicsSystem2D = CreateRef<PhysicsSystem2D>();
+	auto components = m_spRegistry->view<RigidBody2DComponent>();
+	for (auto component : components)
+	{
+		auto spEntity = CreateRef<Entity>(m_spRegistry, component);
+		auto& transform = spEntity->GetComponent<TransformComponent>();
+		auto& rigidBody2D = spEntity->GetComponent<RigidBody2DComponent>();
+
+		if (spEntity->HasComponent<BoxCollider2DComponent>())
+		{
+			auto& boxCollider2D = spEntity->GetComponent<BoxCollider2DComponent>();
+
+			m_spPhysicsSystem2D->CreateBody(rigidBody2D, boxCollider2D, transform);
+		}
+		else
+		{
+			m_spPhysicsSystem2D->CreateBody(rigidBody2D, transform);
+		}
+	}
+}
+
+void Scene::OnRuntimeStop()
+{
+	m_spPhysicsSystem2D = nullptr;
+}
+
 void Scene::OnUpdate(const TimeStep& timeStep)
 {
 	{
@@ -45,6 +74,20 @@ void Scene::OnUpdate(const TimeStep& timeStep)
 
 			nsc.Instance->OnUpdate(timeStep);
 		});
+	}
+
+	{
+		m_spPhysicsSystem2D->OnUpdate(timeStep);
+
+		auto components = m_spRegistry->view<RigidBody2DComponent>();
+		for (auto component : components)
+		{
+			auto spEntity = CreateRef<Entity>(m_spRegistry, component);
+			auto& transform = spEntity->GetComponent<TransformComponent>();
+			auto& rigidBody2D = spEntity->GetComponent<RigidBody2DComponent>();
+
+			m_spPhysicsSystem2D->UpdateSystem(rigidBody2D, transform);
+		}
 	}
 
 	{

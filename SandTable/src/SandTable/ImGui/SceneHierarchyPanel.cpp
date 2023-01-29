@@ -166,16 +166,31 @@ void SceneHierarchyPanel::OnImGuiRender()
 
 		if (ImGui::BeginPopup("Add Component"))
 		{
-			if (ImGui::MenuItem("Camera"))
+
+			if (!m_spSelectedEntity->HasComponent<CameraComponent>() && ImGui::MenuItem("Camera"))
 			{
 				m_spSelectedEntity->AddComponent<CameraComponent>();
 				ImGui::CloseCurrentPopup();
 			}
-			if (ImGui::MenuItem("Sprite Render"))
+
+			if (!m_spSelectedEntity->HasComponent<SpriteRenderComponent>() && ImGui::MenuItem("Sprite Render"))
 			{
 				m_spSelectedEntity->AddComponent<SpriteRenderComponent>();
 				ImGui::CloseCurrentPopup();
 			}
+
+			if (!m_spSelectedEntity->HasComponent<RigidBody2DComponent>() && ImGui::MenuItem("Rigid Body2D"))
+			{
+				m_spSelectedEntity->AddComponent<RigidBody2DComponent>();
+				ImGui::CloseCurrentPopup();
+			}
+
+			if (!m_spSelectedEntity->HasComponent<BoxCollider2DComponent>() && ImGui::MenuItem("Box Collider2D"))
+			{
+				m_spSelectedEntity->AddComponent<BoxCollider2DComponent>();
+				ImGui::CloseCurrentPopup();
+			}
+
 			ImGui::EndPopup();
 		}
 	}
@@ -347,6 +362,38 @@ void SceneHierarchyPanel::DrawComponents(const Ref<Entity>& spEntity)
 			}
 
 			ImGui::DragFloat("Tiling Facto", &component.TilingFactor, 0.1f, 0.f, 10.f);
+		});
+
+	DrawComponent<RigidBody2DComponent>("Rigidbody 2D", spEntity, [](auto& component)
+		{
+			auto sCurrentBodyType = BodyTypeStrings[static_cast<unsigned int>(component.Type)];
+
+			if (ImGui::BeginCombo("Body Type", sCurrentBodyType.c_str()))
+			{
+				for (size_t i = 0; i < BodyTypeStrings.size(); i++)
+				{
+					bool bSelected = sCurrentBodyType == BodyTypeStrings[i];
+					if (ImGui::Selectable(BodyTypeStrings[i].c_str(), bSelected))
+					{
+						component.Type = static_cast<BodyType>(i);
+						ImGui::SetItemDefaultFocus();
+					}
+				}
+				ImGui::EndCombo();
+
+			}
+
+			ImGui::Checkbox("Fixed Rotation", &component.FixedRotation);
+		});
+
+	DrawComponent<BoxCollider2DComponent>("BoxCollider 2D", spEntity, [](auto& component)
+		{
+			ImGui::DragFloat2("Offset", glm::value_ptr(component.Offset));
+			ImGui::DragFloat2("Size", glm::value_ptr(component.Size));
+			ImGui::DragFloat("Density", &component.Density, 0.01f, 0.f, 1.f);
+			ImGui::DragFloat("Friction", &component.Friction, 0.01f, 0.f, 1.f);
+			ImGui::DragFloat("Restitution",&component.RestitutionThreshold, 0.01f, 0.f, 1.f);
+			ImGui::DragFloat("Restitution Threshold", &component.RestitutionThreshold, 0.01f, 0.f);
 		});
 
 }
