@@ -1,5 +1,7 @@
 #pragma once
 #include "entt.hpp"
+#include "SandTable/Scene/Components.h"
+
 SAND_TABLE_NAMESPACE_BEGIN
 
 class Entity
@@ -39,6 +41,11 @@ public:
 	bool operator!=(const Entity& spEntity) const;
 	Entity& operator=(const Entity& spEntity);
 	Ref<Entity>& operator=(const Ref<Entity>& spEntity);
+
+	UUID GetUUID()
+	{
+		return GetComponent<IDComponent>().ID;
+	}
 
 	operator uint32_t() const;
 	operator entt::entity()const;

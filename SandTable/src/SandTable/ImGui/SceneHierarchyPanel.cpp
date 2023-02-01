@@ -354,9 +354,17 @@ void SceneHierarchyPanel::DrawComponents(const Ref<Entity>& spEntity)
 			{
 				if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM"))
 				{
-					const wchar_t* path = (const wchar_t*)payload->Data;
-					auto texturePath = std::filesystem::path(sAssetsDirector) / path;
-					component.spTexture = Texture2D::Create(texturePath.string());
+					std::filesystem::path filePath((const wchar_t*)payload->Data);
+					if (filePath.extension().string() == ".png")
+					{
+						auto texturePath = sAssetsDirector / filePath;
+						component.spTexture = Texture2D::Create(texturePath.string());
+					}
+					else
+					{
+						LOG_DEV_WARN("Could not load {0} - not a texture file", filePath.filename().string());
+					}
+					
 				}
 				ImGui::EndDragDropTarget();
 			}

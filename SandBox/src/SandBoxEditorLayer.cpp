@@ -384,6 +384,17 @@ void SandBoxEditorLayer::OpenScene()
 
 void SandBoxEditorLayer::OpenScene(const std::filesystem::path& path)
 {
+	if (m_eSceneState != SceneState::STOP)
+	{
+		OnSceneStop();
+	}
+
+	if (path.extension().string()!=".scene")
+	{
+		LOG_DEV_WARN("Could not load {0} - not a scene file", path.filename().string());
+		return;
+	}
+
 	m_spScene = CreateRef<Scene>();
 	m_spScene->OnViewPortResize(m_vec2RenderViewPortSize.x, m_vec2RenderViewPortSize.y);
 	m_spSceneHierarchyPanel->SetSelectedScene(m_spScene);

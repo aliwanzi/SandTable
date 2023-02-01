@@ -22,6 +22,7 @@ Scene::~Scene()
 Ref<Entity> Scene::CreateEntity(const std::string& sName)
 {
 	auto spEntity = CreateRef<Entity>(m_spRegistry);
+	spEntity->AddComponent<IDComponent>();
 	spEntity->AddComponent<TransformComponent>();
 	spEntity->AddComponent<TagComponent>(sName.empty() ? "Entity" : sName);
 	return spEntity;
@@ -62,19 +63,19 @@ void Scene::OnRuntimeStop()
 
 void Scene::OnUpdate(const TimeStep& timeStep)
 {
-	{
-		m_spRegistry->view<NativeScriptComponent>().each([=](auto entity, auto& nsc)
-		{
-			if (nsc.Instance == nullptr)
-			{
-				nsc.InstantiateFunction();
-				nsc.Instance->SetEntity(CreateRef<Entity>(m_spRegistry, entity));
-				nsc.Instance->OnCreate();
-			}
+	//{
+	//	m_spRegistry->view<NativeScriptComponent>().each([=](auto entity, auto& nsc)
+	//	{
+	//		if (nsc.Instance == nullptr)
+	//		{
+	//			nsc.InstantiateFunction();
+	//			nsc.Instance->SetEntity(CreateRef<Entity>(m_spRegistry, entity));
+	//			nsc.Instance->OnCreate();
+	//		}
 
-			nsc.Instance->OnUpdate(timeStep);
-		});
-	}
+	//		nsc.Instance->OnUpdate(timeStep);
+	//	});
+	//}
 
 	{
 		m_spPhysicsSystem2D->OnUpdate(timeStep);

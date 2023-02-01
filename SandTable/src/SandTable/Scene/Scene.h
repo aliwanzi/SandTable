@@ -1,5 +1,6 @@
 #pragma once
 #include "SandTable/System/PhysicsSystem2D.h"
+#include "SandTable/Scene/Entity.h"
 
 SAND_TABLE_NAMESPACE_BEGIN
 

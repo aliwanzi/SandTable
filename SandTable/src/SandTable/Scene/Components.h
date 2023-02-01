@@ -1,11 +1,18 @@
 #pragma once
 #include "SandTable/Render/Camera/OrthoGraphicCamera.h"
 #include "SandTable/Render/Camera/PerspectiveGraphicCamera.h"
-#include "SandTable/Scene/Entity.h"
-#include "SandTable/Scene/ScriptableEntity.h"
 #include "SandTable/Render/Texture/Texture.h"
+#include "SandTable/Scene/UUID.h"
 
 SAND_TABLE_NAMESPACE_BEGIN
+
+struct IDComponent
+{
+	UUID ID;
+	IDComponent() = default;
+	IDComponent(const IDComponent&) = default;
+	IDComponent& operator =(const IDComponent&) = default;
+};
 
 struct TagComponent
 {
@@ -60,8 +67,8 @@ struct SpriteRenderComponent
 
 struct CameraComponent
 {
-	Ref<SandTable::Camera> OrthoCamera = CreateRef<OrthoGraphicCamera>();
-	Ref<SandTable::Camera> PerspecCamera = CreateRef<PerspectiveGraphicCamera>();
+	Ref<Camera> OrthoCamera = CreateRef<OrthoGraphicCamera>();
+	Ref<Camera> PerspecCamera = CreateRef<PerspectiveGraphicCamera>();
 	bool Primary = true;
 	bool FixedAspectRatio = false;
 	ProjectionType Projection = ProjectionType::Orthographic;
@@ -85,19 +92,20 @@ struct CameraComponent
 	}
 };
 
-struct NativeScriptComponent
-{
-	Ref<ScriptableEntity> Instance;
-
-	std::function<void()> InstantiateFunction;
-
-	template<typename T>
-	void Bind()
-	{
-		InstantiateFunction = [&]()
-		{
-			Instance = CreateRef<T>();
-		};
-	}
-};
+//class ScriptableEntity;
+//struct NativeScriptComponent
+//{
+//	Ref<ScriptableEntity> Instance;
+//
+//	std::function<void()> InstantiateFunction;
+//
+//	template<typename T>
+//	void Bind()
+//	{
+//		InstantiateFunction = [&]()
+//		{
+//			Instance = CreateRef<T>();
+//		};
+//	}
+//};
 SAND_TABLE_NAMESPACE_END
