@@ -5,6 +5,32 @@
 
 SAND_TABLE_NAMESPACE_BEGIN
 
+namespace
+{
+	template<typename Component>
+	void CopyComponent(Ref<entt::registry> spSrcRegistry, std::unordered_map<UUID, Ref<Entity>>& mapEntity)
+	{
+		auto srcEntity = spSrcRegistry->view<Component>();
+		for (auto entity : srcEntity)
+		{
+			auto srcUUID = spSrcRegistry->get<IDComponent>(entity).ID;
+			auto spEntity = mapEntity.at(srcUUID);
+
+			auto& srcComponent = spSrcRegistry->get<Component>(entity);
+			spEntity->AddOrReplaceComponent<Component>(srcComponent);
+		}
+	}
+
+	template<typename Component>
+	void CopyComponentIfExists(Ref<Entity> spSrcEntity, Ref<Entity> spDstEntity)
+	{
+		if (spSrcEntity->HasComponent<Component>())
+		{
+			spDstEntity->AddOrReplaceComponent<Component>(spSrcEntity->GetComponent<Component>());
+		}
+	}
+}
+
 Scene::Scene():
 	m_spRegistry(CreateRef<entt::registry>()),
 	m_uiWidth(0),
@@ -19,10 +45,52 @@ Scene::~Scene()
 	LOG_DEV_INFO("Scene Destroy");
 }
 
+Scene::Scene(const Ref<Scene>& spScene):
+	m_spRegistry(CreateRef<entt::registry>()),
+	m_uiWidth(spScene->m_uiWidth),
+	m_uiHeight(spScene->m_uiHeight),
+	m_spPhysicsSystem2D(nullptr)
+{
+	std::unordered_map<UUID, Ref<Entity>> mapEntity;
+
+	auto spSrcRegistry = spScene->m_spRegistry;
+	auto entity = spSrcRegistry->view<IDComponent>();
+
+	for (auto e : entity)
+	{
+		const auto& uuid = spSrcRegistry->get<IDComponent>(e).ID;
+		const auto& name = spSrcRegistry->get<TagComponent>(e).Tag;
+		auto spNewEntity = CreateEntityWithUUID(uuid, name);
+		mapEntity[uuid] = spNewEntity;
+	}
+
+	CopyComponent<TransformComponent>(spSrcRegistry, mapEntity);
+	CopyComponent<SpriteRenderComponent>(spSrcRegistry, mapEntity);
+	CopyComponent<CameraComponent>(spSrcRegistry, mapEntity);
+	CopyComponent<RigidBody2DComponent>(spSrcRegistry, mapEntity);
+	CopyComponent<BoxCollider2DComponent>(spSrcRegistry, mapEntity);
+}
+
+Ref<Entity> Scene::CreateEntity(const Ref<Entity>& spSrcEntity)
+{
+	auto spDstEntity = CreateEntity(spSrcEntity->GetName());
+	CopyComponentIfExists<TransformComponent>(spSrcEntity, spDstEntity);
+	CopyComponentIfExists<SpriteRenderComponent>(spSrcEntity, spDstEntity);
+	CopyComponentIfExists<CameraComponent>(spSrcEntity, spDstEntity);
+	CopyComponentIfExists<RigidBody2DComponent>(spSrcEntity, spDstEntity);
+	CopyComponentIfExists<BoxCollider2DComponent>(spSrcEntity, spDstEntity);
+	return spDstEntity;
+}
+
 Ref<Entity> Scene::CreateEntity(const std::string& sName)
 {
+	return CreateEntityWithUUID(UUID(), sName);
+}
+
+Ref<Entity> Scene::CreateEntityWithUUID(const UUID& uuid, const std::string& sName)
+{
 	auto spEntity = CreateRef<Entity>(m_spRegistry);
-	spEntity->AddComponent<IDComponent>();
+	spEntity->AddComponent<IDComponent>(uuid);
 	spEntity->AddComponent<TransformComponent>();
 	spEntity->AddComponent<TagComponent>(sName.empty() ? "Entity" : sName);
 	return spEntity;

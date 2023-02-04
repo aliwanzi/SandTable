@@ -45,6 +45,16 @@ Ref<Entity>& Entity::operator=(const Ref<Entity>& spEntity)
 	return Ref<Entity>(this);
 }
 
+UUID Entity::GetUUID()
+{
+	return GetComponent<IDComponent>().ID;
+}
+
+const std::string& Entity::GetName()
+{
+	return GetComponent<TagComponent>().Tag;
+}
+
 Entity::operator uint32_t() const
 {
 	return static_cast<uint32_t>(m_entity);

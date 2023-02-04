@@ -23,10 +23,12 @@ private:
 	void OpenScene();
 	void OpenScene(const std::filesystem::path& path);
 	void SaveSceneAs();
+	void SaveScene();
 	void OnScenePlay();
 	void OnSceneStop();
 
 	void UIToolbar();
+	void OnDuplicateEntity();
 private:
 	Ref<Texture> m_spIconPlay;
 	Ref<Texture> m_spIconStop;
@@ -40,7 +42,10 @@ private:
 	ImVec2 m_vec2RenderViewPortSize;
 	std::array<ImVec2, 2> m_vec2RenderViewPortBounds;
 
-	Ref<Scene> m_spScene;
+	Ref<Scene> m_spActiveScene;
+	Ref<Scene> m_spEditorScene;
+	std::filesystem::path m_sEditorScenePath;
+
 	Ref<Entity> m_spSquareEntity;
 	Ref<Entity> m_spCameraEntity;
 	Ref<Entity> m_spHoveredEntity;

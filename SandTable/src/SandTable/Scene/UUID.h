@@ -20,7 +20,7 @@ namespace std
 	template<>
 	struct hash<SandTable::UUID>
 	{
-		std::size_t operator()(const SandTable::UUID& uuid)
+		std::size_t operator()(const SandTable::UUID& uuid) const
 		{
 			return static_cast<uint64_t>(uuid);
 		}

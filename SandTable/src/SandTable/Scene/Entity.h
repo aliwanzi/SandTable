@@ -18,6 +18,12 @@ public:
 		return m_spRegistry->emplace<T>(m_entity, std::forward<Args>(args)...);
 	}
 
+	template<typename T, typename... Args>
+	T& AddOrReplaceComponent(Args&&... args)
+	{
+		return m_spRegistry->emplace_or_replace<T>(m_entity, std::forward<Args>(args)...);
+	}
+
 	template<typename T>
 	T& GetComponent()
 	{
@@ -42,10 +48,8 @@ public:
 	Entity& operator=(const Entity& spEntity);
 	Ref<Entity>& operator=(const Ref<Entity>& spEntity);
 
-	UUID GetUUID()
-	{
-		return GetComponent<IDComponent>().ID;
-	}
+	UUID GetUUID();
+	const std::string& GetName();
 
 	operator uint32_t() const;
 	operator entt::entity()const;

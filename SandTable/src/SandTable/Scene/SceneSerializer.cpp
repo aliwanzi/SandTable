@@ -277,7 +277,7 @@ bool SceneSerializer::DeSerialize(const std::string& sFilePath)
 
 			LOG_DEV_TRACE("Deserialized entity with ID = {0}, name = {1}", uuid, sName);
 
-			Ref<Entity> deserializedEntity = m_spScene->CreateEntity(sName);
+			Ref<Entity> deserializedEntity = m_spScene->CreateEntityWithUUID(uuid, sName);
 
 			auto transformComponent = entity["TransformComponent"];
 			if (transformComponent)

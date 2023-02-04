@@ -6,17 +6,21 @@ SAND_TABLE_NAMESPACE_BEGIN
 
 enum class SceneState
 {
-	PLAY = 0,
-	STOP,
+	Play = 0,
+	Edit,
 };
 
-//class b2World;
+class UUID;
 class Scene
 {
 public:
 	Scene();
 	~Scene();
+	Scene(const Ref<Scene>& spScene);
+
+	Ref<Entity> CreateEntity(const Ref<Entity>& spSrcEntity);
 	Ref<Entity> CreateEntity(const std::string& sName = std::string());
+	Ref<Entity> CreateEntityWithUUID(const UUID& uuid, const std::string& sName);
 	void DestroyEntity(const Ref<Entity>& spEntity);
 
 	void OnRuntimeStart();
@@ -30,6 +34,7 @@ public:
 	Ref<Entity> GetPrimaryCameraEntity();
 
 private:
+	
 	void RenderScene(const Ref<Camera>& spCamera);
 private:
 	unsigned int m_uiWidth;
