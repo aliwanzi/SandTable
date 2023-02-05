@@ -3,6 +3,7 @@
 #include "SandTable/Render/Camera/PerspectiveGraphicCamera.h"
 #include "SandTable/Render/Texture/Texture.h"
 #include "SandTable/Scene/UUID.h"
+#include "SandTable/Scene/Primitive/QuadPrimitive.h"
 
 SAND_TABLE_NAMESPACE_BEGIN
 
@@ -50,19 +51,24 @@ struct TransformComponent
 	}
 };
 
-
 struct SpriteRenderComponent
 {
-	glm::vec4 Color{ 1.f };
 	Ref<Texture> spTexture;
-	float TilingFactor = 1.0f;
+	Ref<QuadPrimitive> spQuadPrimitive = CreateRef<QuadPrimitive>();
 	SpriteRenderComponent() = default;
 	SpriteRenderComponent(const SpriteRenderComponent&) = default;
 	SpriteRenderComponent& operator =(const SpriteRenderComponent&) = default;
-	SpriteRenderComponent(const glm::vec4& vec4Color) :Color(vec4Color)
-	{}
-	operator glm::vec4& () { return Color; }
-	operator const glm::vec4& ()const { return Color; }
+};
+
+struct CircleRenderComponent
+{
+	glm::vec4 Color{ 1.f };
+	float Radius = 0.5f;
+	float Thickness = 1.f;
+	float Fade = 0.005f;
+	CircleRenderComponent() = default;
+	CircleRenderComponent(const CircleRenderComponent&) = default;
+	CircleRenderComponent& operator =(const CircleRenderComponent&) = default;
 };
 
 struct CameraComponent

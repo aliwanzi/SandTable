@@ -44,7 +44,7 @@ SandBoxEditorLayer::~SandBoxEditorLayer()
 void SandBoxEditorLayer::OnAttach()
 {
 	m_spSquareEntity = m_spEditorScene->CreateEntity("Square Entity");
-	m_spSquareEntity->AddComponent<SpriteRenderComponent>(glm::vec4(0.f, 1.f, 0.f, 1.f));
+	m_spSquareEntity->AddComponent<SpriteRenderComponent>();
 
 	m_spCameraEntity = m_spEditorScene->CreateEntity("Camera Entity");
 	m_spCameraEntity->AddComponent<CameraComponent>();
@@ -192,12 +192,12 @@ void SandBoxEditorLayer::OnImGuiRender()
 		sEntityName = m_spHoveredEntity->GetComponent<TagComponent>().Tag;
 	}
 	ImGui::Text("Hovered Entity: %s", sEntityName.c_str());
-	auto stats = Render2D::GetStats();
+	auto spQuadStatic = Render2D::GetQuadStatic();
 	ImGui::Text("Renderer2D Stats:");
-	ImGui::Text("Draw Calls: %d", stats.DrawCalls);
-	ImGui::Text("Draw Quads: %d", stats.QuadCount);
-	ImGui::Text("Draw Vertices: %d", stats.GetTotalVertexCount());
-	ImGui::Text("Draw Indices: %d", stats.GetTotalIndexCount());
+	ImGui::Text("Draw Calls: %d", spQuadStatic->GetDrawCalls());
+	ImGui::Text("Draw Quads: %d", spQuadStatic->GetDrawCount());
+	ImGui::Text("Draw Vertices: %d", spQuadStatic->GetTotalVertexCount());
+	ImGui::Text("Draw Indices: %d", spQuadStatic->GetTotalIndexCount());
 	ImGui::End();
 
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));

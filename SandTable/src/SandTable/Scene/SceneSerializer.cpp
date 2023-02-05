@@ -181,7 +181,7 @@ namespace
 			out << YAML::BeginMap;
 
 			auto& spriteRendererComponent = entity.GetComponent<SpriteRenderComponent>();
-			out << YAML::Key << "Color" << YAML::Value << spriteRendererComponent.Color;
+			out << YAML::Key << "Color" << YAML::Value << spriteRendererComponent.spQuadPrimitive->GetColor();
 
 			if (spriteRendererComponent.spTexture != nullptr)
 			{
@@ -320,7 +320,7 @@ bool SceneSerializer::DeSerialize(const std::string& sFilePath)
 			if (spriteRenderComponent)
 			{
 				auto& src = deserializedEntity->AddComponent<SpriteRenderComponent>();
-				src.Color = spriteRenderComponent["Color"].as<glm::vec4>();
+				src.spQuadPrimitive->SetColor(spriteRenderComponent["Color"].as<glm::vec4>());
 				if (spriteRenderComponent["TexturePath"].IsDefined())
 				{
 					std::string sPath = spriteRenderComponent["TexturePath"].as<std::string>();

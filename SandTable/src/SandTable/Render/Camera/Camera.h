@@ -11,6 +11,11 @@ enum class ProjectionType
 
 const std::array<std::string, 2> ProjectionTypeStrings = { "Perspective","Orthographic" };
 
+struct CameraMatrix
+{
+	glm::mat4 ViewProjection;
+};
+
 class Camera
 {
 public:

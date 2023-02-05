@@ -5,12 +5,16 @@
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtx/compatibility.hpp>
 #include "SandTable/Render/Render2D.h"
+#include "SandTable/Render/Camera/OrthoGraphicCamera.h"
+#include "SandTable/Render/Texture/Texture2D.h"
+#include "SandTable/Scene/Primitive/QuadPrimitive.h"
 
 SAND_TABLE_NAMESPACE_BEGIN
 
 ParticleSystem2D::ParticleSystem2D()
 {
 	m_vecParticlePool.reserve(1000);
+	m_spQuadPrimtive = CreateRef<QuadPrimitive>();
 }
 
 void ParticleSystem2D::OnUpdate(TimeStep timeStep)
@@ -32,9 +36,9 @@ void ParticleSystem2D::OnUpdate(TimeStep timeStep)
 	}
 }
 
-void ParticleSystem2D::OnRender(const Ref<OrthoGraphicCamera>& spOrthoGraphicCamera)
+void ParticleSystem2D::OnRender(const Ref<Camera>& spCamera)
 {
-	Render2D::BeginScene(spOrthoGraphicCamera);
+	Render2D::BeginScene(spCamera);
 
 	for (auto& particle : m_vecParticlePool)
 	{
@@ -48,13 +52,14 @@ void ParticleSystem2D::OnRender(const Ref<OrthoGraphicCamera>& spOrthoGraphicCam
 			case ParticleRenderType::COLOR:
 			{
 				glm::vec4 color = glm::lerp(particle.ColorEnd, particle.ColorBegin, life);
-				Render2D::DrawQuad(glm::vec3(particle.Position.x, particle.Position.y, 0.2f), particle.Rotation, glm::vec2(size), color);
+				m_spQuadPrimtive->SetColor(color);
+				Render2D::DrawPrimitive(glm::vec3(particle.Position.x, particle.Position.y, 0.2f), particle.Rotation, glm::vec3(size), m_spQuadPrimtive);
 				break;
 			}
 			case ParticleRenderType::TEXTURE:
 			{
 				SAND_TABLE_ASSERT(particle.RefTexture, "Texture is null in render particle");
-				Render2D::DrawQuad(glm::vec3(particle.Position.x, particle.Position.y, 0.2f), particle.Rotation, glm::vec2(size), particle.RefTexture);
+				Render2D::DrawPrimitive(glm::vec3(particle.Position.x, particle.Position.y, 0.2f), particle.Rotation, glm::vec3(size), m_spQuadPrimtive, particle.RefTexture);
 				break;
 			}
 			default:

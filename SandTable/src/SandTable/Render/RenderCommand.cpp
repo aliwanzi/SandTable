@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "RenderCommand.h"
 #include "PlatForm/OpenGL/OpenGLRenderAPI.h"
+#include "SandTable/Render/Buffer/IndexBuffer.h"
 
 SAND_TABLE_NAMESPACE_BEGIN
 

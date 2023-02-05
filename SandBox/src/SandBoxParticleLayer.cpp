@@ -113,9 +113,9 @@ void SandBoxParticleLayer::OnUpdate(const TimeStep& timeStep)
 	}
 
 	Render2D::BeginScene(m_spOrthoGraphicCameraController->GetCamera());
-	Render2D::DrawQuad(glm::vec3(0.f, 0.f, 0.5f), 0.f, glm::vec2(1.f), m_spSubTexStairs);
-	Render2D::DrawQuad(glm::vec3(1.f, 0.f, 0.5f), 0.f, glm::vec2(1.f), m_spSubTexBarrel);
-	Render2D::DrawQuad(glm::vec3(-1.f, 0.f, 0.5f), 0.f, glm::vec2(1.f, 2.f), m_spSubTexTree);
+	//Render2D::DrawQuad(glm::vec3(0.f, 0.f, 0.5f), 0.f, glm::vec2(1.f), m_spSubTexStairs);
+	//Render2D::DrawQuad(glm::vec3(1.f, 0.f, 0.5f), 0.f, glm::vec2(1.f), m_spSubTexBarrel);
+	//Render2D::DrawQuad(glm::vec3(-1.f, 0.f, 0.5f), 0.f, glm::vec2(1.f, 2.f), m_spSubTexTree);
 	Render2D::EndScene();
 
 	m_spParticleSystem2D->OnUpdate(timeStep);
@@ -190,12 +190,12 @@ void SandBoxParticleLayer::OnImGuiRender()
 	ImGui::End();
 
 	ImGui::Begin("Settings");
-	auto stats = Render2D::GetStats();
+	auto spQuadStatic = Render2D::GetQuadStatic();
 	ImGui::Text("Renderer2D Stats:");
-	ImGui::Text("Draw Calls: %d", stats.DrawCalls);
-	ImGui::Text("Draw Quads: %d", stats.QuadCount);
-	ImGui::Text("Draw Vertices: %d", stats.GetTotalVertexCount());
-	ImGui::Text("Draw Indices: %d", stats.GetTotalIndexCount());
+	ImGui::Text("Draw Calls: %d", spQuadStatic->GetDrawCalls());
+	ImGui::Text("Draw Quads: %d", spQuadStatic->GetDrawCount());
+	ImGui::Text("Draw Vertices: %d", spQuadStatic->GetTotalVertexCount());
+	ImGui::Text("Draw Indices: %d", spQuadStatic->GetTotalIndexCount());
 	ImGui::End();
 
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));

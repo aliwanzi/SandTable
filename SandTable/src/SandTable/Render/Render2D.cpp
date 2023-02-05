@@ -3,9 +3,15 @@
 #include "SandTable/Render/VertexArray.h"
 #include "SandTable/Render/Shader.h"
 #include "SandTable/Render/RenderCommand.h"
-#include "SandTable/Debug/Instrumentor.h"
-#include "SandTable/Scene/Components.h"
 #include "SandTable/Render/Buffer/UniformBuffer.h"
+#include "SandTable/Render/Buffer/VertexBuffer.h"
+#include "SandTable/Render/Buffer/IndexBuffer.h"
+#include "SandTable/Render/Texture/Texture2D.h"
+
+#include "SandTable/Debug/Instrumentor.h"
+#include "SandTable/Debug/DrawStatistics/QuadDrawStatics.h"
+
+#include "SandTable/Scene/Components.h"
 
 SAND_TABLE_NAMESPACE_BEGIN
 
@@ -14,33 +20,25 @@ Ref<Render2D::Render2DStroge> Render2D::m_spRender2DStroge = CreateRef<Render2D:
 void Render2D::Init()
 {
 	SAND_TABLE_PROFILE_FUNCTION();
-	//VBO
-	m_spRender2DStroge->VertexArray = VertexArray::Create();
 
-	std::vector<VertexBufferElement> vecBufferElement
-	{
-		{ VertexDataType::Float3 },
-		{ VertexDataType::Float4 },
-		{ VertexDataType::Float2 },
-		{ VertexDataType::Float },
-		{ VertexDataType::Float },
-		{ VertexDataType::Float }
-	};
-	auto spVertexBufferLayout = CreateRef<VertexBufferLayout>(vecBufferElement);
-	m_spRender2DStroge->VertexBuffer = VertexBuffer::Create(m_spRender2DStroge->MaxVertices * sizeof(Vertex));
-	std::dynamic_pointer_cast<VertexBuffer>(m_spRender2DStroge->VertexBuffer)->SetVertexBufferLayout(spVertexBufferLayout);
-	m_spRender2DStroge->VertexArray->AddVertexBuffer(m_spRender2DStroge->VertexBuffer);
+	//QUAD
+	m_spRender2DStroge->spQuadDrawStatics = CreateRef<QuadDrawStatics>(10000);
+	m_spRender2DStroge->vecQuadVertexs.clear();
 
-	m_spRender2DStroge->VertexPosition[0] = glm::vec4(-0.5f, -0.5f, 0.0f, 1.0f);
-	m_spRender2DStroge->VertexPosition[1] = glm::vec4( 0.5f, -0.5f, 0.0f, 1.0f);
-	m_spRender2DStroge->VertexPosition[2] = glm::vec4( 0.5f,  0.5f, 0.0f, 1.0f);
-	m_spRender2DStroge->VertexPosition[3] = glm::vec4(-0.5f,  0.5f, 0.0f, 1.0f);
+	auto spQuadVertexBufferLayout = CreateRef<VertexBufferLayout>(vecQuadBufferElement);
+	auto iVertexSize = spQuadVertexBufferLayout->GetStride();
+	auto iMaxVertices = m_spRender2DStroge->spQuadDrawStatics->GetMaxVertices();
+	m_spRender2DStroge->spQuadVertexBuffer = VertexBuffer::Create(iMaxVertices * iVertexSize);
+	auto spQuadVertexBuffer = std::dynamic_pointer_cast<VertexBuffer>(m_spRender2DStroge->spQuadVertexBuffer);
+	spQuadVertexBuffer->SetVertexBufferLayout(spQuadVertexBufferLayout);
 
-	//EBO
-	std::vector<unsigned int> vecIndices(m_spRender2DStroge->MaxIndices);
+	m_spRender2DStroge->spQuadVertexArray = VertexArray::Create();
+	m_spRender2DStroge->spQuadVertexArray->AddVertexBuffer(m_spRender2DStroge->spQuadVertexBuffer);
+
+	std::vector<unsigned int> vecIndices(m_spRender2DStroge->spQuadDrawStatics->GetMaxIndices());
 
 	int uiOffset(0);
-	for (unsigned int i = 0; i < m_spRender2DStroge->MaxIndices; i += 6)
+	for (unsigned int i = 0; i < vecIndices.size(); i += 6)
 	{
 		vecIndices[i + 0] = uiOffset + 0;
 		vecIndices[i + 1] = uiOffset + 1;
@@ -54,7 +52,20 @@ void Render2D::Init()
 	}
 
 	auto spIndexBuffer = IndexBuffer::Create(vecIndices);
-	m_spRender2DStroge->VertexArray->SetIndexBuffer(spIndexBuffer);
+	m_spRender2DStroge->spQuadVertexArray->SetIndexBuffer(spIndexBuffer);
+
+	std::vector<int> vecTextures(m_spRender2DStroge->spQuadDrawStatics->GetMaxTextureSlots());
+	for (int i = 0; i < vecTextures.size(); i++)
+	{
+		vecTextures[i] = i;
+	}
+
+	int uiWiteTextureData = 0xffffffff;
+	m_spRender2DStroge->spWhiteTexture = Texture2D::Create(1, 1);
+	m_spRender2DStroge->spWhiteTexture->SetData(&uiWiteTextureData, sizeof(uiWiteTextureData));
+
+	m_spRender2DStroge->CameraUniformBuffer = std::dynamic_pointer_cast<UniformBuffer>
+		(UniformBuffer::Create(sizeof(CameraMatrix), 2));
 
 	//Shader
 	std::vector<ShaderInfo> vecColorShaderInfo
@@ -62,27 +73,11 @@ void Render2D::Init()
 		{ShaderType::VETEX_SHADER,"assets/shaders/texture_color.vs"},
 		{ShaderType::FRAGMENT_SHADER,"assets/shaders/texture_color.fs"}
 	};
-	m_spRender2DStroge->Shader = Shader::Create(vecColorShaderInfo);
+	m_spRender2DStroge->spQuadShader = Shader::Create(vecColorShaderInfo);
 
-	std::vector<int> vecTextures(32);
-	for (int i = 0; i < 32; i++)
-	{
-		vecTextures[i] = i;
-	}
-	m_spRender2DStroge->TextureCoord[0] = glm::vec2(0.f, 0.f);
-	m_spRender2DStroge->TextureCoord[1] = glm::vec2(1.f, 0.f);
-	m_spRender2DStroge->TextureCoord[2] = glm::vec2(1.f, 1.f);
-	m_spRender2DStroge->TextureCoord[3] = glm::vec2(0.f, 1.f);
-
-	int uiWiteTextureData = 0xffffffff;
-	m_spRender2DStroge->WhiteTexture = Texture2D::Create(1, 1);
-	m_spRender2DStroge->WhiteTexture->SetData(&uiWiteTextureData, sizeof(uiWiteTextureData));
-
-	m_spRender2DStroge->CameraUniformBuffer = UniformBuffer::Create(sizeof(Render2DStroge::CameraData), 2);
-
-	m_spRender2DStroge->Shader->Bind();
-	m_spRender2DStroge->Shader->SetIntArray("u_Textures", vecTextures.data(), vecTextures.size());
-	m_spRender2DStroge->Shader->SetUniformBlock("Camera", 2);
+	m_spRender2DStroge->spQuadShader->Bind();
+	m_spRender2DStroge->spQuadShader->SetIntArray("u_Textures", vecTextures.data(), vecTextures.size());
+	m_spRender2DStroge->spQuadShader->SetUniformBlock("Camera", 2);
 }
 
 void Render2D::ShutDown()
@@ -92,9 +87,8 @@ void Render2D::ShutDown()
 void Render2D::BeginScene(const Ref<Camera>& spCamera)
 {
 	m_spRender2DStroge->CameraBuffer.ViewProjection = spCamera->GetViewProjectionMatrix();
-
 	auto spCameraUniformBuffer = std::dynamic_pointer_cast<UniformBuffer>(m_spRender2DStroge->CameraUniformBuffer);
-	spCameraUniformBuffer->SetData(&m_spRender2DStroge->CameraBuffer, sizeof(Render2DStroge::CameraData));
+	spCameraUniformBuffer->SetData(&m_spRender2DStroge->CameraBuffer, sizeof(CameraMatrix));
 	StartBatch();
 }
 
@@ -105,173 +99,85 @@ void Render2D::EndScene()
 
 void Render2D::Flush()
 {
-	if (m_spRender2DStroge->QuadIndexCount)
+	for (auto iter : m_spRender2DStroge->TextureSlots)
 	{
-		for (auto iter : m_spRender2DStroge->TextureSlots)
-		{
-			iter.second->Bind(iter.first);
-		}
-		auto spVertexBuffer = std::dynamic_pointer_cast<VertexBuffer>(m_spRender2DStroge->VertexBuffer);
-		SAND_TABLE_ASSERT(spVertexBuffer, "Vertex Buffer is null in Render2D");
-		spVertexBuffer->SetData(m_spRender2DStroge->Vertex.data(), m_spRender2DStroge->Vertex.size() * sizeof(Vertex));
-		RenderCommand::DrawVertex(m_spRender2DStroge->VertexArray, m_spRender2DStroge->QuadIndexCount);
+		iter.second->Bind(iter.first);
+	}
 
-		m_spRender2DStroge->Stats.DrawCalls++;
+	if (m_spRender2DStroge->spQuadDrawStatics->GetDrawCount())
+	{
+		m_spRender2DStroge->spQuadShader->Bind();
+		auto spQuadVertexBuffer = std::dynamic_pointer_cast<VertexBuffer>(m_spRender2DStroge->spQuadVertexBuffer);
+		auto vertexSize = spQuadVertexBuffer->GetVertexBufferLayout()->GetStride();
+		spQuadVertexBuffer->SetData(m_spRender2DStroge->vecQuadVertexs.data(), m_spRender2DStroge->vecQuadVertexs.size() * vertexSize);
+		RenderCommand::DrawVertex(m_spRender2DStroge->spQuadVertexArray,m_spRender2DStroge->spQuadDrawStatics->GetTotalIndexCount());
+		m_spRender2DStroge->spQuadDrawStatics->AddDrawCalls();
 	}
 }
 
 void Render2D::DrawSprite(const glm::mat4& mat4Transform, const SpriteRenderComponent& spriteRenderComponent, int iEntityID)
 {
-	if (spriteRenderComponent.spTexture != nullptr)
-	{
-		DrawQuad(mat4Transform, spriteRenderComponent.spTexture, spriteRenderComponent.TilingFactor, spriteRenderComponent.Color, iEntityID);
-	}
-	else
-	{
-		DrawQuad(mat4Transform, spriteRenderComponent.Color, iEntityID);
-	}
+	DrawPrimitive(mat4Transform, spriteRenderComponent.spQuadPrimitive, spriteRenderComponent.spTexture, iEntityID);
 }
 
-void Render2D::DrawQuad(const glm::vec2& vec2Position, float fRotation, const glm::vec2& vec2Size, const glm::vec4& vec4Color)
+void Render2D::DrawPrimitive(const glm::vec3& vec3Pan, float fRotation, const glm::vec3& vec3Scale, Ref<QuadPrimitive> spPrimitive, Ref<Texture> spTexture, int iEntityID)
 {
-	DrawQuad(glm::vec3(vec2Position, 0.f), fRotation, vec2Size, vec4Color);
-}
-
-void Render2D::DrawQuad(const glm::vec3& vec3Position, float fRotation, const glm::vec2& vec2Size, const glm::vec4& vec4Color)
-{
-	glm::mat4 matTransform = glm::translate(glm::mat4(1.f), vec3Position)
+	glm::mat4 matTransform = glm::translate(glm::mat4(1.f), vec3Pan)
 		* glm::rotate(glm::mat4(1.f), fRotation, glm::vec3(0.f, 0.f, 1.f))
-		* glm::scale(glm::mat4(1.f), glm::vec3(vec2Size, 1.f));
-
-	DrawQuad(matTransform, vec4Color);
+		* glm::scale(glm::mat4(1.f), vec3Scale);
+	DrawPrimitive(matTransform, spPrimitive, spTexture, iEntityID);
 }
-
-void Render2D::DrawQuad(const glm::vec2& vec2Position, float fRotation, const glm::vec2& vec2Size, const Ref<Texture>& spTexture, 
-	float fFactor, const glm::vec4& vec4Color)
-{
-	DrawQuad(glm::vec3(vec2Position, 0.f), fRotation, vec2Size, spTexture, fFactor, vec4Color);
-}
-
-void Render2D::DrawQuad(const glm::vec3& vec3Position, float fRotation, const glm::vec2& vec2Size, const Ref<Texture>& spTexture, 
-	float fFactor, const glm::vec4& vec4Color)
-{
-	glm::mat4 matTransform = glm::translate(glm::mat4(1.f), vec3Position)
-		* glm::rotate(glm::mat4(1.f), glm::radians(fRotation), glm::vec3(0.f, 0.f, 1.f))
-		* glm::scale(glm::mat4(1.f), glm::vec3(vec2Size, 1.f));
-
-	DrawQuad(matTransform, spTexture, fFactor, vec4Color);
-}
-
-void Render2D::DrawQuad(const glm::vec2& vec2Position, float fRotation, const glm::vec2& vec2Size, const Ref<SubTexture2D>& spSubTexture2D,
-	float fFactor, const glm::vec4& vec4Color)
-{
-	DrawQuad(glm::vec3(vec2Position, 0.f), fRotation, vec2Size, spSubTexture2D, fFactor, vec4Color);
-}
-
-void Render2D::DrawQuad(const glm::vec3& vec3Position, float fRotation, const glm::vec2& vec2Size, const Ref<SubTexture2D>& spSubTexture2D,
-	float fFactor, const glm::vec4& vec4Color)
-{
-	auto spRefTexture2D = spSubTexture2D->GetTexture();
-	if (m_spRender2DStroge->TextureSlots.find(spRefTexture2D->GetRenderID())
-		== m_spRender2DStroge->TextureSlots.end())
-	{
-		m_spRender2DStroge->TextureSlots[spRefTexture2D->GetRenderID()] = spRefTexture2D;
-	}
-	if (m_spRender2DStroge->TextureSlots.size() == 31  //Texture0未使用
-		|| m_spRender2DStroge->QuadIndexCount + 6 > m_spRender2DStroge->MaxIndices)
-	{
-		NextBatch();
-	}
-
-	glm::mat4 matTransform = glm::translate(glm::mat4(1.f), vec3Position)
-		* glm::rotate(glm::mat4(1.f), glm::radians(fRotation), glm::vec3(0.f, 0.f, 1.f))
-		* glm::scale(glm::mat4(1.f), glm::vec3(vec2Size, 1.f));
-
-	for (int i = 0; i < 4; i++)
-	{
-		Vertex vertex;
-		vertex.Position = matTransform * m_spRender2DStroge->VertexPosition[i];
-		vertex.Color = vec4Color;
-		vertex.TexCoord = spSubTexture2D->GetTexCoord()[i];
-		vertex.TexIndex = spRefTexture2D->GetRenderID();
-		vertex.TilingFactor = fFactor;
-		m_spRender2DStroge->Vertex.emplace_back(vertex);
-	}
-
-	m_spRender2DStroge->QuadIndexCount += 6;
-	m_spRender2DStroge->Stats.QuadCount++;
-}
-
-void Render2D::DrawQuad(const glm::mat4& mat4Transform, const glm::vec4& vec4Color, int iEntityID)
-{
-	if (m_spRender2DStroge->QuadIndexCount + 6 > m_spRender2DStroge->MaxIndices)
-	{
-		NextBatch();
-	}
-	for (int i = 0; i < 4; i++)
-	{
-		Vertex vertex;
-		vertex.Position = mat4Transform * m_spRender2DStroge->VertexPosition[i];
-		vertex.Color = vec4Color;
-		vertex.TexCoord = m_spRender2DStroge->TextureCoord[i];
-		vertex.TexIndex = m_spRender2DStroge->WhiteTexture->GetRenderID();
-		vertex.TilingFactor = 1.0f;
-		vertex.EntityID = iEntityID;
-		m_spRender2DStroge->Vertex.emplace_back(vertex);
-	}
-
-	m_spRender2DStroge->QuadIndexCount += 6;
-
-	m_spRender2DStroge->Stats.QuadCount++;
-}
-
-void Render2D::DrawQuad(const glm::mat4& mat4Transform, const Ref<Texture>& spTexture, float fFactor, const glm::vec4& vec4Color, int iEntityID)
-{
-	if (m_spRender2DStroge->TextureSlots.find(spTexture->GetRenderID())
-		== m_spRender2DStroge->TextureSlots.end())
-	{
-		m_spRender2DStroge->TextureSlots[spTexture->GetRenderID()] = spTexture;
-	}
-	if (m_spRender2DStroge->TextureSlots.size() == 31  //Texture0未使用
-		|| m_spRender2DStroge->QuadIndexCount + 6 > m_spRender2DStroge->MaxIndices)
-	{
-		NextBatch();
-	}
-
-	for (int i = 0; i < 4; i++)
-	{
-		Vertex vertex;
-		vertex.Position = mat4Transform * m_spRender2DStroge->VertexPosition[i];
-		vertex.Color = vec4Color;
-		vertex.TexCoord = m_spRender2DStroge->TextureCoord[i];
-		vertex.TexIndex = spTexture->GetRenderID();
-		vertex.TilingFactor = fFactor;
-		vertex.EntityID = iEntityID;
-		m_spRender2DStroge->Vertex.emplace_back(vertex);
-	}
-
-	m_spRender2DStroge->QuadIndexCount += 6;
-	m_spRender2DStroge->Stats.QuadCount++;
-}
-
 
 void Render2D::ResetStats()
 {
-	m_spRender2DStroge->Stats.DrawCalls = m_spRender2DStroge->Stats.QuadCount = 0;
+	m_spRender2DStroge->spQuadDrawStatics->ResetDrawCalls();
+	m_spRender2DStroge->spQuadDrawStatics->ResetDrawCount();
 }
 
-Render2D::Statistics Render2D::GetStats()
+const Ref<QuadDrawStatics>& Render2D::GetQuadStatic()
 {
-	return m_spRender2DStroge->Stats;
+	return m_spRender2DStroge->spQuadDrawStatics;
+}
+
+void Render2D::DrawPrimitive(const glm::mat4& mat4Transform, Ref<QuadPrimitive> spPrimitive, Ref<Texture> spTexture, int iEntityID)
+{
+	if (spTexture != nullptr)
+	{
+		if (m_spRender2DStroge->TextureSlots.find(spTexture->GetRenderID())
+			== m_spRender2DStroge->TextureSlots.end())
+		{
+			m_spRender2DStroge->TextureSlots[spTexture->GetRenderID()] = spTexture;
+		}
+	}
+
+	if (m_spRender2DStroge->TextureSlots.size() + 1 == m_spRender2DStroge->spQuadDrawStatics->GetMaxTextureSlots()  //Texture0未使用
+		|| m_spRender2DStroge->spQuadDrawStatics->GetDrawCount() + 1 == m_spRender2DStroge->spQuadDrawStatics->GetMaxDrawCount())
+	{
+		NextBatch();
+	}
+
+	for (int i = 0; i < 4; i++)
+	{
+		QuadPrimitive::QuadVertex quadVertex;
+		quadVertex.Position = mat4Transform * spPrimitive->GetPosition()[i];
+		quadVertex.Color = spPrimitive->GetColor();
+		quadVertex.TexCoord = spPrimitive->GetTexCoord()[i];
+		quadVertex.TexIndex = spTexture != nullptr ? spTexture->GetRenderID() : m_spRender2DStroge->spWhiteTexture->GetRenderID();
+		quadVertex.TilingFactor = spPrimitive->GetTilingFactor();
+		quadVertex.EntityID = iEntityID;
+		m_spRender2DStroge->vecQuadVertexs.emplace_back(quadVertex);
+	}
+
+	m_spRender2DStroge->spQuadDrawStatics->AddDrawCount();
 }
 
 void Render2D::StartBatch()
 {
-	m_spRender2DStroge->QuadIndexCount = 0;
-	m_spRender2DStroge->Vertex.clear();
-	m_spRender2DStroge->Vertex.reserve(m_spRender2DStroge->MaxVertices);
+	m_spRender2DStroge->spQuadDrawStatics->ResetDrawCount();
+	m_spRender2DStroge->vecQuadVertexs.clear();
+	m_spRender2DStroge->vecQuadVertexs.reserve(m_spRender2DStroge->spQuadDrawStatics->GetMaxVertices());
 	m_spRender2DStroge->TextureSlots.clear();
-	m_spRender2DStroge->TextureSlots[m_spRender2DStroge->WhiteTexture->GetRenderID()] = m_spRender2DStroge->WhiteTexture;
+	m_spRender2DStroge->TextureSlots[m_spRender2DStroge->spWhiteTexture->GetRenderID()] = m_spRender2DStroge->spWhiteTexture;
 }
 
 void Render2D::NextBatch()

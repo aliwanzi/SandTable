@@ -27,6 +27,7 @@
 #include "SandTable/Scene/Scene.h"
 #include "SandTable/Scene/Components.h"
 #include "SandTable/Scene/Entity.h"
+#include "SandTable/Debug/DrawStatistics/QuadDrawStatics.h"
 
 #include "SandTable/System/ParticleSystem2D.h"
 

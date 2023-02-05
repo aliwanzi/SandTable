@@ -1,9 +1,8 @@
 #pragma once
-#include "SandTable/Render/Camera/OrthoGraphicCamera.h"
-#include "SandTable/Render/Texture/Texture2D.h"
-
 SAND_TABLE_NAMESPACE_BEGIN
-
+class Texture;
+class Camera;
+class QuadPrimitive;
 enum class ParticleRenderType
 {
 	COLOR = 0,
@@ -31,7 +30,7 @@ public:
 	ParticleSystem2D();
 
 	void OnUpdate(TimeStep timeStep);
-	void OnRender(const Ref<OrthoGraphicCamera>& spOrthoGraphicCamera);
+	void OnRender(const Ref<Camera>& spCamera);
 
 	void Emit(const ParticleProps& particleProps);
 private:
@@ -55,6 +54,7 @@ private:
 	};
 
 	std::vector<Particle> m_vecParticlePool;
+	Ref<QuadPrimitive> m_spQuadPrimtive;
 };
 
 SAND_TABLE_NAMESPACE_END
