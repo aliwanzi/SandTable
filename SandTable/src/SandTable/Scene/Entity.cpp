@@ -21,6 +21,11 @@ Entity::Entity(const Ref<entt::registry>& spRegistry, int iEntityID) :
 	m_entity = static_cast<entt::entity>(iEntityID);
 }
 
+void Entity::Destrory()
+{
+	m_spRegistry->destroy(m_entity);
+}
+
 bool Entity::operator==(const Entity& entity) const
 {
 	return m_entity == entity.m_entity;

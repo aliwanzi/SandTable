@@ -66,6 +66,7 @@ Scene::Scene(const Ref<Scene>& spScene):
 
 	CopyComponent<TransformComponent>(spSrcRegistry, mapEntity);
 	CopyComponent<SpriteRenderComponent>(spSrcRegistry, mapEntity);
+	CopyComponent<CircleRenderComponent>(spSrcRegistry, mapEntity);
 	CopyComponent<CameraComponent>(spSrcRegistry, mapEntity);
 	CopyComponent<RigidBody2DComponent>(spSrcRegistry, mapEntity);
 	CopyComponent<BoxCollider2DComponent>(spSrcRegistry, mapEntity);
@@ -76,6 +77,7 @@ Ref<Entity> Scene::CreateEntity(const Ref<Entity>& spSrcEntity)
 	auto spDstEntity = CreateEntity(spSrcEntity->GetName());
 	CopyComponentIfExists<TransformComponent>(spSrcEntity, spDstEntity);
 	CopyComponentIfExists<SpriteRenderComponent>(spSrcEntity, spDstEntity);
+	CopyComponentIfExists<CircleRenderComponent>(spSrcEntity, spDstEntity);
 	CopyComponentIfExists<CameraComponent>(spSrcEntity, spDstEntity);
 	CopyComponentIfExists<RigidBody2DComponent>(spSrcEntity, spDstEntity);
 	CopyComponentIfExists<BoxCollider2DComponent>(spSrcEntity, spDstEntity);
@@ -94,11 +96,6 @@ Ref<Entity> Scene::CreateEntityWithUUID(const UUID& uuid, const std::string& sNa
 	spEntity->AddComponent<TransformComponent>();
 	spEntity->AddComponent<TagComponent>(sName.empty() ? "Entity" : sName);
 	return spEntity;
-}
-
-void Scene::DestroyEntity(const Ref<Entity>& spEntity)
-{
-	m_spRegistry->destroy(*spEntity);
 }
 
 void Scene::OnRuntimeStart()
@@ -230,6 +227,15 @@ void Scene::RenderScene(const Ref<Camera>& spCamera)
 
 		Render2D::DrawSprite(spriteTransform.GetTransform(), sprite, static_cast<int>(spriteComponent));
 	}
+
+	auto circleView = m_spRegistry->view<TransformComponent, CircleRenderComponent>();
+	for (auto circleComponent : circleView)
+	{
+		const auto [circleTransform, circle] = circleView.get<TransformComponent, CircleRenderComponent>(circleComponent);
+
+		Render2D::DrawCircle(circleTransform.GetTransform(), circle, static_cast<int>(circleComponent));
+	}
+
 
 	Render2D::EndScene();
 }

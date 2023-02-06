@@ -10,6 +10,7 @@ public:
 	Entity(const Ref<entt::registry>& spRegistry);
 	Entity(const Ref<entt::registry>& spRegistry, const entt::entity& Entity);
 	Entity(const Ref<entt::registry>& spRegistry, int iEntityID);
+	void Destrory();
 
 	template<typename T, typename... Args>
 	T& AddComponent(Args&&... args)

@@ -190,6 +190,18 @@ namespace
 			out << YAML::EndMap; // SpriteRendererComponent
 		}
 
+		if (entity.HasComponent<CircleRenderComponent>())
+		{
+			out << YAML::Key << "CircleRenderComponent";
+			out << YAML::BeginMap;
+
+			auto& circleRenderComponent = entity.GetComponent<CircleRenderComponent>();
+			out << YAML::Key << "Color" << YAML::Value << circleRenderComponent.spCirclePrimitive->GetColor();
+			out << YAML::Key << "Thickness" << YAML::Value << circleRenderComponent.spCirclePrimitive->GetThickness();
+			out << YAML::Key << "Fade" << YAML::Value << circleRenderComponent.spCirclePrimitive->GetFade();
+			out << YAML::EndMap; // SpriteRendererComponent
+		}
+
 		if (entity.HasComponent<RigidBody2DComponent>())
 		{
 			out << YAML::Key << "RigidBody2DComponent";
@@ -326,6 +338,15 @@ bool SceneSerializer::DeSerialize(const std::string& sFilePath)
 					std::string sPath = spriteRenderComponent["TexturePath"].as<std::string>();
 					src.spTexture = Texture2D::Create(sPath);
 				}
+			}
+
+			auto circleRenderComponent = entity["CircleRenderComponent"];
+			if (circleRenderComponent)
+			{
+				auto& src = deserializedEntity->AddComponent<CircleRenderComponent>();
+				src.spCirclePrimitive->SetColor(circleRenderComponent["Color"].as<glm::vec4>());
+				src.spCirclePrimitive->SetThickness(circleRenderComponent["Thickness"].as<float>());
+				src.spCirclePrimitive->SetFade(circleRenderComponent["Fade"].as<float>());
 			}
 
 			auto rigidBody2DComponent = entity["RigidBody2DComponent"];

@@ -4,6 +4,7 @@
 #include "SandTable/Render/Texture/Texture.h"
 #include "SandTable/Scene/UUID.h"
 #include "SandTable/Scene/Primitive/QuadPrimitive.h"
+#include "SandTable/Scene/Primitive/CirclePrimitive.h"
 
 SAND_TABLE_NAMESPACE_BEGIN
 
@@ -62,10 +63,7 @@ struct SpriteRenderComponent
 
 struct CircleRenderComponent
 {
-	glm::vec4 Color{ 1.f };
-	float Radius = 0.5f;
-	float Thickness = 1.f;
-	float Fade = 0.005f;
+	Ref<CirclePrimitive> spCirclePrimitive = CreateRef<CirclePrimitive>();
 	CircleRenderComponent() = default;
 	CircleRenderComponent(const CircleRenderComponent&) = default;
 	CircleRenderComponent& operator =(const CircleRenderComponent&) = default;

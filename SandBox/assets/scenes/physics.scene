@@ -1,5 +1,16 @@
 Scene: Untitled
 Entities:
+  - Entity: 8601749735297645532
+    TagComponent:
+      Tag: Circle Entity
+    TransformComponent:
+      Translation: [3.46596241, 0.414407551, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    CircleRenderComponent:
+      Color: [0.613899589, 0.215694472, 0.215694472, 1]
+      Thickness: 1
+      Fade: 0.00499999989
   - Entity: 11357024064893281421
     TagComponent:
       Tag: Dynamic
@@ -98,3 +109,14 @@ Entities:
       Friction: 0.5
       Restitution: 0
       RestitutionThreshold: 0.5
+  - Entity: 7539505326503967952
+    TagComponent:
+      Tag: Circle Entity
+    TransformComponent:
+      Translation: [1.59177315, -0.316525131, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    CircleRenderComponent:
+      Color: [0.613899589, 0.215694472, 0.215694472, 1]
+      Thickness: 1
+      Fade: 0.00499999989

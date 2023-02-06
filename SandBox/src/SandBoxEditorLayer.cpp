@@ -43,11 +43,14 @@ SandBoxEditorLayer::~SandBoxEditorLayer()
 
 void SandBoxEditorLayer::OnAttach()
 {
+	m_spCameraEntity = m_spEditorScene->CreateEntity("Camera Entity");
+	m_spCameraEntity->AddComponent<CameraComponent>();
+
 	m_spSquareEntity = m_spEditorScene->CreateEntity("Square Entity");
 	m_spSquareEntity->AddComponent<SpriteRenderComponent>();
 
-	m_spCameraEntity = m_spEditorScene->CreateEntity("Camera Entity");
-	m_spCameraEntity->AddComponent<CameraComponent>();
+	m_spCameraEntity = m_spEditorScene->CreateEntity("Circle Entity");
+	m_spCameraEntity->AddComponent<CircleRenderComponent>();
 }
 
 void SandBoxEditorLayer::OnDetach()
@@ -96,8 +99,14 @@ void SandBoxEditorLayer::OnUpdate(const TimeStep& timeStep)
 	{
 		int iPixelData = spFrameBuffer->ReadPixel
 		(1, static_cast<unsigned int>(vec2MousePos.x), static_cast<unsigned int>(vec2MousePos.y));
-
-		m_spHoveredEntity = iPixelData != -1 ? CreateRef<Entity>(m_spEditorScene->Registry(), iPixelData) : nullptr;
+		if (iPixelData != -1)
+		{
+			m_spHoveredEntity = CreateRef<Entity>(m_spEditorScene->Registry(), iPixelData);
+		}
+		else
+		{
+			m_spHoveredEntity = nullptr;
+		}
 	}
 
 	spFrameBuffer->UnBind();

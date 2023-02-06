@@ -249,9 +249,9 @@ void SceneHierarchyPanel::DrawEntityNode(const Ref<Entity>& spEntity)
 
 	if (entityDeleted)
 	{
-		m_spScene->DestroyEntity(spEntity);
-		if (*m_spSelectedEntity == *spEntity)
+		if (m_spSelectedEntity != nullptr && *m_spSelectedEntity == *spEntity)
 			m_spSelectedEntity = nullptr;
+		spEntity->Destrory();
 	}
 }
 
@@ -354,7 +354,8 @@ void SceneHierarchyPanel::DrawComponents(const Ref<Entity>& spEntity)
 
 	DrawComponent<SpriteRenderComponent>("Sprite Render", spEntity, [](auto& component)
 		{
-			ImGui::ColorEdit4("Color", glm::value_ptr(component.spQuadPrimitive->GetColor()));
+			auto& spQuadPrimitive = component.spQuadPrimitive;
+			ImGui::ColorEdit4("Color", glm::value_ptr(spQuadPrimitive->GetColor()));
 			ImGui::Button("Texture", ImVec2(100.f, 0.0f));
 			if (ImGui::BeginDragDropTarget())
 			{
@@ -375,15 +376,15 @@ void SceneHierarchyPanel::DrawComponents(const Ref<Entity>& spEntity)
 				ImGui::EndDragDropTarget();
 			}
 
-			ImGui::DragFloat("Tiling Facto", &component.spQuadPrimitive->GetTilingFactor(), 0.1f, 0.f, 10.f);
+			ImGui::DragFloat("Tiling Facto", &spQuadPrimitive->GetTilingFactor(), 0.1f, 0.f, 10.f);
 		});
 
 	DrawComponent<CircleRenderComponent>("Circle Render", spEntity, [](auto& component)
 		{
-			ImGui::ColorEdit4("Color", glm::value_ptr(component.Color));
-			ImGui::DragFloat("Radius", &component.Radius, 0.5f, 0.f, 100.f);
-			ImGui::DragFloat("Thickness", &component.Thickness, 0.025f, 0.f, 100.f);
-			ImGui::DragFloat("Fade", &component.Fade, 0.00025f, 0.f, 100.f);
+			auto& spCirclePrimitive = component.spCirclePrimitive;
+			ImGui::ColorEdit4("Color", glm::value_ptr(spCirclePrimitive->GetColor()));
+			ImGui::DragFloat("Thickness", &spCirclePrimitive->GetThickness(), 0.025f, 0.f, 100.f);
+			ImGui::DragFloat("Fade", &spCirclePrimitive->GetFade(), 0.00025f, 0.f, 100.f);
 		});
 
 	DrawComponent<RigidBody2DComponent>("Rigidbody 2D", spEntity, [](auto& component)

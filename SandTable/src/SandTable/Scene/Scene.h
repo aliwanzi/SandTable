@@ -21,7 +21,6 @@ public:
 	Ref<Entity> CreateEntity(const Ref<Entity>& spSrcEntity);
 	Ref<Entity> CreateEntity(const std::string& sName = std::string());
 	Ref<Entity> CreateEntityWithUUID(const UUID& uuid, const std::string& sName);
-	void DestroyEntity(const Ref<Entity>& spEntity);
 
 	void OnRuntimeStart();
 	void OnRuntimeStop();
