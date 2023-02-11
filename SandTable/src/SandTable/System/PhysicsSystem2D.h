@@ -37,17 +37,34 @@ struct BoxCollider2DComponent
 	BoxCollider2DComponent(const BoxCollider2DComponent&) = default;
 };
 
+struct CircleCollider2DComponent
+{
+	glm::vec2 Offset = glm::vec2(0.f);
+	float Radius = 0.5f;
+
+	float Density = 1.f;
+	float Friction = 0.5f;
+	float Restitution = 0.f;
+	float RestitutionThreshold = 0.5f;
+
+	CircleCollider2DComponent() = default;
+	CircleCollider2DComponent(const CircleCollider2DComponent&) = default;
+};
+
 class PhysicsSystem2D
 {
 public:
 	PhysicsSystem2D();
+	~PhysicsSystem2D();
 	void CreateBody(RigidBody2DComponent& rigidBody2D, const TransformComponent& transform);
-	void CreateBody(RigidBody2DComponent& rigidBody2D, BoxCollider2DComponent& boxCollider2D,
-		const TransformComponent& transform);
+	void CreatePolygonShape(BoxCollider2DComponent& boxCollider2D, const TransformComponent& transform);
+	void CreateCircleShape(CircleCollider2DComponent& circleCollider2D, const TransformComponent& transform);
+
 	void OnUpdate(const TimeStep& timeStep);
 	void UpdateSystem(RigidBody2DComponent& rigidBody2D, TransformComponent& transform);
 private:
 	Ref<b2World> m_spPhysicsWorld;
+	b2Body* m_pBody;
 };
 
 SAND_TABLE_NAMESPACE_END

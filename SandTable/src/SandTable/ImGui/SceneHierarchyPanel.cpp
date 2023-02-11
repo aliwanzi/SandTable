@@ -191,11 +191,18 @@ void SceneHierarchyPanel::OnImGuiRender()
 				ImGui::CloseCurrentPopup();
 			}
 
-			if (!m_spSelectedEntity->HasComponent<BoxCollider2DComponent>() && ImGui::MenuItem("Box Collider2D"))
+			if (!m_spSelectedEntity->HasComponent<BoxCollider2DComponent>() && ImGui::MenuItem("Box Collider 2D"))
 			{
 				m_spSelectedEntity->AddComponent<BoxCollider2DComponent>();
 				ImGui::CloseCurrentPopup();
 			}
+
+			if (!m_spSelectedEntity->HasComponent<CircleCollider2DComponent>() && ImGui::MenuItem("Circle Collider 2D"))
+			{
+				m_spSelectedEntity->AddComponent<CircleCollider2DComponent>();
+				ImGui::CloseCurrentPopup();
+			}
+
 
 			ImGui::EndPopup();
 		}
@@ -409,10 +416,20 @@ void SceneHierarchyPanel::DrawComponents(const Ref<Entity>& spEntity)
 			ImGui::Checkbox("Fixed Rotation", &component.FixedRotation);
 		});
 
-	DrawComponent<BoxCollider2DComponent>("BoxCollider 2D", spEntity, [](auto& component)
+	DrawComponent<BoxCollider2DComponent>("Box Collider 2D", spEntity, [](auto& component)
 		{
 			ImGui::DragFloat2("Offset", glm::value_ptr(component.Offset));
 			ImGui::DragFloat2("Size", glm::value_ptr(component.Size));
+			ImGui::DragFloat("Density", &component.Density, 0.01f, 0.f, 1.f);
+			ImGui::DragFloat("Friction", &component.Friction, 0.01f, 0.f, 1.f);
+			ImGui::DragFloat("Restitution",&component.Restitution, 0.01f, 0.f, 1.f);
+			ImGui::DragFloat("Restitution Threshold", &component.RestitutionThreshold, 0.01f, 0.f);
+		});
+
+	DrawComponent<CircleCollider2DComponent>("Circle Collider 2D", spEntity, [](auto& component)
+		{
+			ImGui::DragFloat2("Offset", glm::value_ptr(component.Offset));
+			ImGui::DragFloat("Radius", &component.Radius);
 			ImGui::DragFloat("Density", &component.Density, 0.01f, 0.f, 1.f);
 			ImGui::DragFloat("Friction", &component.Friction, 0.01f, 0.f, 1.f);
 			ImGui::DragFloat("Restitution",&component.Restitution, 0.01f, 0.f, 1.f);

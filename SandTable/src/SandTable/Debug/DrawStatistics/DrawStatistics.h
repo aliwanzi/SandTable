@@ -11,7 +11,6 @@ public:
 	virtual unsigned int GetMaxVertices()const = 0;
 	virtual unsigned int GetMaxIndices()const = 0;
 	unsigned int GetMaxDrawCount()const;
-	unsigned int GetMaxTextureSlots()const;
 	unsigned int GetDrawCalls() const;
 	unsigned int GetDrawCount()const;
 

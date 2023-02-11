@@ -14,7 +14,9 @@ public:
 	virtual void SetClearColor(const glm::vec4& vec4Color) = 0;
 	virtual void SetViewPort(unsigned int uiWidth, unsigned int uiHeight) = 0;
 	virtual void Clear() = 0;
-	virtual void DrawElements(unsigned int uiIndexCount) = 0;
+	virtual void DrawTriangles(unsigned int uiIndexCount) = 0;
+	virtual void DrawLines(unsigned int uiIndexCount) = 0;
+	virtual void SetLineWidth(float fWidth) = 0;
 	static APIType GetAPIType();
 	static Ref<RenderAPI> CreateRenderAPI();
 

@@ -70,6 +70,7 @@ Scene::Scene(const Ref<Scene>& spScene):
 	CopyComponent<CameraComponent>(spSrcRegistry, mapEntity);
 	CopyComponent<RigidBody2DComponent>(spSrcRegistry, mapEntity);
 	CopyComponent<BoxCollider2DComponent>(spSrcRegistry, mapEntity);
+	CopyComponent<CircleCollider2DComponent>(spSrcRegistry, mapEntity);
 }
 
 Ref<Entity> Scene::CreateEntity(const Ref<Entity>& spSrcEntity)
@@ -81,6 +82,7 @@ Ref<Entity> Scene::CreateEntity(const Ref<Entity>& spSrcEntity)
 	CopyComponentIfExists<CameraComponent>(spSrcEntity, spDstEntity);
 	CopyComponentIfExists<RigidBody2DComponent>(spSrcEntity, spDstEntity);
 	CopyComponentIfExists<BoxCollider2DComponent>(spSrcEntity, spDstEntity);
+	CopyComponentIfExists<CircleCollider2DComponent>(spSrcEntity, spDstEntity);
 	return spDstEntity;
 }
 
@@ -108,15 +110,19 @@ void Scene::OnRuntimeStart()
 		auto& transform = spEntity->GetComponent<TransformComponent>();
 		auto& rigidBody2D = spEntity->GetComponent<RigidBody2DComponent>();
 
+		m_spPhysicsSystem2D->CreateBody(rigidBody2D, transform);
+
 		if (spEntity->HasComponent<BoxCollider2DComponent>())
 		{
 			auto& boxCollider2D = spEntity->GetComponent<BoxCollider2DComponent>();
-
-			m_spPhysicsSystem2D->CreateBody(rigidBody2D, boxCollider2D, transform);
+			m_spPhysicsSystem2D->CreatePolygonShape(boxCollider2D, transform);
 		}
-		else
+
+		if (spEntity->HasComponent<CircleCollider2DComponent>())
 		{
-			m_spPhysicsSystem2D->CreateBody(rigidBody2D, transform);
+			auto& circleCollider2D = spEntity->GetComponent<CircleCollider2DComponent>();
+
+			m_spPhysicsSystem2D->CreateCircleShape(circleCollider2D, transform);
 		}
 	}
 }
@@ -124,6 +130,47 @@ void Scene::OnRuntimeStart()
 void Scene::OnRuntimeStop()
 {
 	m_spPhysicsSystem2D = nullptr;
+}
+
+void Scene::OnShowPhysicsCollider(const Ref<Camera>& spCamera)
+{
+	Render2D::BeginScene(spCamera);
+	{
+		auto view = m_spRegistry->view<TransformComponent, CircleCollider2DComponent>();
+		for (auto entity : view)
+		{
+			const auto [tc, cc2d] = view.get<TransformComponent, CircleCollider2DComponent>(entity);
+			auto spCirclePrimitive = CreateRef<CirclePrimitive>();
+			spCirclePrimitive->SetColor(glm::vec4(0.f, 1.f, 0.f, 1.f));
+			spCirclePrimitive->SetThickness(0.05f);
+
+			glm::vec3 translation = tc.Translation + glm::vec3(cc2d.Offset, 0.001f);
+			glm::vec3 scale = tc.Scale * glm::vec3(cc2d.Radius * 2.f + 0.05f);
+			glm::mat4 transform = glm::translate(glm::mat4(1.f), translation) * glm::scale(glm::mat4(1.f), scale);
+
+			Render2D::DrawPrimitive(transform, spCirclePrimitive);
+		}
+	}
+	{
+		auto view = m_spRegistry->view<TransformComponent, BoxCollider2DComponent>();
+		for (auto entity : view)
+		{
+			const auto [tc, bc2d] = view.get<TransformComponent, BoxCollider2DComponent>(entity);
+
+			auto  spQuadPrimitive = CreateRef<QuadPrimitive>();
+			spQuadPrimitive->SetColor(glm::vec4(0.f, 1.f, 0.f, 1.f));
+	
+			glm::vec3 translation = tc.Translation + glm::vec3(bc2d.Offset, 0.001f);
+			glm::vec3 scale = tc.Scale * glm::vec3(bc2d.Size * 2.f, 1.f);
+
+			glm::mat4 transform = glm::translate(glm::mat4(1.f), translation)
+				* glm::rotate(glm::mat4(1.f), tc.Rotation.z, glm::vec3(0.f, 0.f, 1.f))
+				* glm::scale(glm::mat4(1.f), scale);
+
+			Render2D::DrawBoundary(transform, spQuadPrimitive);
+		}
+	}
+	Render2D::EndScene();
 }
 
 void Scene::OnUpdate(const TimeStep& timeStep)

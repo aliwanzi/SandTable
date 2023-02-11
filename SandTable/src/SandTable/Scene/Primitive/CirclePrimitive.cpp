@@ -8,31 +8,10 @@ CirclePrimitive::CirclePrimitive() :
 	m_fThickness(1.f),
 	m_fFade(0.005f)
 {
-}
-
-void CirclePrimitive::SetPosition(const std::array<glm::vec4, 4>& arrayPosition)
-{
-	m_arrayPosition = arrayPosition;
-}
-
-const std::array<glm::vec4, 4>& CirclePrimitive::GetPosition() const
-{
-	return m_arrayPosition;
-}
-
-void CirclePrimitive::SetColor(const glm::vec4& vec4Color)
-{
-	m_vec4Color = vec4Color;
-}
-
-const glm::vec4& CirclePrimitive::GetColor() const
-{
-	return m_vec4Color;
-}
-
-glm::vec4& CirclePrimitive::GetColor()
-{
-	return m_vec4Color;
+	AddPosition(glm::vec4(-0.5f, -0.5f, 0.0f, 1.0f));
+	AddPosition(glm::vec4(0.5f, -0.5f, 0.0f, 1.0f));
+	AddPosition(glm::vec4(0.5f, 0.5f, 0.0f, 1.0f));
+	AddPosition(glm::vec4(-0.5f, 0.5f, 0.0f, 1.0f));
 }
 
 void CirclePrimitive::SetRadius(float fRadius)

@@ -1,6 +1,4 @@
 #pragma once
-//#include "SandTable/Render/Camera/OrthoGraphicCameraController.h"
-//#include "SandTable/Render/Texture/SubTexture2D.h"
 #include "SandTable/Scene/Components.h"
 
 SAND_TABLE_NAMESPACE_BEGIN
@@ -8,26 +6,31 @@ class VertexArray;
 class Buffer;
 class Shader;
 class Texture;
-class QuadDrawStatics;
-class CircleDrawStatics;
+class DrawStatistics;
 
 class Render2D
 {
 public:
 	struct Render2DStroge
 	{
-		Ref<QuadDrawStatics> spQuadDrawStatics;
+		Ref<DrawStatistics> spQuadDrawStatics;
 		Ref<VertexArray> spQuadVertexArray;
 		Ref<Buffer> spQuadVertexBuffer;
 		Ref<Shader> spQuadShader;
 		Ref<Texture> spWhiteTexture;
 		std::vector<QuadPrimitive::QuadVertex> vecQuadVertexs;
 
-		Ref<CircleDrawStatics> spCircleDrawStatics;
+		Ref<DrawStatistics> spCircleDrawStatics;
 		Ref<VertexArray> spCircleVertexArray;
 		Ref<Buffer> spCircleVertexBuffer;
 		Ref<Shader> spCircleShader;
 		std::vector<CirclePrimitive::CircleVertex> vecCircleVertexs;
+
+		Ref<DrawStatistics> spLineDrawStatics;
+		Ref<VertexArray> spLineVertexArray;
+		Ref<Buffer> spLineVertexBuffer;
+		Ref<Shader> spLineShader;
+		std::vector<LinePrimitive::LineVertex> vecLineVertexs;
 
 		std::unordered_map<unsigned int, Ref<Texture>> TextureSlots;
 
@@ -45,12 +48,15 @@ public:
 	static void DrawCircle(const glm::mat4& mat4Transform, const CircleRenderComponent& circleRenderComponent, int iEntityID);
 	static void DrawPrimitive(const glm::vec3& vec3Pan, float fRotation, const glm::vec3& vec3Scale, Ref<Primitive> spPrimitive, Ref<Texture> spTexture = nullptr, int iEntityID = -1);
 	static void DrawPrimitive(const glm::mat4& mat4Transform, Ref<Primitive> spPrimitive, Ref<Texture> spTexture = nullptr, int iEntityID = -1);
+	static void DrawBoundary(const glm::mat4& mat4Transform, Ref<Primitive> spPrimitive);
 
 	static void ResetStats();
-	static const Ref<QuadDrawStatics>& GetQuadStatic();
+	static const Ref<DrawStatistics>& GetQuadStatic();
 private:
+	static void CreateRenderPara(Ref<DrawStatistics> spDrawStatistics, Ref<VertexArray>& spVertexArray, Ref<Buffer>& spVertexBuffer, const std::vector<VertexBufferElement>& vertexBufferElement);
 	static void DrawPrimitive(const glm::mat4& mat4Transform, Ref<QuadPrimitive> spPrimitive, Ref<Texture> spTexture, int iEntityID);
 	static void DrawPrimitive(const glm::mat4& mat4Transform, Ref<CirclePrimitive> spPrimitive, Ref<Texture> spTexture, int iEntityID);
+	static void DrawPrimitive(const glm::mat4& mat4Transform, Ref<LinePrimitive> spPrimitive, Ref<Texture> spTexture, int iEntityID);
 	static void StartBatch();
 	static void NextBatch();
 	static Ref<Render2DStroge> m_spRender2DStroge;

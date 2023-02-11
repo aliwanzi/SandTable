@@ -5,12 +5,13 @@ SAND_TABLE_NAMESPACE_BEGIN
 
 extern const std::filesystem::path sAssetsDirector;
 
-SandBoxEditorLayer::SandBoxEditorLayer() 
+SandBoxEditorLayer::SandBoxEditorLayer()
 	:m_vec4Color(glm::vec4(0.2f, 0.3f, 0.8f, 1.0f)),
 	m_bViewportHovered(false),
 	m_bViewportFocused(false),
 	m_iGizmoType(-1),
-	m_eSceneState(SceneState::Edit)
+	m_eSceneState(SceneState::Edit),
+	m_bShowPhysicsCollider(false)
 {
 	auto uiWindowWidth = Application::GetApplication()->GetWindowWidth();
 	auto uiWindowHeight = Application::GetApplication()->GetWindowHeight();
@@ -108,6 +109,8 @@ void SandBoxEditorLayer::OnUpdate(const TimeStep& timeStep)
 			m_spHoveredEntity = nullptr;
 		}
 	}
+
+	OnOverlayRender();
 
 	spFrameBuffer->UnBind();
 }
@@ -207,6 +210,10 @@ void SandBoxEditorLayer::OnImGuiRender()
 	ImGui::Text("Draw Quads: %d", spQuadStatic->GetDrawCount());
 	ImGui::Text("Draw Vertices: %d", spQuadStatic->GetTotalVertexCount());
 	ImGui::Text("Draw Indices: %d", spQuadStatic->GetTotalIndexCount());
+	ImGui::End();
+
+	ImGui::Begin("Setting");
+	ImGui::Checkbox("Show Physics Collider", &m_bShowPhysicsCollider);
 	ImGui::End();
 
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
@@ -461,6 +468,37 @@ void SandBoxEditorLayer::OnDuplicateEntity()
 		m_spEditorScene->CreateEntity(spEntity);
 	}
 }
+
+void SandBoxEditorLayer::OnOverlayRender()
+{
+	if (!m_bShowPhysicsCollider)
+	{
+		return;
+	}
+
+	switch (m_eSceneState)
+	{
+		case SandTable::SceneState::Play:
+		{
+			if (m_spActiveScene != nullptr)
+			{
+				auto spCameraEntity = m_spActiveScene->GetPrimaryCameraEntity();
+				auto spCamera = spCameraEntity->GetComponent<CameraComponent>().GetCamera();
+				m_spActiveScene->OnShowPhysicsCollider(spCamera);
+			}
+			break;
+		}
+		case SandTable::SceneState::Edit:
+		{
+			if (m_spEditorScene != nullptr)
+			{
+				m_spEditorScene->OnShowPhysicsCollider(m_spEditCamera);
+			}
+			break;
+		}
+	}
+}
+
 
 void SandBoxEditorLayer::UIToolbar()
 {

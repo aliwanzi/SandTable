@@ -29,6 +29,7 @@ private:
 
 	void UIToolbar();
 	void OnDuplicateEntity();
+	void OnOverlayRender();
 private:
 	Ref<Texture> m_spIconPlay;
 	Ref<Texture> m_spIconStop;
@@ -45,6 +46,7 @@ private:
 	Ref<Scene> m_spActiveScene;
 	Ref<Scene> m_spEditorScene;
 	std::filesystem::path m_sEditorScenePath;
+	bool m_bShowPhysicsCollider;
 
 	Ref<Entity> m_spSquareEntity;
 	Ref<Entity> m_spCameraEntity;

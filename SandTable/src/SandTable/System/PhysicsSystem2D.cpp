@@ -40,19 +40,19 @@ void PhysicsSystem2D::CreateBody(RigidBody2DComponent& rigidBody2D, const Transf
 	bodyDef.type = RigidBodyTypeToBox2D(rigidBody2D.Type);
 	bodyDef.position.Set(transform.Translation.x, transform.Translation.y);
 	bodyDef.angle = transform.Rotation.z;
-	auto pB2Body = m_spPhysicsWorld->CreateBody(&bodyDef);
-	pB2Body->SetFixedRotation(bodyDef.fixedRotation);
-	rigidBody2D.RuntimeBody = pB2Body;
+
+	m_pBody = m_spPhysicsWorld->CreateBody(&bodyDef);
+	m_pBody->SetFixedRotation(bodyDef.fixedRotation);
+	rigidBody2D.RuntimeBody = m_pBody;
 }
 
-void PhysicsSystem2D::CreateBody(RigidBody2DComponent& rigidBody2D, BoxCollider2DComponent& boxCollider2D,
-	const TransformComponent& transform)
+PhysicsSystem2D::~PhysicsSystem2D()
 {
-	b2BodyDef bodyDef;
-	bodyDef.type = RigidBodyTypeToBox2D(rigidBody2D.Type);
-	bodyDef.position.Set(transform.Translation.x, transform.Translation.y);
-	bodyDef.angle = transform.Rotation.z;
+	m_spPhysicsWorld->DestroyBody(m_pBody);
+}
 
+void PhysicsSystem2D::CreatePolygonShape(BoxCollider2DComponent& boxCollider2D, const TransformComponent& transform)
+{
 	b2PolygonShape polygonShape;
 	polygonShape.SetAsBox(boxCollider2D.Size.x * transform.Scale.x, boxCollider2D.Size.y * transform.Scale.y);
 
@@ -63,10 +63,23 @@ void PhysicsSystem2D::CreateBody(RigidBody2DComponent& rigidBody2D, BoxCollider2
 	fixtureDef.restitution = boxCollider2D.Restitution;
 	fixtureDef.restitutionThreshold = boxCollider2D.RestitutionThreshold;
 
-	auto pB2Body = m_spPhysicsWorld->CreateBody(&bodyDef);
-	pB2Body->SetFixedRotation(bodyDef.fixedRotation);
-	pB2Body->CreateFixture(&fixtureDef);
-	rigidBody2D.RuntimeBody = pB2Body;
+	m_pBody->CreateFixture(&fixtureDef);
+}
+
+void PhysicsSystem2D::CreateCircleShape(CircleCollider2DComponent& circleCollider2D, const TransformComponent& transform)
+{
+	b2CircleShape circleShape;
+	circleShape.m_p.Set(circleCollider2D.Offset.x, circleCollider2D.Offset.y);
+	circleShape.m_radius = circleCollider2D.Radius * transform.Scale.x;
+
+	b2FixtureDef fixtureDef;
+	fixtureDef.shape = &circleShape;
+	fixtureDef.density = circleCollider2D.Density;
+	fixtureDef.friction = circleCollider2D.Friction;
+	fixtureDef.restitution = circleCollider2D.Restitution;
+	fixtureDef.restitutionThreshold = circleCollider2D.RestitutionThreshold;
+
+	m_pBody->CreateFixture(&fixtureDef);
 }
 
 void PhysicsSystem2D::OnUpdate(const TimeStep& timeStep)
@@ -81,6 +94,4 @@ void PhysicsSystem2D::UpdateSystem(RigidBody2DComponent& rigidBody2D, TransformC
 	transform.Translation.y = pB2Body->GetPosition().y;
 	transform.Rotation.z = pB2Body->GetAngle();
 }
-
-
 SAND_TABLE_NAMESPACE_END

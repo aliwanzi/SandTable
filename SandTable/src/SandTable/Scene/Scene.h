@@ -24,6 +24,7 @@ public:
 
 	void OnRuntimeStart();
 	void OnRuntimeStop();
+	void OnShowPhysicsCollider(const Ref<Camera>& spCamera);
 
 	void OnUpdate(const TimeStep& timeStep);
 	void OnUpdate(const Ref<Camera>& spCamera);

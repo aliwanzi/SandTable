@@ -5,6 +5,7 @@
 #include "SandTable/Scene/UUID.h"
 #include "SandTable/Scene/Primitive/QuadPrimitive.h"
 #include "SandTable/Scene/Primitive/CirclePrimitive.h"
+#include "SandTable/Scene/Primitive/LinePrimitive.h"
 
 SAND_TABLE_NAMESPACE_BEGIN
 

@@ -30,13 +30,6 @@ public:
 
 	CirclePrimitive();
 
-	void SetPosition(const std::array<glm::vec4, 4>& arrayPosition);
-	const std::array<glm::vec4, 4>& GetPosition()const;
-
-	void SetColor(const glm::vec4& vec4Color);
-	const glm::vec4& GetColor()const;
-	glm::vec4& GetColor();
-
 	void SetRadius(float fRadius);
 	float GetRadius()const;
 	float& GetRadius();
@@ -49,13 +42,6 @@ public:
 	float GetFade()const;
 	float& GetFade();
 private:
-	std::array<glm::vec4, 4> m_arrayPosition =
-	{
-		glm::vec4(-0.5f, -0.5f, 0.0f, 1.0f),
-		glm::vec4(0.5f, -0.5f, 0.0f, 1.0f),
-		glm::vec4(0.5f,  0.5f, 0.0f, 1.0f),
-		glm::vec4(-0.5f,  0.5f, 0.0f, 1.0f)
-	};
 	glm::vec4 m_vec4Color;
 	float m_fRadius;
 	float m_fThickness;

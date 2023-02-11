@@ -2,24 +2,30 @@
 #include "LineDrawStatics.h"
 
 SAND_TABLE_NAMESPACE_BEGIN
+LineDrawStatics::LineDrawStatics(unsigned int uiMaxDrawCount) :
+	DrawStatistics(uiMaxDrawCount)
+{
+
+}
+
 unsigned int LineDrawStatics::GetTotalVertexCount() const
 {
-    return 0;
+    return m_uiDrawCount * 2;
 }
 
 unsigned int LineDrawStatics::GetTotalIndexCount() const
 {
-    return 0;
+    return m_uiDrawCount * 2;
 }
 
 unsigned int LineDrawStatics::GetMaxVertices() const
 {
-    return 0;
+    return m_uiMaxDrawCount * 2;
 }
 
 unsigned int LineDrawStatics::GetMaxIndices() const
 {
-    return 0;
+    return m_uiMaxDrawCount * 2;
 }
 
 SAND_TABLE_NAMESPACE_END

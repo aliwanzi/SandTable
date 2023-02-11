@@ -7,7 +7,7 @@ layout(location = 3) in float a_Thickness;
 layout(location = 4) in float a_Fade;
 layout(location = 5) in float a_EntityID;
 
-layout(std140, binding = 0) uniform Camera
+layout(std140) uniform Camera
 {
 	mat4 u_ViewProjection;
 };

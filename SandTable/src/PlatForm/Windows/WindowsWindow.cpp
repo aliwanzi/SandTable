@@ -10,32 +10,6 @@ SAND_TABLE_NAMESPACE_BEGIN
 Ref<Context> WindowsWindow::m_spContext = nullptr;
 namespace
 {
-	//void OnDebug(GLenum source, GLenum type, GLuint id, GLenum severity,
-	//	GLsizei length, const GLchar* message, GLvoid* userParam)
-	//{
-	//	switch (severity)
-	//	{
-	//	case GL_DEBUG_SEVERITY_MEDIUM:       LOG_DEV_ERROR(message); return;
-	//	case GL_DEBUG_SEVERITY_LOW:          LOG_DEV_WARN(message); return;
-	//	case GL_DEBUG_SEVERITY_NOTIFICATION: LOG_DEV_INFO(message); return;
-	//	}
-	//}
-
-	bool IsExtensionSupported(const std::string& sExtersionName)
-	{
-		GLint numExtensions;
-		glGetIntegerv(GL_NUM_EXTENSIONS, &numExtensions);
-
-		for (int i = 0; i < numExtensions; i++)
-		{
-			if (std::string((char const*)glGetStringi(GL_EXTENSIONS, i)) == sExtersionName)
-			{
-				return true;
-			}
-		}
-		return false;
-	}
-
 	static void GLFWErrorCallback(int error, const char* description)
 	{
 		LOG_DEV_ERROR("GLFW Error ({0}): {1}", error, description);
@@ -108,7 +82,9 @@ void WindowsWindow::Init()
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, m_WindowProps.MinorVersion);
 
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
+	#ifdef SAND_TABLE_PLATFORM_APPLE
+		glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE); 
+	#endif
 	glfwWindowHint(GLFW_SAMPLES, m_WindowProps.Samples);
 
 	{

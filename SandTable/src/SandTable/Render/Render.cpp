@@ -30,7 +30,7 @@ void Render::Submit(const Ref<Shader>& spShader, const Ref<VertexArray>& spVerte
 	spShader->Bind();
 	spShader->SetMat4("ViewProjection", m_spSceneData->m_mat4ViewProjectionMatrix);
 	spShader->SetMat4("Transform", mat4Transform);
-	RenderCommand::DrawVertex(spVertexArray);
+	RenderCommand::DrawTriangles(spVertexArray);
 }
 
 SAND_TABLE_NAMESPACE_END

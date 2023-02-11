@@ -15,11 +15,6 @@ unsigned int DrawStatistics::GetMaxDrawCount() const
     return m_uiMaxDrawCount;
 }
 
-unsigned int DrawStatistics::GetMaxTextureSlots() const
-{
-    return 32;
-}
-
 unsigned int DrawStatistics::GetDrawCalls() const
 {
     return m_uiDrawCalls;

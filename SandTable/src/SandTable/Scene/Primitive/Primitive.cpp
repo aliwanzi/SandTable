@@ -2,19 +2,40 @@
 #include "Primitive.h"
 
 SAND_TABLE_NAMESPACE_BEGIN
-Primitive::Primitive() :
-	m_iEntityID(-1)
+Primitive::Primitive():
+	m_vec4Color(glm::vec4(1.f))
 {
+
 }
 
-void Primitive::SetEntityID(int iEntityID)
+void Primitive::SetPosition(const std::vector<glm::vec4>& vecPosition)
 {
-	m_iEntityID = iEntityID;
+	m_vecPosition = vecPosition;
 }
 
-int Primitive::GetEntityID() const
+void Primitive::AddPosition(const glm::vec4& vec4Position)
 {
-	return m_iEntityID;
+	m_vecPosition.push_back(vec4Position);
+}
+
+const std::vector<glm::vec4>& Primitive::GetPositions() const
+{
+	return m_vecPosition;
+}
+
+void Primitive::SetColor(const glm::vec4& vec4Color)
+{
+	m_vec4Color = vec4Color;
+}
+
+const glm::vec4& Primitive::GetColor() const
+{
+	return m_vec4Color;
+}
+
+glm::vec4& Primitive::GetColor()
+{
+	return m_vec4Color;
 }
 
 const std::vector<VertexBufferElement>& Primitive::GetVertexBufferElement() const
