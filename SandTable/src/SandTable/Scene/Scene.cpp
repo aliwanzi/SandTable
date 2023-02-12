@@ -75,6 +75,7 @@ Scene::Scene(const Ref<Scene>& spScene):
 
 Ref<Entity> Scene::CreateEntity(const Ref<Entity>& spSrcEntity)
 {
+	SAND_TABLE_ASSERT(spSrcEntity,"Source Entitiy is null CreateEntity Scene")
 	auto spDstEntity = CreateEntity(spSrcEntity->GetName());
 	CopyComponentIfExists<TransformComponent>(spSrcEntity, spDstEntity);
 	CopyComponentIfExists<SpriteRenderComponent>(spSrcEntity, spDstEntity);
