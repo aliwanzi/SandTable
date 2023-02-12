@@ -23,12 +23,18 @@ private:
 	void OpenScene();
 	void OpenScene(const std::filesystem::path& path);
 	void SaveSceneAs();
+	void SaveScene();
+
 	void OnScenePlay();
+	void OnSceneSimulate();
 	void OnSceneStop();
 
 	void UIToolbar();
+	void OnDuplicateEntity();
+	void OnOverlayRender();
 private:
 	Ref<Texture> m_spIconPlay;
+	Ref<Texture> m_spIcomSimulate;
 	Ref<Texture> m_spIconStop;
 
 	glm::vec4 m_vec4Color;
@@ -40,7 +46,12 @@ private:
 	ImVec2 m_vec2RenderViewPortSize;
 	std::array<ImVec2, 2> m_vec2RenderViewPortBounds;
 
-	Ref<Scene> m_spScene;
+	Ref<Scene> m_spActiveScene;
+	Ref<Scene> m_spEditorScene;
+	std::filesystem::path m_sEditorScenePath;
+	bool m_bShowPhysicsCollider;
+	bool m_bShowDemoWindow;
+
 	Ref<Entity> m_spSquareEntity;
 	Ref<Entity> m_spCameraEntity;
 	Ref<Entity> m_spHoveredEntity;

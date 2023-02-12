@@ -1,11 +1,21 @@
 #pragma once
 #include "SandTable/Render/Camera/OrthoGraphicCamera.h"
 #include "SandTable/Render/Camera/PerspectiveGraphicCamera.h"
-#include "SandTable/Scene/Entity.h"
-#include "SandTable/Scene/ScriptableEntity.h"
 #include "SandTable/Render/Texture/Texture.h"
+#include "SandTable/Scene/UUID.h"
+#include "SandTable/Scene/Primitive/QuadPrimitive.h"
+#include "SandTable/Scene/Primitive/CirclePrimitive.h"
+#include "SandTable/Scene/Primitive/LinePrimitive.h"
 
 SAND_TABLE_NAMESPACE_BEGIN
+
+struct IDComponent
+{
+	UUID ID;
+	IDComponent() = default;
+	IDComponent(const IDComponent&) = default;
+	IDComponent& operator =(const IDComponent&) = default;
+};
 
 struct TagComponent
 {
@@ -43,25 +53,28 @@ struct TransformComponent
 	}
 };
 
-
 struct SpriteRenderComponent
 {
-	glm::vec4 Color{ 1.f };
 	Ref<Texture> spTexture;
-	float TilingFactor = 1.0f;
+	Ref<QuadPrimitive> spQuadPrimitive = CreateRef<QuadPrimitive>();
 	SpriteRenderComponent() = default;
 	SpriteRenderComponent(const SpriteRenderComponent&) = default;
 	SpriteRenderComponent& operator =(const SpriteRenderComponent&) = default;
-	SpriteRenderComponent(const glm::vec4& vec4Color) :Color(vec4Color)
-	{}
-	operator glm::vec4& () { return Color; }
-	operator const glm::vec4& ()const { return Color; }
+};
+
+struct CircleRenderComponent
+{
+	Ref<Texture> spTexture;
+	Ref<CirclePrimitive> spCirclePrimitive = CreateRef<CirclePrimitive>();
+	CircleRenderComponent() = default;
+	CircleRenderComponent(const CircleRenderComponent&) = default;
+	CircleRenderComponent& operator =(const CircleRenderComponent&) = default;
 };
 
 struct CameraComponent
 {
-	Ref<SandTable::Camera> OrthoCamera = CreateRef<OrthoGraphicCamera>();
-	Ref<SandTable::Camera> PerspecCamera = CreateRef<PerspectiveGraphicCamera>();
+	Ref<Camera> OrthoCamera = CreateRef<OrthoGraphicCamera>();
+	Ref<Camera> PerspecCamera = CreateRef<PerspectiveGraphicCamera>();
 	bool Primary = true;
 	bool FixedAspectRatio = false;
 	ProjectionType Projection = ProjectionType::Orthographic;
@@ -85,20 +98,20 @@ struct CameraComponent
 	}
 };
 
-struct NativeScriptComponent
-{
-	Ref<ScriptableEntity> Instance;
-
-	std::function<void()> InstantiateFunction;
-
-	template<typename T>
-	void Bind()
-	{
-		InstantiateFunction = [&]()
-		{
-			Instance = CreateRef<T>();
-		};
-	}
-};
-
+//class ScriptableEntity;
+//struct NativeScriptComponent
+//{
+//	Ref<ScriptableEntity> Instance;
+//
+//	std::function<void()> InstantiateFunction;
+//
+//	template<typename T>
+//	void Bind()
+//	{
+//		InstantiateFunction = [&]()
+//		{
+//			Instance = CreateRef<T>();
+//		};
+//	}
+//};
 SAND_TABLE_NAMESPACE_END

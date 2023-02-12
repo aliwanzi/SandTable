@@ -21,6 +21,11 @@ Entity::Entity(const Ref<entt::registry>& spRegistry, int iEntityID) :
 	m_entity = static_cast<entt::entity>(iEntityID);
 }
 
+void Entity::Destrory()
+{
+	m_spRegistry->destroy(m_entity);
+}
+
 bool Entity::operator==(const Entity& entity) const
 {
 	return m_entity == entity.m_entity;
@@ -43,6 +48,16 @@ Ref<Entity>& Entity::operator=(const Ref<Entity>& spEntity)
 	m_entity = spEntity->m_entity;
 	m_spRegistry = spEntity->m_spRegistry;
 	return Ref<Entity>(this);
+}
+
+UUID Entity::GetUUID()
+{
+	return GetComponent<IDComponent>().ID;
+}
+
+const std::string& Entity::GetName()
+{
+	return GetComponent<TagComponent>().Tag;
 }
 
 Entity::operator uint32_t() const

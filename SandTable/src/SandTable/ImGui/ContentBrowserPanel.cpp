@@ -16,8 +16,8 @@ namespace
 ContentBrowserPanel::ContentBrowserPanel() :
 	m_currentDirectory(sAssetsDirector)
 {
-	m_spDirectoryIcon = Texture2D::Create("Resources/Icons/ContentBrowser/DirectoryIcon.png");
-	m_spFileIcon = Texture2D::Create("Resources/Icons/ContentBrowser/FileIcon.png");
+	m_spDirectoryIcon = Texture2D::Create("assets/textures/Icons/ContentBrowser/DirectoryIcon.png");
+	m_spFileIcon = Texture2D::Create("assets/textures/Icons/ContentBrowser/FileIcon.png");
 }
 
 void ContentBrowserPanel::OnImGuiRender()

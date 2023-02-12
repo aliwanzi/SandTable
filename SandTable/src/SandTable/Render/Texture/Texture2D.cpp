@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "PlatForm/OpenGL/Texture/OpenGLTexture2D.h"
 #include "SandTable/Render/RenderAPI.h"
+#include "Texture2D.h"
 
 SAND_TABLE_NAMESPACE_BEGIN
 
@@ -60,6 +61,11 @@ Ref<Texture> Texture2D::Create(unsigned int uiWidth, unsigned int uiHeight)
 unsigned int Texture2D::GetRenderID() const
 {
 	return m_uiRenderID;
+}
+
+const std::string& Texture2D::GetTexturePath() const
+{
+	return m_sPath;
 }
 
 

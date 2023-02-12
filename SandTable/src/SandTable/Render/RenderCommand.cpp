@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "RenderCommand.h"
 #include "PlatForm/OpenGL/OpenGLRenderAPI.h"
+#include "SandTable/Render/Buffer/IndexBuffer.h"
 
 SAND_TABLE_NAMESPACE_BEGIN
 
@@ -24,16 +25,24 @@ void RenderCommand::Clear()
 	m_spRenderAPI->Clear();
 }
 
-void RenderCommand::DrawVertex(const Ref<VertexArray>& spVertexArray,unsigned int uiIndexCount)
+void RenderCommand::DrawTriangles(const Ref<VertexArray>& spVertexArray, unsigned int uiIndexCount)
 {
 	spVertexArray->Bind();
-	m_spRenderAPI->DrawElements(uiIndexCount);
+	if (uiIndexCount == 0)
+	{
+		uiIndexCount = spVertexArray->GetIndexBuffer()->GetIndex().size();
+	}
+	m_spRenderAPI->DrawTriangles(uiIndexCount);
 }
 
-void RenderCommand::DrawVertex(const Ref<VertexArray>& spVertexArray)
+void RenderCommand::DrawLines(const Ref<VertexArray>& spVertexArray, unsigned int uiIndexCount)
 {
-	unsigned int uiIndexCount = spVertexArray->GetIndexBuffer()->GetIndex().size();
-	DrawVertex(spVertexArray, uiIndexCount);
+	spVertexArray->Bind();
+	m_spRenderAPI->DrawLines(uiIndexCount);
 }
 
+void RenderCommand::SetLineWidth(float fWidth)
+{
+	m_spRenderAPI->SetLineWidth(fWidth);
+}
 SAND_TABLE_NAMESPACE_END

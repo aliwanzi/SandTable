@@ -166,16 +166,44 @@ void SceneHierarchyPanel::OnImGuiRender()
 
 		if (ImGui::BeginPopup("Add Component"))
 		{
-			if (ImGui::MenuItem("Camera"))
+
+			if (!m_spSelectedEntity->HasComponent<CameraComponent>() && ImGui::MenuItem("Camera"))
 			{
 				m_spSelectedEntity->AddComponent<CameraComponent>();
 				ImGui::CloseCurrentPopup();
 			}
-			if (ImGui::MenuItem("Sprite Render"))
+
+			if (!m_spSelectedEntity->HasComponent<SpriteRenderComponent>() && ImGui::MenuItem("Sprite Render"))
 			{
 				m_spSelectedEntity->AddComponent<SpriteRenderComponent>();
 				ImGui::CloseCurrentPopup();
 			}
+
+			if (!m_spSelectedEntity->HasComponent<CircleRenderComponent>() && ImGui::MenuItem("Circle Render"))
+			{
+				m_spSelectedEntity->AddComponent<CircleRenderComponent>();
+				ImGui::CloseCurrentPopup();
+			}
+
+			if (!m_spSelectedEntity->HasComponent<RigidBody2DComponent>() && ImGui::MenuItem("Rigid Body2D"))
+			{
+				m_spSelectedEntity->AddComponent<RigidBody2DComponent>();
+				ImGui::CloseCurrentPopup();
+			}
+
+			if (!m_spSelectedEntity->HasComponent<BoxCollider2DComponent>() && ImGui::MenuItem("Box Collider 2D"))
+			{
+				m_spSelectedEntity->AddComponent<BoxCollider2DComponent>();
+				ImGui::CloseCurrentPopup();
+			}
+
+			if (!m_spSelectedEntity->HasComponent<CircleCollider2DComponent>() && ImGui::MenuItem("Circle Collider 2D"))
+			{
+				m_spSelectedEntity->AddComponent<CircleCollider2DComponent>();
+				ImGui::CloseCurrentPopup();
+			}
+
+
 			ImGui::EndPopup();
 		}
 	}
@@ -228,9 +256,9 @@ void SceneHierarchyPanel::DrawEntityNode(const Ref<Entity>& spEntity)
 
 	if (entityDeleted)
 	{
-		m_spScene->DestroyEntity(spEntity);
-		if (*m_spSelectedEntity == *spEntity)
+		if (m_spSelectedEntity != nullptr && *m_spSelectedEntity == *spEntity)
 			m_spSelectedEntity = nullptr;
+		spEntity->Destrory();
 	}
 }
 
@@ -333,20 +361,98 @@ void SceneHierarchyPanel::DrawComponents(const Ref<Entity>& spEntity)
 
 	DrawComponent<SpriteRenderComponent>("Sprite Render", spEntity, [](auto& component)
 		{
-			ImGui::ColorEdit4("Color", glm::value_ptr(component.Color));
+			auto& spQuadPrimitive = component.spQuadPrimitive;
+			ImGui::ColorEdit4("Color", glm::value_ptr(spQuadPrimitive->GetColor()));
 			ImGui::Button("Texture", ImVec2(100.f, 0.0f));
 			if (ImGui::BeginDragDropTarget())
 			{
 				if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM"))
 				{
-					const wchar_t* path = (const wchar_t*)payload->Data;
-					auto texturePath = std::filesystem::path(sAssetsDirector) / path;
-					component.spTexture = Texture2D::Create(texturePath.string());
+					std::filesystem::path filePath((const wchar_t*)payload->Data);
+					if (filePath.extension().string() == ".png")
+					{
+						auto texturePath = sAssetsDirector / filePath;
+						component.spTexture = Texture2D::Create(texturePath.string());
+					}
+					else
+					{
+						LOG_DEV_WARN("Could not load {0} - not a texture file", filePath.filename().string());
+					}
+					
 				}
 				ImGui::EndDragDropTarget();
 			}
 
-			ImGui::DragFloat("Tiling Facto", &component.TilingFactor, 0.1f, 0.f, 10.f);
+			ImGui::DragFloat("Tiling Facto", &spQuadPrimitive->GetTilingFactor(), 0.1f, 0.f, 10.f);
+		});
+
+	DrawComponent<CircleRenderComponent>("Circle Render", spEntity, [](auto& component)
+		{
+			auto& spCirclePrimitive = component.spCirclePrimitive;
+			ImGui::ColorEdit4("Color", glm::value_ptr(spCirclePrimitive->GetColor()));
+			ImGui::DragFloat("Thickness", &spCirclePrimitive->GetThickness(), 0.025f, 0.f, 100.f);
+			ImGui::DragFloat("Fade", &spCirclePrimitive->GetFade(), 0.00025f, 0.f, 100.f);
+			ImGui::Button("Texture", ImVec2(100.f, 0.0f));
+			if (ImGui::BeginDragDropTarget())
+			{
+				if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM"))
+				{
+					std::filesystem::path filePath((const wchar_t*)payload->Data);
+					if (filePath.extension().string() == ".png")
+					{
+						auto texturePath = sAssetsDirector / filePath;
+						component.spTexture = Texture2D::Create(texturePath.string());
+					}
+					else
+					{
+						LOG_DEV_WARN("Could not load {0} - not a texture file", filePath.filename().string());
+					}
+
+				}
+				ImGui::EndDragDropTarget();
+			}
+		});
+
+	DrawComponent<RigidBody2DComponent>("Rigidbody 2D", spEntity, [](auto& component)
+		{
+			auto sCurrentBodyType = BodyTypeStrings[static_cast<unsigned int>(component.Type)];
+
+			if (ImGui::BeginCombo("Body Type", sCurrentBodyType.c_str()))
+			{
+				for (size_t i = 0; i < BodyTypeStrings.size(); i++)
+				{
+					bool bSelected = sCurrentBodyType == BodyTypeStrings[i];
+					if (ImGui::Selectable(BodyTypeStrings[i].c_str(), bSelected))
+					{
+						component.Type = static_cast<BodyType>(i);
+						ImGui::SetItemDefaultFocus();
+					}
+				}
+				ImGui::EndCombo();
+
+			}
+
+			ImGui::Checkbox("Fixed Rotation", &component.FixedRotation);
+		});
+
+	DrawComponent<BoxCollider2DComponent>("Box Collider 2D", spEntity, [](auto& component)
+		{
+			ImGui::DragFloat2("Offset", glm::value_ptr(component.Offset));
+			ImGui::DragFloat2("Size", glm::value_ptr(component.Size));
+			ImGui::DragFloat("Density", &component.Density, 0.01f, 0.f, 1.f);
+			ImGui::DragFloat("Friction", &component.Friction, 0.01f, 0.f, 1.f);
+			ImGui::DragFloat("Restitution",&component.Restitution, 0.01f, 0.f, 1.f);
+			ImGui::DragFloat("Restitution Threshold", &component.RestitutionThreshold, 0.01f, 0.f);
+		});
+
+	DrawComponent<CircleCollider2DComponent>("Circle Collider 2D", spEntity, [](auto& component)
+		{
+			ImGui::DragFloat2("Offset", glm::value_ptr(component.Offset));
+			ImGui::DragFloat("Radius", &component.Radius);
+			ImGui::DragFloat("Density", &component.Density, 0.01f, 0.f, 1.f);
+			ImGui::DragFloat("Friction", &component.Friction, 0.01f, 0.f, 1.f);
+			ImGui::DragFloat("Restitution",&component.Restitution, 0.01f, 0.f, 1.f);
+			ImGui::DragFloat("Restitution Threshold", &component.RestitutionThreshold, 0.01f, 0.f);
 		});
 
 }

@@ -34,7 +34,8 @@ project "SandTable"
 		"%{IncludeDir.stb_image}",
 		"%{IncludeDir.entt}",
 		"%{IncludeDir.yaml_cpp}",
-		"%{IncludeDir.ImGuizmo}"
+		"%{IncludeDir.ImGuizmo}",
+		"%{IncludeDir.Box2D}"
 	}
 
 	links
@@ -44,6 +45,7 @@ project "SandTable"
 		"ImGui",
 		"yaml-cpp",
 		"opengl32.lib",
+		"Box2D"
 	}
 
 	filter "files:vendor/ImGuizmo/**.cpp"

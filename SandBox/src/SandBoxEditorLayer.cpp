@@ -5,21 +5,23 @@ SAND_TABLE_NAMESPACE_BEGIN
 
 extern const std::filesystem::path sAssetsDirector;
 
-SandBoxEditorLayer::SandBoxEditorLayer() 
+SandBoxEditorLayer::SandBoxEditorLayer()
 	:m_vec4Color(glm::vec4(0.2f, 0.3f, 0.8f, 1.0f)),
 	m_bViewportHovered(false),
 	m_bViewportFocused(false),
 	m_iGizmoType(-1),
-	m_eSceneState(SceneState::STOP)
+	m_eSceneState(SceneState::Edit),
+	m_bShowPhysicsCollider(false),
+	m_bShowDemoWindow(false)
 {
 	auto uiWindowWidth = Application::GetApplication()->GetWindowWidth();
 	auto uiWindowHeight = Application::GetApplication()->GetWindowHeight();
 	m_spEditCamera = CreateRef<EditorCamera>(30.f, static_cast<float>(uiWindowWidth) / static_cast<float>(uiWindowHeight));
 
-	m_spScene = CreateRef<Scene>();
-	m_spSceneHierarchyPanel = CreateRef<SceneHierarchyPanel>(m_spScene);
+	m_spEditorScene = CreateRef<Scene>();
+	m_spSceneHierarchyPanel = CreateRef<SceneHierarchyPanel>(m_spEditorScene);
 	m_spContentBrowserPanel = CreateRef<ContentBrowserPanel>();
-	m_spSceneSerializer = CreateRef<SceneSerializer>(m_spScene);
+	m_spSceneSerializer = CreateRef<SceneSerializer>(m_spEditorScene);
 
 	std::vector<FrameBufferTextureSpecification> vecFrameBufferTextureSpecification =
 	{
@@ -33,8 +35,9 @@ SandBoxEditorLayer::SandBoxEditorLayer()
 
 	m_spFrameBuffer = FrameBuffer::Create(spFrameBufferSpecification);
 
-	m_spIconPlay = Texture2D::Create("Resources/Icons/PlayButton.png");
-	m_spIconStop = Texture2D::Create("Resources/Icons/StopButton.png");
+	m_spIconPlay = Texture2D::Create("assets/textures/Icons/PlayButton.png");
+	m_spIcomSimulate = Texture2D::Create("assets/textures/Icons/SimulateButton.png");
+	m_spIconStop = Texture2D::Create("assets/textures/Icons/StopButton.png");
 }
 
 SandBoxEditorLayer::~SandBoxEditorLayer()
@@ -43,11 +46,14 @@ SandBoxEditorLayer::~SandBoxEditorLayer()
 
 void SandBoxEditorLayer::OnAttach()
 {
-	m_spSquareEntity = m_spScene->CreateEntity("Square Entity");
-	m_spSquareEntity->AddComponent<SpriteRenderComponent>(glm::vec4(0.f, 1.f, 0.f, 1.f));
-
-	m_spCameraEntity = m_spScene->CreateEntity("Camera Entity");
+	m_spCameraEntity = m_spEditorScene->CreateEntity("Camera Entity");
 	m_spCameraEntity->AddComponent<CameraComponent>();
+
+	m_spSquareEntity = m_spEditorScene->CreateEntity("Square Entity");
+	m_spSquareEntity->AddComponent<SpriteRenderComponent>();
+
+	m_spCameraEntity = m_spEditorScene->CreateEntity("Circle Entity");
+	m_spCameraEntity->AddComponent<CircleRenderComponent>();
 }
 
 void SandBoxEditorLayer::OnDetach()
@@ -58,7 +64,7 @@ void SandBoxEditorLayer::OnDetach()
 void SandBoxEditorLayer::OnUpdate(const TimeStep& timeStep)
 {
 	SAND_TABLE_PROFILE_SCOPE("SandBoxEditorLayer::OnUpdate");
-	m_spScene->OnViewPortResize(m_vec2RenderViewPortSize.x, m_vec2RenderViewPortSize.y);
+	m_spEditorScene->OnViewPortResize(m_vec2RenderViewPortSize.x, m_vec2RenderViewPortSize.y);
 
 	auto spFrameBuffer = std::dynamic_pointer_cast<FrameBuffer>(m_spFrameBuffer);
 	SAND_TABLE_ASSERT(spFrameBuffer, "FrameBuffer is null in Edit Layer");
@@ -73,16 +79,22 @@ void SandBoxEditorLayer::OnUpdate(const TimeStep& timeStep)
 
 	switch (m_eSceneState)
 	{
-		case SandTable::SceneState::PLAY:
+		case SceneState::Play:
 		{
-			m_spScene->OnUpdate(timeStep);
+			m_spActiveScene->OnUpdate(timeStep);
 			break;
 		}
-		case SandTable::SceneState::STOP:
+		case SceneState::Edit:
 		{
 			auto spEditorCamera = std::dynamic_pointer_cast<EditorCamera>(m_spEditCamera);
 			spEditorCamera->OnUpdate(timeStep);
-			m_spScene->OnUpdate(spEditorCamera);
+			m_spEditorScene->OnUpdate(spEditorCamera);
+			break;
+		}
+		case SceneState::Simulate:
+		{
+			auto spEditorCamera = std::dynamic_pointer_cast<EditorCamera>(m_spEditCamera);
+			m_spActiveScene->OnUpdate(timeStep, spEditorCamera);
 			break;
 		}
 	}
@@ -96,9 +108,17 @@ void SandBoxEditorLayer::OnUpdate(const TimeStep& timeStep)
 	{
 		int iPixelData = spFrameBuffer->ReadPixel
 		(1, static_cast<unsigned int>(vec2MousePos.x), static_cast<unsigned int>(vec2MousePos.y));
-
-		m_spHoveredEntity = iPixelData != -1 ? CreateRef<Entity>(m_spScene->Registry(), iPixelData) : nullptr;
+		if (iPixelData != -1)
+		{
+			m_spHoveredEntity = CreateRef<Entity>(m_spEditorScene->Registry(), iPixelData);
+		}
+		else
+		{
+			m_spHoveredEntity = nullptr;
+		}
 	}
+
+	OnOverlayRender();
 
 	spFrameBuffer->UnBind();
 }
@@ -192,12 +212,41 @@ void SandBoxEditorLayer::OnImGuiRender()
 		sEntityName = m_spHoveredEntity->GetComponent<TagComponent>().Tag;
 	}
 	ImGui::Text("Hovered Entity: %s", sEntityName.c_str());
-	auto stats = Render2D::GetStats();
+
+
 	ImGui::Text("Renderer2D Stats:");
-	ImGui::Text("Draw Calls: %d", stats.DrawCalls);
-	ImGui::Text("Draw Quads: %d", stats.QuadCount);
-	ImGui::Text("Draw Vertices: %d", stats.GetTotalVertexCount());
-	ImGui::Text("Draw Indices: %d", stats.GetTotalIndexCount());
+	ImGui::Columns(5, "Renderer2D Stats"); // 4-ways, with border
+	ImGui::Separator();
+	ImGui::Text("Draw Primitive"); ImGui::NextColumn();
+	ImGui::Text("Calls"); ImGui::NextColumn();
+	ImGui::Text("Count"); ImGui::NextColumn();
+	ImGui::Text("Vertices"); ImGui::NextColumn();
+	ImGui::Text("Indices"); ImGui::NextColumn();
+	ImGui::Separator();
+	ImGui::Text("Quad"); ImGui::NextColumn();
+	auto spQuadStatic = Render2D::GetQuadStatic();
+	ImGui::Text("%d", spQuadStatic->GetDrawCalls()); ImGui::NextColumn();
+	ImGui::Text("%d", spQuadStatic->GetDrawCount()); ImGui::NextColumn();
+	ImGui::Text("%d", spQuadStatic->GetTotalVertexCount()); ImGui::NextColumn();
+	ImGui::Text("%d", spQuadStatic->GetTotalIndexCount()); ImGui::NextColumn();
+	ImGui::Separator();
+	ImGui::Text("Circle"); ImGui::NextColumn();
+	auto spCircleStatic = Render2D::GetCircleStatic();
+	ImGui::Text("%d", spCircleStatic->GetDrawCalls()); ImGui::NextColumn();
+	ImGui::Text("%d", spCircleStatic->GetDrawCount()); ImGui::NextColumn();
+	ImGui::Text("%d", spCircleStatic->GetTotalVertexCount()); ImGui::NextColumn();
+	ImGui::Text("%d", spCircleStatic->GetTotalIndexCount()); ImGui::NextColumn();
+	ImGui::Columns(1);
+	ImGui::Separator();
+	ImGui::End();
+
+	ImGui::Begin("Setting");
+	ImGui::Checkbox("Show Physics Collider", &m_bShowPhysicsCollider);
+	ImGui::Checkbox("Show Demo Window", &m_bShowDemoWindow);
+	if (m_bShowDemoWindow)
+	{
+		ImGui::ShowDemoWindow(&m_bShowDemoWindow);
+	}
 	ImGui::End();
 
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
@@ -231,7 +280,7 @@ void SandBoxEditorLayer::OnImGuiRender()
 
 	//Gizmos
 	auto spSelectedEntity = m_spSceneHierarchyPanel->GetSelectedEntity();
-	if (spSelectedEntity != nullptr && m_iGizmoType != -1 && m_eSceneState == SceneState::STOP)
+	if (spSelectedEntity != nullptr && m_iGizmoType != -1 && m_eSceneState == SceneState::Edit)
 	{
 		ImGuizmo::SetOrthographic(false);
 		ImGuizmo::SetDrawlist();
@@ -282,7 +331,7 @@ void SandBoxEditorLayer::OnImGuiRender()
 
 void SandBoxEditorLayer::OnEvent(Event& e)
 {
-	if (m_eSceneState == SceneState::STOP)
+	if (m_eSceneState == SceneState::Edit)
 	{
 		auto spEditorCamera = std::dynamic_pointer_cast<EditorCamera>(m_spEditCamera);
 		spEditorCamera->OnEvent(e);
@@ -323,9 +372,17 @@ bool SandBoxEditorLayer::OnKeyPressed(KeyPressedEvent& e)
 	}
 	case Key::S:
 	{
-		if (bControl && bShift)
+		if (bControl)
 		{
-			SaveSceneAs();
+			bShift ? SaveSceneAs() : SaveScene();
+		}
+		break;
+	}
+	case Key::D:
+	{
+		if (bControl)
+		{
+			OnDuplicateEntity();
 		}
 		break;
 	}
@@ -368,9 +425,11 @@ bool SandBoxEditorLayer::OnMousePressed(MouseButtonPressedEvent& e)
 
 void SandBoxEditorLayer::NewScene()
 {
-	m_spScene = CreateRef<Scene>();
-	m_spScene->OnViewPortResize(m_vec2RenderViewPortSize.x, m_vec2RenderViewPortSize.y);
-	m_spSceneHierarchyPanel->SetSelectedScene(m_spScene);
+	m_spEditorScene = CreateRef<Scene>();
+	m_spEditorScene->OnViewPortResize(m_vec2RenderViewPortSize.x, m_vec2RenderViewPortSize.y);
+	m_spSceneHierarchyPanel->SetSelectedScene(m_spEditorScene);
+
+	m_sEditorScenePath = std::filesystem::path();
 }
 
 void SandBoxEditorLayer::OpenScene()
@@ -384,11 +443,21 @@ void SandBoxEditorLayer::OpenScene()
 
 void SandBoxEditorLayer::OpenScene(const std::filesystem::path& path)
 {
-	m_spScene = CreateRef<Scene>();
-	m_spScene->OnViewPortResize(m_vec2RenderViewPortSize.x, m_vec2RenderViewPortSize.y);
-	m_spSceneHierarchyPanel->SetSelectedScene(m_spScene);
-	m_spSceneSerializer->SetSelectedScene(m_spScene);
+	if (m_eSceneState != SceneState::Edit)
+	{
+		OnSceneStop();
+	}
+
+	if (path.extension().string()!=".scene")
+	{
+		LOG_DEV_WARN("Could not load {0} - not a scene file", path.filename().string());
+		return;
+	}
+
+	NewScene();
+	m_spSceneSerializer->SetSelectedScene(m_spEditorScene);
 	m_spSceneSerializer->DeSerialize(path.string());
+	m_sEditorScenePath = path;
 }
 
 void SandBoxEditorLayer::SaveSceneAs()
@@ -397,18 +466,91 @@ void SandBoxEditorLayer::SaveSceneAs()
 	if (!sFilePath.empty())
 	{
 		m_spSceneSerializer->Serialize(sFilePath);
+		m_sEditorScenePath = sFilePath;
+	}
+}
+
+void SandBoxEditorLayer::SaveScene()
+{
+	if (!m_sEditorScenePath.empty())
+	{
+		m_spSceneSerializer->Serialize(m_sEditorScenePath.string());
 	}
 }
 
 void SandBoxEditorLayer::OnScenePlay()
 {
-	m_eSceneState = SceneState::STOP;
+	m_eSceneState = SceneState::Play;
+
+	m_spActiveScene = CreateRef<Scene>(m_spEditorScene);
+	m_spActiveScene->OnRuntimeStart();
+}
+
+void SandBoxEditorLayer::OnSceneSimulate()
+{
+	m_eSceneState = SceneState::Simulate;
+	m_spActiveScene = CreateRef<Scene>(m_spEditorScene);
+	m_spActiveScene->OnSimulationStart();
 }
 
 void SandBoxEditorLayer::OnSceneStop()
 {
-	m_eSceneState = SceneState::PLAY;
+	switch (m_eSceneState)
+	{
+		case SandTable::SceneState::Play:
+		{
+			m_spActiveScene->OnRuntimeStop();
+			break;
+		}
+		case SandTable::SceneState::Simulate:
+		{
+			m_spActiveScene->OnSimulationStop();
+			break;
+		}
+	}
+	m_eSceneState = SceneState::Edit;
+
 }
+
+void SandBoxEditorLayer::OnDuplicateEntity()
+{
+	if (m_eSceneState == SceneState::Edit)
+	{
+		auto spEntity = m_spSceneHierarchyPanel->GetSelectedEntity();
+		m_spEditorScene->CreateEntity(spEntity);
+	}
+}
+
+void SandBoxEditorLayer::OnOverlayRender()
+{
+	if (!m_bShowPhysicsCollider)
+	{
+		return;
+	}
+
+	switch (m_eSceneState)
+	{
+		case SandTable::SceneState::Play:
+		{
+			if (m_spActiveScene != nullptr)
+			{
+				auto spCameraEntity = m_spActiveScene->GetPrimaryCameraEntity();
+				auto spCamera = spCameraEntity->GetComponent<CameraComponent>().GetCamera();
+				m_spActiveScene->OnShowPhysicsCollider(spCamera);
+			}
+			break;
+		}
+		case SandTable::SceneState::Edit:
+		{
+			if (m_spEditorScene != nullptr)
+			{
+				m_spEditorScene->OnShowPhysicsCollider(m_spEditCamera);
+			}
+			break;
+		}
+	}
+}
+
 
 void SandBoxEditorLayer::UIToolbar()
 {
@@ -426,32 +568,61 @@ void SandBoxEditorLayer::UIToolbar()
 	
 	float size = ImGui::GetWindowHeight() - 4.0f;
 	ImVec4 tintColor = ImVec4(1, 1, 1, 1);
-	auto spIconTexture = m_eSceneState == SceneState::STOP ? m_spIconPlay : m_spIconStop;
-
-	ImGui::SetCursorPosX(ImGui::GetWindowContentRegionMax().x * 0.5f - size * 0.5f);
-	if (ImGui::ImageButton((ImTextureID)(uint64_t)spIconTexture->GetRenderID(), ImVec2(size, size),
-		ImVec2(0, 0), ImVec2(1, 1), 0, ImVec4(0.0f, 0.0f, 0.0f, 0.0f), tintColor))
 	{
-		switch (m_eSceneState)
+		auto spIconTexture = (m_eSceneState == SceneState::Edit || m_eSceneState == SceneState::Simulate)
+			? m_spIconPlay : m_spIconStop;
+		ImGui::SetCursorPosX(ImGui::GetWindowContentRegionMax().x * 0.5f - size * 0.5f);
+		if (ImGui::ImageButton((ImTextureID)(uint64_t)spIconTexture->GetRenderID(), ImVec2(size, size),
+			ImVec2(0, 0), ImVec2(1, 1), 0, ImVec4(0.0f, 0.0f, 0.0f, 0.0f), tintColor))
 		{
-		case SandTable::SceneState::PLAY:
-		{
-			OnScenePlay();
-			break;
-		}
-		case SandTable::SceneState::STOP:
-		{
-			OnSceneStop();
-			break;
-		}
-		default:
-			break;
+			switch (m_eSceneState)
+			{
+			case SandTable::SceneState::Play:
+			{
+				OnSceneStop();
+				break;
+			}
+			case SandTable::SceneState::Edit:
+			case SceneState::Simulate:
+			{
+				OnScenePlay();
+				break;
+			}
+			default:
+				break;
+			}
 		}
 	}
+	ImGui::SameLine();
+	{
+		auto spIconTexture = (m_eSceneState == SceneState::Edit || m_eSceneState == SceneState::Play)
+			? m_spIcomSimulate : m_spIconStop;
+		//ImGui::SetCursorPosX(ImGui::GetWindowContentRegionMax().x * 0.5f - size * 0.5f);
+		if (ImGui::ImageButton((ImTextureID)(uint64_t)spIconTexture->GetRenderID(), ImVec2(size, size),
+			ImVec2(0, 0), ImVec2(1, 1), 0, ImVec4(0.0f, 0.0f, 0.0f, 0.0f), tintColor))
+		{
+			switch (m_eSceneState)
+			{
+			case SceneState::Simulate:
+			{
+				OnSceneStop();
+				break;
+			}
+			case SceneState::Edit:
+			case SceneState::Play:
+			{
+				OnSceneSimulate();
+				break;
+			}
+			default:
+				break;
+			}
+		}
+	}
+
 	ImGui::PopStyleVar(2);
 	ImGui::PopStyleColor(3);
 	ImGui::End();
 
 }
-
 SAND_TABLE_NAMESPACE_END
