@@ -102,6 +102,26 @@ Ref<Entity> Scene::CreateEntityWithUUID(const UUID& uuid, const std::string& sNa
 
 void Scene::OnRuntimeStart()
 {
+	OnSimulationStart();
+}
+
+void Scene::OnRuntimeStop()
+{
+	OnSimulationStop();
+}
+
+void Scene::OnSimulationStart()
+{
+	OnPhysics2DStart();
+}
+
+void Scene::OnSimulationStop()
+{
+	OnPhysics2DStop();
+}
+
+void Scene::OnPhysics2DStart()
+{
 	m_spPhysicsSystem2D = CreateRef<PhysicsSystem2D>();
 	auto components = m_spRegistry->view<RigidBody2DComponent>();
 	for (auto component : components)
@@ -127,7 +147,7 @@ void Scene::OnRuntimeStart()
 	}
 }
 
-void Scene::OnRuntimeStop()
+void Scene::OnPhysics2DStop()
 {
 	m_spPhysicsSystem2D = nullptr;
 }
@@ -224,6 +244,26 @@ void Scene::OnUpdate(const Ref<Camera>& spCamera)
 {
 	RenderScene(spCamera);
 }
+
+void Scene::OnUpdate(const TimeStep& timeStep, const Ref<Camera>& spCamera)
+{
+	{
+		m_spPhysicsSystem2D->OnUpdate(timeStep);
+
+		auto components = m_spRegistry->view<RigidBody2DComponent>();
+		for (auto component : components)
+		{
+			auto spEntity = CreateRef<Entity>(m_spRegistry, component);
+			auto& transform = spEntity->GetComponent<TransformComponent>();
+			auto& rigidBody2D = spEntity->GetComponent<RigidBody2DComponent>();
+
+			m_spPhysicsSystem2D->UpdateSystem(rigidBody2D, transform);
+		}
+	}
+
+	RenderScene(spCamera);
+}
+
 
 void Scene::OnViewPortResize(unsigned int uiWidth, unsigned int uiHeight)
 {

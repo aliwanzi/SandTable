@@ -197,7 +197,7 @@ void Render2D::DrawSprite(const glm::mat4& mat4Transform, const SpriteRenderComp
 
 void Render2D::DrawCircle(const glm::mat4& mat4Transform, const CircleRenderComponent& circleRenderComponent, int iEntityID)
 {
-	DrawPrimitive(mat4Transform, circleRenderComponent.spCirclePrimitive, nullptr, iEntityID);
+	DrawPrimitive(mat4Transform, circleRenderComponent.spCirclePrimitive, circleRenderComponent.spTexture, iEntityID);
 }
 
 void Render2D::DrawPrimitive(const glm::vec3& vec3Pan, float fRotation, const glm::vec3& vec3Scale, Ref<Primitive> spPrimitive, Ref<Texture> spTexture, int iEntityID)
@@ -282,6 +282,11 @@ const Ref<DrawStatistics>& Render2D::GetQuadStatic()
 	return m_spRender2DStroge->spQuadDrawStatics;
 }
 
+const Ref<DrawStatistics>& Render2D::GetCircleStatic()
+{
+	return m_spRender2DStroge->spCircleDrawStatics;
+}
+
 void Render2D::DrawPrimitive(const glm::mat4& mat4Transform, Ref<QuadPrimitive> spPrimitive, Ref<Texture> spTexture, int iEntityID)
 {
 	if (spTexture != nullptr)
@@ -339,6 +344,8 @@ void Render2D::DrawPrimitive(const glm::mat4& mat4Transform, Ref<CirclePrimitive
 		circleVertex.WorldPosition = mat4Transform * vecPositions[i];
 		circleVertex.LocalPosition = vecPositions[i] * 2.f;
 		circleVertex.Color = spPrimitive->GetColor();
+		circleVertex.TexCoord = spPrimitive->GetTexCoord()[i];
+		circleVertex.TexIndex = spTexture != nullptr ? spTexture->GetRenderID() : m_spRender2DStroge->spWhiteTexture->GetRenderID();
 		circleVertex.Thickness = spPrimitive->GetThickness();
 		circleVertex.Fade = spPrimitive->GetFade();
 		circleVertex.EntityID = iEntityID;

@@ -51,7 +51,10 @@ public:
 	static void DrawBoundary(const glm::mat4& mat4Transform, Ref<Primitive> spPrimitive);
 
 	static void ResetStats();
+
 	static const Ref<DrawStatistics>& GetQuadStatic();
+	static const Ref<DrawStatistics>& GetCircleStatic();
+
 private:
 	static void CreateRenderPara(Ref<DrawStatistics> spDrawStatistics, Ref<VertexArray>& spVertexArray, Ref<Buffer>& spVertexBuffer, const std::vector<VertexBufferElement>& vertexBufferElement);
 	static void DrawPrimitive(const glm::mat4& mat4Transform, Ref<QuadPrimitive> spPrimitive, Ref<Texture> spTexture, int iEntityID);

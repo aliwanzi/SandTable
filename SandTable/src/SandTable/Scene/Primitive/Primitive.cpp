@@ -5,7 +5,7 @@ SAND_TABLE_NAMESPACE_BEGIN
 Primitive::Primitive():
 	m_vec4Color(glm::vec4(1.f))
 {
-
+	m_vecPosition.reserve(4);
 }
 
 void Primitive::SetPosition(const std::vector<glm::vec4>& vecPosition)

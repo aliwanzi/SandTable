@@ -64,6 +64,7 @@ struct SpriteRenderComponent
 
 struct CircleRenderComponent
 {
+	Ref<Texture> spTexture;
 	Ref<CirclePrimitive> spCirclePrimitive = CreateRef<CirclePrimitive>();
 	CircleRenderComponent() = default;
 	CircleRenderComponent(const CircleRenderComponent&) = default;

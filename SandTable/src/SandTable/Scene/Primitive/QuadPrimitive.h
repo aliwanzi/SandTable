@@ -32,9 +32,6 @@ public:
 	void SetTexCoord(const std::array<glm::vec2, 4>& arrayTexCoord);
 	const std::array<glm::vec2, 4>& GetTexCoord()const;
 
-	void SetTexIndex(int iTexIndex);
-	int GetTexIndex()const;
-
 	void SetTilingFactor(float fTilingFactor);
 	float GetTilingFactor()const;
 	float& GetTilingFactor();
@@ -47,7 +44,6 @@ private:
 		glm::vec2(1.f, 1.f),
 		glm::vec2(0.f, 1.f)
 	};
-	int m_iTexIndex;
 	float m_fTilingFactor;
 };
 SAND_TABLE_NAMESPACE_END

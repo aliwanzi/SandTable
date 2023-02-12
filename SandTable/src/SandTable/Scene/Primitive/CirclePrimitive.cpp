@@ -59,4 +59,14 @@ float& CirclePrimitive::GetFade()
 	return m_fFade;
 }
 
+void CirclePrimitive::SetTexCoord(const std::array<glm::vec2, 4>& arrayTexCoord)
+{
+	m_arrayTexCoord = arrayTexCoord;
+}
+
+const std::array<glm::vec2, 4>& CirclePrimitive::GetTexCoord() const
+{
+	return m_arrayTexCoord;
+}
+
 SAND_TABLE_NAMESPACE_END

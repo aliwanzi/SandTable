@@ -11,7 +11,8 @@ SandBoxEditorLayer::SandBoxEditorLayer()
 	m_bViewportFocused(false),
 	m_iGizmoType(-1),
 	m_eSceneState(SceneState::Edit),
-	m_bShowPhysicsCollider(false)
+	m_bShowPhysicsCollider(false),
+	m_bShowDemoWindow(false)
 {
 	auto uiWindowWidth = Application::GetApplication()->GetWindowWidth();
 	auto uiWindowHeight = Application::GetApplication()->GetWindowHeight();
@@ -34,8 +35,9 @@ SandBoxEditorLayer::SandBoxEditorLayer()
 
 	m_spFrameBuffer = FrameBuffer::Create(spFrameBufferSpecification);
 
-	m_spIconPlay = Texture2D::Create("Resources/Icons/PlayButton.png");
-	m_spIconStop = Texture2D::Create("Resources/Icons/StopButton.png");
+	m_spIconPlay = Texture2D::Create("assets/textures/Icons/PlayButton.png");
+	m_spIcomSimulate = Texture2D::Create("assets/textures/Icons/SimulateButton.png");
+	m_spIconStop = Texture2D::Create("assets/textures/Icons/StopButton.png");
 }
 
 SandBoxEditorLayer::~SandBoxEditorLayer()
@@ -77,16 +79,22 @@ void SandBoxEditorLayer::OnUpdate(const TimeStep& timeStep)
 
 	switch (m_eSceneState)
 	{
-		case SandTable::SceneState::Play:
+		case SceneState::Play:
 		{
 			m_spActiveScene->OnUpdate(timeStep);
 			break;
 		}
-		case SandTable::SceneState::Edit:
+		case SceneState::Edit:
 		{
 			auto spEditorCamera = std::dynamic_pointer_cast<EditorCamera>(m_spEditCamera);
 			spEditorCamera->OnUpdate(timeStep);
 			m_spEditorScene->OnUpdate(spEditorCamera);
+			break;
+		}
+		case SceneState::Simulate:
+		{
+			auto spEditorCamera = std::dynamic_pointer_cast<EditorCamera>(m_spEditCamera);
+			m_spActiveScene->OnUpdate(timeStep, spEditorCamera);
 			break;
 		}
 	}
@@ -204,16 +212,41 @@ void SandBoxEditorLayer::OnImGuiRender()
 		sEntityName = m_spHoveredEntity->GetComponent<TagComponent>().Tag;
 	}
 	ImGui::Text("Hovered Entity: %s", sEntityName.c_str());
-	auto spQuadStatic = Render2D::GetQuadStatic();
+
+
 	ImGui::Text("Renderer2D Stats:");
-	ImGui::Text("Draw Calls: %d", spQuadStatic->GetDrawCalls());
-	ImGui::Text("Draw Quads: %d", spQuadStatic->GetDrawCount());
-	ImGui::Text("Draw Vertices: %d", spQuadStatic->GetTotalVertexCount());
-	ImGui::Text("Draw Indices: %d", spQuadStatic->GetTotalIndexCount());
+	ImGui::Columns(5, "Renderer2D Stats"); // 4-ways, with border
+	ImGui::Separator();
+	ImGui::Text("Draw Primitive"); ImGui::NextColumn();
+	ImGui::Text("Calls"); ImGui::NextColumn();
+	ImGui::Text("Count"); ImGui::NextColumn();
+	ImGui::Text("Vertices"); ImGui::NextColumn();
+	ImGui::Text("Indices"); ImGui::NextColumn();
+	ImGui::Separator();
+	ImGui::Text("Quad"); ImGui::NextColumn();
+	auto spQuadStatic = Render2D::GetQuadStatic();
+	ImGui::Text("%d", spQuadStatic->GetDrawCalls()); ImGui::NextColumn();
+	ImGui::Text("%d", spQuadStatic->GetDrawCount()); ImGui::NextColumn();
+	ImGui::Text("%d", spQuadStatic->GetTotalVertexCount()); ImGui::NextColumn();
+	ImGui::Text("%d", spQuadStatic->GetTotalIndexCount()); ImGui::NextColumn();
+	ImGui::Separator();
+	ImGui::Text("Circle"); ImGui::NextColumn();
+	auto spCircleStatic = Render2D::GetCircleStatic();
+	ImGui::Text("%d", spCircleStatic->GetDrawCalls()); ImGui::NextColumn();
+	ImGui::Text("%d", spCircleStatic->GetDrawCount()); ImGui::NextColumn();
+	ImGui::Text("%d", spCircleStatic->GetTotalVertexCount()); ImGui::NextColumn();
+	ImGui::Text("%d", spCircleStatic->GetTotalIndexCount()); ImGui::NextColumn();
+	ImGui::Columns(1);
+	ImGui::Separator();
 	ImGui::End();
 
 	ImGui::Begin("Setting");
 	ImGui::Checkbox("Show Physics Collider", &m_bShowPhysicsCollider);
+	ImGui::Checkbox("Show Demo Window", &m_bShowDemoWindow);
+	if (m_bShowDemoWindow)
+	{
+		ImGui::ShowDemoWindow(&m_bShowDemoWindow);
+	}
 	ImGui::End();
 
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
@@ -453,11 +486,30 @@ void SandBoxEditorLayer::OnScenePlay()
 	m_spActiveScene->OnRuntimeStart();
 }
 
+void SandBoxEditorLayer::OnSceneSimulate()
+{
+	m_eSceneState = SceneState::Simulate;
+	m_spActiveScene = CreateRef<Scene>(m_spEditorScene);
+	m_spActiveScene->OnSimulationStart();
+}
+
 void SandBoxEditorLayer::OnSceneStop()
 {
+	switch (m_eSceneState)
+	{
+		case SandTable::SceneState::Play:
+		{
+			m_spActiveScene->OnRuntimeStop();
+			break;
+		}
+		case SandTable::SceneState::Simulate:
+		{
+			m_spActiveScene->OnSimulationStop();
+			break;
+		}
+	}
 	m_eSceneState = SceneState::Edit;
 
-	m_spActiveScene->OnRuntimeStop();
 }
 
 void SandBoxEditorLayer::OnDuplicateEntity()
@@ -516,28 +568,58 @@ void SandBoxEditorLayer::UIToolbar()
 	
 	float size = ImGui::GetWindowHeight() - 4.0f;
 	ImVec4 tintColor = ImVec4(1, 1, 1, 1);
-	auto spIconTexture = m_eSceneState == SceneState::Edit ? m_spIconPlay : m_spIconStop;
-
-	ImGui::SetCursorPosX(ImGui::GetWindowContentRegionMax().x * 0.5f - size * 0.5f);
-	if (ImGui::ImageButton((ImTextureID)(uint64_t)spIconTexture->GetRenderID(), ImVec2(size, size),
-		ImVec2(0, 0), ImVec2(1, 1), 0, ImVec4(0.0f, 0.0f, 0.0f, 0.0f), tintColor))
 	{
-		switch (m_eSceneState)
+		auto spIconTexture = (m_eSceneState == SceneState::Edit || m_eSceneState == SceneState::Simulate)
+			? m_spIconPlay : m_spIconStop;
+		ImGui::SetCursorPosX(ImGui::GetWindowContentRegionMax().x * 0.5f - size * 0.5f);
+		if (ImGui::ImageButton((ImTextureID)(uint64_t)spIconTexture->GetRenderID(), ImVec2(size, size),
+			ImVec2(0, 0), ImVec2(1, 1), 0, ImVec4(0.0f, 0.0f, 0.0f, 0.0f), tintColor))
 		{
-		case SandTable::SceneState::Play:
-		{
-			OnSceneStop();
-			break;
-		}
-		case SandTable::SceneState::Edit:
-		{
-			OnScenePlay();
-			break;
-		}
-		default:
-			break;
+			switch (m_eSceneState)
+			{
+			case SandTable::SceneState::Play:
+			{
+				OnSceneStop();
+				break;
+			}
+			case SandTable::SceneState::Edit:
+			case SceneState::Simulate:
+			{
+				OnScenePlay();
+				break;
+			}
+			default:
+				break;
+			}
 		}
 	}
+	ImGui::SameLine();
+	{
+		auto spIconTexture = (m_eSceneState == SceneState::Edit || m_eSceneState == SceneState::Play)
+			? m_spIcomSimulate : m_spIconStop;
+		//ImGui::SetCursorPosX(ImGui::GetWindowContentRegionMax().x * 0.5f - size * 0.5f);
+		if (ImGui::ImageButton((ImTextureID)(uint64_t)spIconTexture->GetRenderID(), ImVec2(size, size),
+			ImVec2(0, 0), ImVec2(1, 1), 0, ImVec4(0.0f, 0.0f, 0.0f, 0.0f), tintColor))
+		{
+			switch (m_eSceneState)
+			{
+			case SceneState::Simulate:
+			{
+				OnSceneStop();
+				break;
+			}
+			case SceneState::Edit:
+			case SceneState::Play:
+			{
+				OnSceneSimulate();
+				break;
+			}
+			default:
+				break;
+			}
+		}
+	}
+
 	ImGui::PopStyleVar(2);
 	ImGui::PopStyleColor(3);
 	ImGui::End();

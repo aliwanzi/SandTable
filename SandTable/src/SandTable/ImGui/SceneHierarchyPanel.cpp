@@ -392,6 +392,25 @@ void SceneHierarchyPanel::DrawComponents(const Ref<Entity>& spEntity)
 			ImGui::ColorEdit4("Color", glm::value_ptr(spCirclePrimitive->GetColor()));
 			ImGui::DragFloat("Thickness", &spCirclePrimitive->GetThickness(), 0.025f, 0.f, 100.f);
 			ImGui::DragFloat("Fade", &spCirclePrimitive->GetFade(), 0.00025f, 0.f, 100.f);
+			ImGui::Button("Texture", ImVec2(100.f, 0.0f));
+			if (ImGui::BeginDragDropTarget())
+			{
+				if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM"))
+				{
+					std::filesystem::path filePath((const wchar_t*)payload->Data);
+					if (filePath.extension().string() == ".png")
+					{
+						auto texturePath = sAssetsDirector / filePath;
+						component.spTexture = Texture2D::Create(texturePath.string());
+					}
+					else
+					{
+						LOG_DEV_WARN("Could not load {0} - not a texture file", filePath.filename().string());
+					}
+
+				}
+				ImGui::EndDragDropTarget();
+			}
 		});
 
 	DrawComponent<RigidBody2DComponent>("Rigidbody 2D", spEntity, [](auto& component)
