@@ -1,0 +1,44 @@
+Scene: Untitled
+Entities:
+  - Entity: 11873905390215920824
+    TagComponent:
+      Tag: Circle Entity
+    TransformComponent:
+      Translation: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    CircleRenderComponent:
+      Color: [1, 1, 1, 1]
+      Thickness: 1
+      Fade: 0.00499999989
+  - Entity: 8137969104574673959
+    TagComponent:
+      Tag: Square Entity
+    TransformComponent:
+      Translation: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    SpriteRenderComponent:
+      Color: [1, 1, 1, 1]
+  - Entity: 11569474356132700050
+    TagComponent:
+      Tag: Camera Entity
+    TransformComponent:
+      Translation: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    CameraComponent:
+      Ortho Camera:
+        ProjectionType: 1
+        OrthographicSize: 10
+        OrthographicNear: -1
+        OrthographicFar: 1
+        AspectRatio: 1.47738695
+      Perspective Camera:
+        ProjectionType: 0
+        PerspectiveFOV: 45
+        PerspectiveNear: 0.100000001
+        PerspectiveFar: 1000
+        AspectRatio: 1.47738695
+      Primary: true
+      FixedAspectRatio: false
