@@ -16,4 +16,4 @@ LibraryDir = {}
 LibraryDir["mono"] = "%{wks.location}/SandTable/vendor/mono/lib/%{cfg.buildcfg}"
 
 Library = {}
-Library["mono"] = "%{LibraryDir.mono}/libmono-static-sgen.lib"
+Library["mono"] = "%{LibraryDir.mono}/mono-2.0-sgen.lib"

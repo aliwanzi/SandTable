@@ -369,3 +369,5 @@ FodyWeavers.xsd
 /SandBox/SandTableProfile-Startup.json
 /SandBox/SandTableProfile-Runtime.json
 *.idb
+/SandTable/Resources/Scripts/SandTable-ScriptCore.dll
+*.csproj

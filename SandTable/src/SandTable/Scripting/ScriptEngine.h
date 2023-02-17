@@ -9,6 +9,7 @@ public:
 	static void ShutDown();
 private:
 	static void InitMono();
+	static void ShutDownMono();
 };
 
 SAND_TABLE_NAMESPACE_END

@@ -5,6 +5,7 @@
 #include "SandTable/Render/Render.h"
 #include "SandTable/Render/Render2D.h"
 #include "SandTable/Debug/Instrumentor.h"
+#include "SandTable/Scripting/ScriptEngine.h"
 
 SAND_TABLE_NAMESPACE_BEGIN
 
@@ -22,6 +23,7 @@ void Application::Init()
 	SAND_TABLE_PROFILE_FUNCTION();
 	Render::Init();
 	Render2D::Init();
+	ScriptEngine::Init();
 	m_spLayerStack = CreateRef<LayerStack>();
 	m_spImGuiLayer = CreateRef<ImGuiLayer>();
 	PushOverlay(m_spImGuiLayer);

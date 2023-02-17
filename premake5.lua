@@ -25,6 +25,7 @@ group ""
 
 group "Core"
 	include "SandTable"
+	include "SandTable-ScriptCore"
 group ""
 
 group "Misc"
