@@ -88,7 +88,6 @@ bool Application::OnWindowClosedEvent(WindowCloseEvent& /*event*/)
 
 Application::~Application()
 {
-
 }
 
 void Application::Run()

@@ -125,10 +125,6 @@ void Render2D::Init()
 
 }
 
-void Render2D::ShutDown()
-{
-}
-
 void Render2D::BeginScene(const Ref<Camera>& spCamera)
 {
 	m_spRender2DStroge->CameraBuffer.ViewProjection = spCamera->GetViewProjectionMatrix();

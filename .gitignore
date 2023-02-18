@@ -371,3 +371,4 @@ FodyWeavers.xsd
 *.idb
 /SandTable/Resources/Scripts/SandTable-ScriptCore.dll
 *.csproj
+/SandBox/Resources/Scripts/SandTable-ScriptCore.dll

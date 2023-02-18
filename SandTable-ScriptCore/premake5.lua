@@ -3,8 +3,8 @@ project "SandTable-ScriptCore"
 	language "C#"
 	dotnetframework "4.7.2"
 
-	targetdir ("../SandTable/Resources/Scripts")
-	objdir ("../SandTable/Resources/Scripts/Intermediates")
+	targetdir ("../Sandbox/Resources/Scripts")
+	objdir ("../Sandbox/Resources/Scripts/Intermediates")
 
 	files 
 	{

@@ -12,6 +12,13 @@ namespace
 		Ref<MonoDomain> RootDomain = nullptr;
 		Ref<MonoDomain> AppDomain = nullptr;
 		Ref<MonoAssembly> CoreAssembly = nullptr;
+
+		~ScriptEngineData()
+		{
+			//mono_domain_set(mono_get_root_domain(), false);
+			//mono_domain_unload(AppDomain.get());
+			//mono_jit_cleanup(RootDomain.get());
+		}
 	};
 	static Ref<ScriptEngineData> spScriptEngineData;
 
@@ -38,7 +45,7 @@ namespace
 		stream.close();
 
 		MonoImageOpenStatus status;
-		const auto& pMonoImage = mono_image_open_from_data_full(spFileData.get(), iFileSize, true, &status, false);
+		MonoImage* pMonoImage = mono_image_open_from_data_full(spFileData.get(), iFileSize, true, &status, false);
 		if (status != MONO_IMAGE_OK)
 		{
 			LOG_DEV_ERROR(mono_image_strerror(status));
@@ -54,18 +61,17 @@ namespace
 		return spAssembly;
 	}
 
-	void PrintAssemblyTypes(Ref<MonoAssembly> spAssembly)
+	void PrintAssemblyTypes(MonoImage* pMonoImage)
 	{
-		const auto& pMonoImage = mono_assembly_get_image(spAssembly.get());
-		const auto& pTypeDefinitionsTable = mono_image_get_table_info(pMonoImage, MONO_TABLE_TYPEDEF);
+		const MonoTableInfo* pTypeDefinitionsTable = mono_image_get_table_info(pMonoImage, MONO_TABLE_TYPEDEF);
 		int iNumTypes = mono_table_info_get_rows(pTypeDefinitionsTable);
 
 		for (int i = 0; i < iNumTypes; i++)
 		{
 			auto spCols = Ref<uint32_t>(new uint32_t[MONO_TYPEDEF_SIZE], std::default_delete<uint32_t>());
 			mono_metadata_decode_row(pTypeDefinitionsTable, i, spCols.get(), MONO_TYPEDEF_SIZE);
-			const auto& pNameSpace = mono_metadata_string_heap(pMonoImage, spCols.get()[MONO_TYPEDEF_NAMESPACE]);
-			const auto& pName = mono_metadata_string_heap(pMonoImage, spCols.get()[MONO_TYPEDEF_NAME]);
+			const char* pNameSpace = mono_metadata_string_heap(pMonoImage, spCols.get()[MONO_TYPEDEF_NAMESPACE]);
+			const char* pName = mono_metadata_string_heap(pMonoImage, spCols.get()[MONO_TYPEDEF_NAME]);
 
 			LOG_DEV_INFO("{}.{}", pNameSpace, pName);
 		}
@@ -79,11 +85,6 @@ void ScriptEngine::Init()
 	InitMono();
 }
 
-void ScriptEngine::ShutDown()
-{
-	ShutDownMono();
-}
-
 void ScriptEngine::InitMono()
 {
 	mono_set_assemblies_path("mono/lib");
@@ -95,12 +96,39 @@ void ScriptEngine::InitMono()
 	mono_domain_set(spScriptEngineData->AppDomain.get(), true);
 
 	spScriptEngineData->CoreAssembly = LoadCSharpAssembly("Resources/Scripts/SandTable-ScriptCore.dll");
-	PrintAssemblyTypes(spScriptEngineData->CoreAssembly);
-}
 
-void ScriptEngine::ShutDownMono()
-{
+	//1. create an object (and call constructor)
+	MonoImage* pMonoImage = mono_assembly_get_image(spScriptEngineData->CoreAssembly.get());
+	MonoClass* pMonoClass = mono_class_from_name(pMonoImage, "SandTable", "Main");
+	MonoObject* pMonoObject = mono_object_new(spScriptEngineData->AppDomain.get(), pMonoClass);
+	SAND_TABLE_ASSERT(pMonoObject, "Mono Object is null in ScriptEngine");
+	mono_runtime_object_init(pMonoObject);
 
+	//2. call function
+	MonoMethod* pPrintMessageFunc = mono_class_get_method_from_name(pMonoClass, "PrintMessage", 0);
+	mono_runtime_invoke(pPrintMessageFunc, pMonoObject, nullptr, nullptr);
+
+	MonoMethod* pPrintIntFunc= mono_class_get_method_from_name(pMonoClass, "PrintInt", 1);
+	int iValue1(5);
+	void* pParam = &iValue1;
+	mono_runtime_invoke(pPrintIntFunc, pMonoObject, &pParam, nullptr);
+
+	MonoMethod* pPrintIntsFunc = mono_class_get_method_from_name(pMonoClass, "PrintInts", 2);
+	int iValue2(10);
+	void* pParams[2] = {
+		&iValue1,
+		&iValue2
+	};
+	mono_runtime_invoke(pPrintIntsFunc, pMonoObject, pParams, nullptr);
+
+
+	MonoString* pMonoString = mono_string_new(spScriptEngineData->AppDomain.get(), "Hello World from c++");
+	MonoMethod* pPrintCustomMessageFunc = mono_class_get_method_from_name(pMonoClass, "PrintCustomMessage", 1);
+	void* sParam = pMonoString;
+	mono_runtime_invoke(pPrintCustomMessageFunc, pMonoObject, &sParam, nullptr);
+
+
+	//SAND_TABLE_ASSERT(false,"Error");
 }
 
 SAND_TABLE_NAMESPACE_END
