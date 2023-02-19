@@ -47,7 +47,7 @@ public:
 	bool operator==(const Entity& spEntity) const;
 	bool operator!=(const Entity& spEntity) const;
 	Entity& operator=(const Entity& spEntity);
-	Ref<Entity>& operator=(const Ref<Entity>& spEntity);
+	Ref<Entity> operator=(const Ref<Entity>& spEntity);
 
 	UUID GetUUID();
 	const std::string& GetName();

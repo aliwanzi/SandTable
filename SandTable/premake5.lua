@@ -47,6 +47,7 @@ project "SandTable"
 		"yaml-cpp",
 		"opengl32.lib",
 		"Box2D",
+		"SandTable-ScriptCore",
 
 		"%{Library.mono}",
 	}

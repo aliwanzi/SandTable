@@ -77,6 +77,30 @@ namespace
 		}
 
 	}
+
+	void CppFunc()
+	{
+		std::cout << "This is written in C++!" << std::endl;
+	}
+
+	void NativeLogInt(MonoString* pStrLog, int iPar)
+	{
+		char* pLog = mono_string_to_utf8(pStrLog);
+		std::cout << pLog << " " << iPar << std::endl;
+		mono_free(pLog);
+	}
+
+	void NativeLogVec3(glm::vec3* vec3Par, glm::vec3* vec3Out)
+	{
+		LOG_DEV_INFO("pStrLog Value:{0}", *vec3Par);
+		*vec3Out = glm::normalize(*vec3Par);
+	}
+
+	float NativeLogVec3Dot(glm::vec3* vec3Par)
+	{
+		LOG_DEV_INFO("pStrLog Value:{0}", *vec3Par);
+		return glm::dot(*vec3Par, *vec3Par);
+	}
 }
 
 void ScriptEngine::Init()
@@ -94,6 +118,12 @@ void ScriptEngine::InitMono()
 
 	spScriptEngineData->AppDomain = Ref<MonoDomain>(mono_domain_create_appdomain("SandTableScriptRuntime", nullptr));
 	mono_domain_set(spScriptEngineData->AppDomain.get(), true);
+
+	mono_add_internal_call("SandTable.Main::CppFunction", CppFunc);
+
+	mono_add_internal_call("SandTable.Main::NativeLogInt", NativeLogInt);
+	mono_add_internal_call("SandTable.Main::NativeLogVec3", NativeLogVec3);
+	mono_add_internal_call("SandTable.Main::NativeLogVec3Dot", NativeLogVec3Dot);
 
 	spScriptEngineData->CoreAssembly = LoadCSharpAssembly("Resources/Scripts/SandTable-ScriptCore.dll");
 

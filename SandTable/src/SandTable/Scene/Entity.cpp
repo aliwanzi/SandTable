@@ -43,7 +43,7 @@ Entity& Entity::operator=(const Entity& spEntity)
 	return *this;
 }
 
-Ref<Entity>& Entity::operator=(const Ref<Entity>& spEntity)
+Ref<Entity> Entity::operator=(const Ref<Entity>& spEntity)
 {
 	m_entity = spEntity->m_entity;
 	m_spRegistry = spEntity->m_spRegistry;
