@@ -13,6 +13,8 @@ public:
 	void SetSelectedScene(const Ref<Scene>& spScene);
 
 private:
+	template<typename T>
+	void DisplayAddComponentEntry(const std::string& entryName);
 	void DrawEntityNode(const Ref<Entity>& spEntity);
 	void DrawComponents(const Ref<Entity>& spEntity);
 private:

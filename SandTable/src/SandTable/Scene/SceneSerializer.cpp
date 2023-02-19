@@ -175,6 +175,17 @@ namespace
 			out << YAML::EndMap; // CameraComponent
 		}
 
+		if (entity.HasComponent<ScriptComponent>())
+		{
+			out << YAML::Key << "ScriptComponent";
+			out << YAML::BeginMap;
+
+			auto& scriptComponent = entity.GetComponent<ScriptComponent>();
+			out << YAML::Key << "ClassName" << YAML::Value << scriptComponent.ClassName;
+
+			out << YAML::EndMap; // SpriteRendererComponent
+		}
+
 		if (entity.HasComponent<SpriteRenderComponent>())
 		{
 			out << YAML::Key << "SpriteRenderComponent";
@@ -344,6 +355,13 @@ bool SceneSerializer::DeSerialize(const std::string& sFilePath)
 
 				cc.Primary = cameraComponent["Primary"].as<bool>();
 				cc.FixedAspectRatio = cameraComponent["FixedAspectRatio"].as<bool>();
+			}
+
+			auto scriptComponent = entity["ScriptComponent"];
+			if (scriptComponent)
+			{
+				auto& src = deserializedEntity->AddComponent<ScriptComponent>();
+				src.ClassName = scriptComponent["ClassName"].as<std::string>();
 			}
 
 			auto spriteRenderComponent = entity["SpriteRenderComponent"];

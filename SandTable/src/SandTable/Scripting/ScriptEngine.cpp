@@ -19,6 +19,7 @@ namespace
 		Ref<MonoImage> CoreMonoImage = nullptr;
 
 		Ref<ScriptClass> EntityScriptClass;
+		std::unordered_map<std::string, Ref<ScriptClass>> EntityClass;
 	};
 	static Ref<ScriptEngineData> spScriptEngineData;
 }
@@ -29,6 +30,7 @@ void ScriptEngine::Init()
 	LoadAssembly("Resources/Scripts/SandTable-ScriptCore.dll");
 
 	ScriptGlue::RegisterFunctions();
+	LoadAssemblyClass();
 	InvokeClass("SandTable", "Entity");
 }
 
@@ -54,7 +56,7 @@ void ScriptEngine::LoadAssembly(const std::filesystem::path& sAssemblyPath)
 
 	std::streampos end = stream.tellg();
 	stream.seekg(0, std::ios::beg);
-	size_t iFileSize = end - stream.tellg();
+	uint32_t iFileSize = static_cast<uint32_t>(end - stream.tellg());
 	if (iFileSize == 0)
 	{
 		SAND_TABLE_ASSERT(false, "Read Assembly {0} is Null", sAssemblyPath);
@@ -79,6 +81,11 @@ void ScriptEngine::LoadAssembly(const std::filesystem::path& sAssemblyPath)
 	}
 
 	spScriptEngineData->CoreMonoImage = Ref<MonoImage>(mono_assembly_get_image(spScriptEngineData->CoreAssembly.get()));
+}
+
+const std::unordered_map<std::string, Ref<ScriptClass>>& ScriptEngine::GetEntityClass()
+{
+	return spScriptEngineData->EntityClass;
 }
 
 void ScriptEngine::InvokeClass(const std::string& sClassNameSpace, const std::string& sClassName)
@@ -106,6 +113,50 @@ void ScriptEngine::InvokeClass(const std::string& sClassNameSpace, const std::st
 	auto spPrintCustomMessageFunc = spScriptEngineData->EntityScriptClass->GetMonoMethod("PrintCustomMessage", 1);
 	void* sParam = pMonoString;
 	spScriptEngineData->EntityScriptClass->InvokeMethod(spPrintCustomMessageFunc,&sParam);
+}
+
+
+void ScriptEngine::LoadAssemblyClass()
+{
+	const auto& pMonoImage = spScriptEngineData->CoreMonoImage.get();
+	const MonoTableInfo* pTypeDefinitionsTable = mono_image_get_table_info(pMonoImage, MONO_TABLE_TYPEDEF);
+	int iNumTypes = mono_table_info_get_rows(pTypeDefinitionsTable);
+
+	MonoClass* pEntityClass = mono_class_from_name(pMonoImage, "SandTable", "Entity");
+
+	for (int i = 0; i < iNumTypes; i++)
+	{
+		auto spCols = Ref<uint32_t>(new uint32_t[MONO_TYPEDEF_SIZE], std::default_delete<uint32_t>());
+		mono_metadata_decode_row(pTypeDefinitionsTable, i, spCols.get(), MONO_TYPEDEF_SIZE);
+
+		const char* pClassNameSpace = mono_metadata_string_heap(pMonoImage, spCols.get()[MONO_TYPEDEF_NAMESPACE]);
+		const char* pClassName = mono_metadata_string_heap(pMonoImage, spCols.get()[MONO_TYPEDEF_NAME]);
+		std::string sFullName("");
+		if (strlen(pClassNameSpace) != 0)
+		{
+			sFullName = fmt::format("{}.{}", pClassNameSpace, pClassName);
+		}
+		else
+		{
+			sFullName = pClassName;
+		}
+
+		MonoClass* pMonoClass = mono_class_from_name(pMonoImage, pClassNameSpace, pClassName);
+		if (pMonoClass == pEntityClass)
+		{
+			continue;
+		}
+
+		if (!mono_class_is_subclass_of(pMonoClass, pEntityClass, false))
+		{
+			continue;
+		}
+
+		spScriptEngineData->EntityClass[sFullName] = CreateRef<ScriptClass>(pClassNameSpace, pClassName,
+			spScriptEngineData->AppDomain, spScriptEngineData->CoreMonoImage);
+
+		LOG_DEV_INFO("{}.{}", pClassNameSpace, pClassName);
+	}
 }
 
 SAND_TABLE_NAMESPACE_END

@@ -98,6 +98,14 @@ struct CameraComponent
 	}
 };
 
+struct ScriptComponent
+{
+	std::string ClassName;
+	ScriptComponent() = default;
+	ScriptComponent(const ScriptComponent&) = default;
+	ScriptComponent& operator =(const ScriptComponent&) = default;
+};
+
 //class ScriptableEntity;
 //struct NativeScriptComponent
 //{

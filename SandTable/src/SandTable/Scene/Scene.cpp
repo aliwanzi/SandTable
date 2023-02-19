@@ -71,6 +71,7 @@ Scene::Scene(const Ref<Scene>& spScene):
 	CopyComponent<RigidBody2DComponent>(spSrcRegistry, mapEntity);
 	CopyComponent<BoxCollider2DComponent>(spSrcRegistry, mapEntity);
 	CopyComponent<CircleCollider2DComponent>(spSrcRegistry, mapEntity);
+	CopyComponent<ScriptComponent>(spSrcRegistry, mapEntity);
 }
 
 Ref<Entity> Scene::CreateEntity(const Ref<Entity>& spSrcEntity)
@@ -84,6 +85,7 @@ Ref<Entity> Scene::CreateEntity(const Ref<Entity>& spSrcEntity)
 	CopyComponentIfExists<RigidBody2DComponent>(spSrcEntity, spDstEntity);
 	CopyComponentIfExists<BoxCollider2DComponent>(spSrcEntity, spDstEntity);
 	CopyComponentIfExists<CircleCollider2DComponent>(spSrcEntity, spDstEntity);
+	CopyComponentIfExists<ScriptComponent>(spSrcEntity, spDstEntity);
 	return spDstEntity;
 }
 

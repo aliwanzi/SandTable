@@ -6,6 +6,8 @@
 #include "SandTable/Render/Texture/Texture2D.h"
 #include "SandTable/Render/Render2D.h"
 
+#include "SandTable/Scripting/ScriptEngine.h"
+
 #include <imgui.h>
 #include <imgui_internal.h>
 
@@ -132,80 +134,35 @@ SceneHierarchyPanel::SceneHierarchyPanel(const Ref<Scene>& spScene):
 void SceneHierarchyPanel::OnImGuiRender()
 {
 	ImGui::Begin("Scene Hierarchy");
-	auto spRegistry = m_spScene->Registry();
-	spRegistry->each([&](auto entity)
-		{
-			DrawEntityNode(CreateRef<Entity>(spRegistry, entity));
-		});
-
-	if (ImGui::IsMouseDown(0) && ImGui::IsWindowHovered())
+	if (m_spScene)
 	{
-		m_spSelectedEntity = nullptr;
-	}
+		auto spRegistry = m_spScene->Registry();
+		spRegistry->each([&](auto entity)
+			{
+				DrawEntityNode(CreateRef<Entity>(spRegistry, entity));
+			});
 
-	if (ImGui::BeginPopupContextWindow(0, 1, false))
-	{
-		if (ImGui::MenuItem("Create Empty Entity"))
+		if (ImGui::IsMouseDown(0) && ImGui::IsWindowHovered())
 		{
-			m_spScene->CreateEntity("Empty Entity");
+			m_spSelectedEntity = nullptr;
 		}
 
-		ImGui::EndPopup();
-	}
-
-	ImGui::End();
-
-	ImGui::Begin("Properties");
-	if (m_spSelectedEntity != nullptr)
-	{
-		DrawComponents(m_spSelectedEntity);
-		if (ImGui::Button("Add Component"))
+		if (ImGui::BeginPopupContextWindow(0, 1, false))
 		{
-			ImGui::OpenPopup("Add Component");
-		}
-
-		if (ImGui::BeginPopup("Add Component"))
-		{
-
-			if (!m_spSelectedEntity->HasComponent<CameraComponent>() && ImGui::MenuItem("Camera"))
+			if (ImGui::MenuItem("Create Empty Entity"))
 			{
-				m_spSelectedEntity->AddComponent<CameraComponent>();
-				ImGui::CloseCurrentPopup();
+				m_spScene->CreateEntity("Empty Entity");
 			}
-
-			if (!m_spSelectedEntity->HasComponent<SpriteRenderComponent>() && ImGui::MenuItem("Sprite Render"))
-			{
-				m_spSelectedEntity->AddComponent<SpriteRenderComponent>();
-				ImGui::CloseCurrentPopup();
-			}
-
-			if (!m_spSelectedEntity->HasComponent<CircleRenderComponent>() && ImGui::MenuItem("Circle Render"))
-			{
-				m_spSelectedEntity->AddComponent<CircleRenderComponent>();
-				ImGui::CloseCurrentPopup();
-			}
-
-			if (!m_spSelectedEntity->HasComponent<RigidBody2DComponent>() && ImGui::MenuItem("Rigid Body2D"))
-			{
-				m_spSelectedEntity->AddComponent<RigidBody2DComponent>();
-				ImGui::CloseCurrentPopup();
-			}
-
-			if (!m_spSelectedEntity->HasComponent<BoxCollider2DComponent>() && ImGui::MenuItem("Box Collider 2D"))
-			{
-				m_spSelectedEntity->AddComponent<BoxCollider2DComponent>();
-				ImGui::CloseCurrentPopup();
-			}
-
-			if (!m_spSelectedEntity->HasComponent<CircleCollider2DComponent>() && ImGui::MenuItem("Circle Collider 2D"))
-			{
-				m_spSelectedEntity->AddComponent<CircleCollider2DComponent>();
-				ImGui::CloseCurrentPopup();
-			}
-
 
 			ImGui::EndPopup();
 		}
+	}
+	ImGui::End();
+
+	ImGui::Begin("Properties");
+	if (m_spScene != nullptr && m_spSelectedEntity != nullptr)
+	{
+		DrawComponents(m_spSelectedEntity);
 	}
 	ImGui::End();
 }
@@ -273,7 +230,28 @@ void SceneHierarchyPanel::DrawComponents(const Ref<Entity>& spEntity)
 		{
 			tagComponent.Tag = std::string(buffer);
 		}
+		//delete[] buffer;
 	}
+
+	ImGui::SameLine();
+	ImGui::PushItemWidth(-1);
+
+	if (ImGui::Button("Add Component"))
+		ImGui::OpenPopup("Add Component");
+	if (ImGui::BeginPopup("Add Component"))
+	{
+		DisplayAddComponentEntry<CameraComponent>("Camera");
+		DisplayAddComponentEntry<ScriptComponent>("Script");
+		DisplayAddComponentEntry<SpriteRenderComponent>("Sprite Renderer");
+		DisplayAddComponentEntry<CircleRenderComponent>("Circle Renderer");
+		DisplayAddComponentEntry<RigidBody2DComponent>("Rigidbody 2D");
+		DisplayAddComponentEntry<BoxCollider2DComponent>("Box Collider 2D");
+		DisplayAddComponentEntry<CircleCollider2DComponent>("Circle Collider 2D");
+
+		ImGui::EndPopup();
+	}
+
+	ImGui::PopItemWidth();
 
 	DrawComponent<TransformComponent>("Transform", spEntity, [](auto& component)
 		{
@@ -358,6 +336,27 @@ void SceneHierarchyPanel::DrawComponents(const Ref<Entity>& spEntity)
 			}
 		});
 
+	DrawComponent<ScriptComponent>("Script", spEntity, [](auto& component)
+		{
+			const auto& mapEntityClass = ScriptEngine::GetEntityClass();
+			bool bScriptClassExists = mapEntityClass.find(component.ClassName) != mapEntityClass.end();
+			if (!bScriptClassExists)
+			{
+				ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.9f, 0.2f, 0.3f, 1.f));
+			}
+
+			char buffer[UCHAR_MAX]{ 0 };
+			strcpy_s(buffer, sizeof(buffer), component.ClassName.c_str());
+			if (ImGui::InputText("Class", buffer, sizeof(buffer)))
+			{
+				component.ClassName = std::string(buffer);
+			}
+
+			if (!bScriptClassExists)
+			{
+				ImGui::PopStyleColor();
+			}
+		});
 
 	DrawComponent<SpriteRenderComponent>("Sprite Render", spEntity, [](auto& component)
 		{
@@ -455,6 +454,19 @@ void SceneHierarchyPanel::DrawComponents(const Ref<Entity>& spEntity)
 			ImGui::DragFloat("Restitution Threshold", &component.RestitutionThreshold, 0.01f, 0.f);
 		});
 
+}
+
+template<typename T>
+void SceneHierarchyPanel::DisplayAddComponentEntry(const std::string& entryName) 
+{
+	if (!m_spSelectedEntity->HasComponent<T>())
+	{
+		if (ImGui::MenuItem(entryName.c_str()))
+		{
+			m_spSelectedEntity->AddComponent<T>();
+			ImGui::CloseCurrentPopup();
+		}
+	}
 }
 
 SAND_TABLE_NAMESPACE_END
