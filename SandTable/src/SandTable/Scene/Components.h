@@ -105,21 +105,4 @@ struct ScriptComponent
 	ScriptComponent(const ScriptComponent&) = default;
 	ScriptComponent& operator =(const ScriptComponent&) = default;
 };
-
-//class ScriptableEntity;
-//struct NativeScriptComponent
-//{
-//	Ref<ScriptableEntity> Instance;
-//
-//	std::function<void()> InstantiateFunction;
-//
-//	template<typename T>
-//	void Bind()
-//	{
-//		InstantiateFunction = [&]()
-//		{
-//			Instance = CreateRef<T>();
-//		};
-//	}
-//};
 SAND_TABLE_NAMESPACE_END

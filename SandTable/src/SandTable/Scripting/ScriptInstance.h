@@ -8,7 +8,7 @@ class ScriptInstance
 public:
 	ScriptInstance(Ref<ScriptClass> spScriptClass);
 	void InvokeOnCreate();
-	void InVokeOnUpdate(float fTimeStep);
+	void InVokeOnUpdate(TimeStep fTimeStep);
 private:
 	Ref<ScriptClass> m_spScriptClass;
 	MonoMethod* m_pMonoMethodOnCreate;

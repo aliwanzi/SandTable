@@ -29,14 +29,18 @@ namespace
 	} 
 }
 
-PhysicsSystem2D::PhysicsSystem2D()
+PhysicsSystem2D::PhysicsSystem2D():
+	m_pBody(nullptr)
 {
 	m_spPhysicsWorld = CreateRef<b2World>(b2Vec2(0.f, -9.8f));
 }
 
 PhysicsSystem2D::~PhysicsSystem2D()
 {
-	m_spPhysicsWorld->DestroyBody(m_pBody);
+	if (m_pBody != nullptr)
+	{
+		m_spPhysicsWorld->DestroyBody(m_pBody);
+	}
 }
 
 void PhysicsSystem2D::CreateBody(RigidBody2DComponent& rigidBody2D, const TransformComponent& transform)

@@ -15,7 +15,7 @@ void ScriptInstance::InvokeOnCreate()
 	m_spScriptClass->InvokeMethod(m_pMonoMethodOnCreate);
 }
 
-void ScriptInstance::InVokeOnUpdate(float fTimeStep)
+void ScriptInstance::InVokeOnUpdate(TimeStep fTimeStep)
 {
 	void* pParam = &fTimeStep;
 	m_spScriptClass->InvokeMethod(m_pMonoMethodOnUpdate, &pParam);

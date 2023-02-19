@@ -12,7 +12,7 @@ enum class SceneState
 };
 
 class UUID;
-class Scene
+class Scene :public std::enable_shared_from_this<Scene>
 {
 public:
 	Scene();
@@ -42,6 +42,10 @@ public:
 private:
 	void OnPhysics2DStart();
 	void OnPhysics2DStop();
+
+	void OnScriptStart();
+	void OnScriptStop();
+
 	void RenderScene(const Ref<Camera>& spCamera);
 private:
 	unsigned int m_uiWidth;

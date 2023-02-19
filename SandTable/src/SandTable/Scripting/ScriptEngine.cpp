@@ -2,9 +2,13 @@
 #include "ScriptEngine.h"
 #include "ScriptGlue.h"
 #include "ScriptClass.h"
+#include "ScriptInstance.h"
 #include "mono/jit/jit.h"
 #include "mono/metadata/assembly.h"
 #include "mono/metadata/object.h"
+
+#include "SandTable/Scene/Scene.h"
+#include "SandTable/Scene/Entity.h"
 
 SAND_TABLE_NAMESPACE_BEGIN
 
@@ -20,6 +24,10 @@ namespace
 
 		Ref<ScriptClass> EntityScriptClass;
 		std::unordered_map<std::string, Ref<ScriptClass>> EntityClass;
+		std::unordered_map<UUID, Ref<ScriptInstance>> EntityInstance;
+
+		//
+		Ref<Scene> SceneContext;
 	};
 	static Ref<ScriptEngineData> spScriptEngineData;
 }
@@ -83,9 +91,44 @@ void ScriptEngine::LoadAssembly(const std::filesystem::path& sAssemblyPath)
 	spScriptEngineData->CoreMonoImage = Ref<MonoImage>(mono_assembly_get_image(spScriptEngineData->CoreAssembly.get()));
 }
 
+bool ScriptEngine::EntityClassExit(const std::string& sFullClassName)
+{
+	return spScriptEngineData->EntityClass.find(sFullClassName) != spScriptEngineData->EntityClass.end();
+}
+
 const std::unordered_map<std::string, Ref<ScriptClass>>& ScriptEngine::GetEntityClass()
 {
 	return spScriptEngineData->EntityClass;
+}
+
+void ScriptEngine::OnCreateEntity(Ref<Entity> spEntity)
+{
+	const auto& scriptComponent = spEntity->GetComponent<ScriptComponent>();
+	if (EntityClassExit(scriptComponent.ClassName))
+	{
+		auto spScriptInstance = CreateRef<ScriptInstance>(spScriptEngineData->EntityClass[scriptComponent.ClassName]);
+		spScriptEngineData->EntityInstance[spEntity->GetUUID()] = spScriptInstance;
+		spScriptInstance->InvokeOnCreate();
+	}
+}
+
+void ScriptEngine::OnUpdateEntity(Ref<Entity> spEntity, TimeStep fTimeStep)
+{
+	auto spScriptInstance = spScriptEngineData->EntityInstance.find(spEntity->GetUUID());
+	SAND_TABLE_ASSERT(spScriptInstance != spScriptEngineData->EntityInstance.end(), "not find Script Instance");
+
+	spScriptInstance->second->InVokeOnUpdate(fTimeStep);
+}
+
+void ScriptEngine::OnRuntimeStart(Ref<Scene> spScene)
+{
+	spScriptEngineData->SceneContext = spScene;
+}
+
+void ScriptEngine::OnRuntimeStop()
+{
+	spScriptEngineData->SceneContext = nullptr;
+	spScriptEngineData->EntityInstance.clear();
 }
 
 void ScriptEngine::InvokeClass(const std::string& sClassNameSpace, const std::string& sClassName)

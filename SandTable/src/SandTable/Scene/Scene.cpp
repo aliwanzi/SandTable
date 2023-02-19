@@ -3,6 +3,8 @@
 #include "SandTable/Render/Render2D.h"
 #include "SandTable/Scene/Entity.h"
 
+#include "SandTable/Scripting/ScriptEngine.h"
+
 SAND_TABLE_NAMESPACE_BEGIN
 
 namespace
@@ -105,12 +107,14 @@ Ref<Entity> Scene::CreateEntityWithUUID(const UUID& uuid, const std::string& sNa
 
 void Scene::OnRuntimeStart()
 {
-	OnSimulationStart();
+	OnPhysics2DStart();
+	OnScriptStart();
 }
 
 void Scene::OnRuntimeStop()
 {
-	OnSimulationStop();
+	OnPhysics2DStop();
+	OnScriptStop();
 }
 
 void Scene::OnSimulationStart()
@@ -153,6 +157,22 @@ void Scene::OnPhysics2DStart()
 void Scene::OnPhysics2DStop()
 {
 	m_spPhysicsSystem2D = nullptr;
+}
+
+void Scene::OnScriptStart()
+{
+	ScriptEngine::OnRuntimeStart(shared_from_this());
+	auto view = m_spRegistry->view<ScriptComponent>();
+	for (auto component : view)
+	{
+		auto spEntity = CreateRef<Entity>(m_spRegistry, component);
+		ScriptEngine::OnCreateEntity(spEntity);
+	}
+}
+
+void Scene::OnScriptStop()
+{
+	ScriptEngine::OnRuntimeStop();
 }
 
 void Scene::OnShowPhysicsCollider(const Ref<Camera>& spCamera)
@@ -198,19 +218,14 @@ void Scene::OnShowPhysicsCollider(const Ref<Camera>& spCamera)
 
 void Scene::OnUpdate(const TimeStep& timeStep)
 {
-	//{
-	//	m_spRegistry->view<NativeScriptComponent>().each([=](auto entity, auto& nsc)
-	//	{
-	//		if (nsc.Instance == nullptr)
-	//		{
-	//			nsc.InstantiateFunction();
-	//			nsc.Instance->SetEntity(CreateRef<Entity>(m_spRegistry, entity));
-	//			nsc.Instance->OnCreate();
-	//		}
-
-	//		nsc.Instance->OnUpdate(timeStep);
-	//	});
-	//}
+	{
+		auto view = m_spRegistry->view<ScriptComponent>();
+		for (auto component : view)
+		{
+			auto spEntity = CreateRef<Entity>(m_spRegistry, component);
+			ScriptEngine::OnUpdateEntity(spEntity, timeStep);
+		}
+	}
 
 	{
 		m_spPhysicsSystem2D->OnUpdate(timeStep);

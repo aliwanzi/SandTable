@@ -224,13 +224,12 @@ void SceneHierarchyPanel::DrawComponents(const Ref<Entity>& spEntity)
 	if (spEntity->HasComponent<TagComponent>())
 	{
 		auto& tagComponent = spEntity->GetComponent<TagComponent>();
-		char buffer[UCHAR_MAX]{ 0 };
-		strcpy_s(buffer, sizeof(buffer), tagComponent.Tag.c_str());
-		if (ImGui::InputText("Tag", buffer, sizeof(buffer)))
+		auto spBuffer = Ref<char>(new char[UCHAR_MAX], std::default_delete<char>());
+		strcpy_s(spBuffer.get(), UCHAR_MAX, tagComponent.Tag.c_str());
+		if (ImGui::InputText("Tag", spBuffer.get(), UCHAR_MAX))
 		{
-			tagComponent.Tag = std::string(buffer);
+			tagComponent.Tag = std::string(spBuffer.get());
 		}
-		//delete[] buffer;
 	}
 
 	ImGui::SameLine();
@@ -338,18 +337,17 @@ void SceneHierarchyPanel::DrawComponents(const Ref<Entity>& spEntity)
 
 	DrawComponent<ScriptComponent>("Script", spEntity, [](auto& component)
 		{
-			const auto& mapEntityClass = ScriptEngine::GetEntityClass();
-			bool bScriptClassExists = mapEntityClass.find(component.ClassName) != mapEntityClass.end();
+			bool bScriptClassExists = ScriptEngine::EntityClassExit(component.ClassName);
 			if (!bScriptClassExists)
 			{
 				ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.9f, 0.2f, 0.3f, 1.f));
 			}
 
-			char buffer[UCHAR_MAX]{ 0 };
-			strcpy_s(buffer, sizeof(buffer), component.ClassName.c_str());
-			if (ImGui::InputText("Class", buffer, sizeof(buffer)))
+			auto spBuffer = Ref<char>(new char[UCHAR_MAX], std::default_delete<char>());
+			strcpy_s(spBuffer.get(), UCHAR_MAX, component.ClassName.c_str());
+			if (ImGui::InputText("Class", spBuffer.get(), UCHAR_MAX))
 			{
-				component.ClassName = std::string(buffer);
+				component.ClassName = std::string(spBuffer.get());
 			}
 
 			if (!bScriptClassExists)
