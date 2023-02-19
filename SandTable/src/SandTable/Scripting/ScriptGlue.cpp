@@ -1,12 +1,13 @@
 #include "pch.h"
 #include "ScriptGlue.h"
 #include "mono/metadata/object.h"
+#include "mono/metadata/reflection.h"
 
 SAND_TABLE_NAMESPACE_BEGIN
 
 namespace
 {
-	void CppFunc()
+	void CppFunction()
 	{
 		std::cout << "This is written in C++!" << std::endl;
 	}
@@ -30,12 +31,12 @@ namespace
 		return glm::dot(*vec3Par, *vec3Par);
 	}
 
-#define SAND_TABLE_INTERNAL_CALL(Name) mono_add_internal_call("SandTable.Main::" #Name , Name)
+#define SAND_TABLE_INTERNAL_CALL(Name) mono_add_internal_call("SandTable.InternalCall::" #Name, Name)
 }
 
 void ScriptGlue::RegisterFunctions()
 {
-	SAND_TABLE_INTERNAL_CALL(CppFunc);
+	SAND_TABLE_INTERNAL_CALL(CppFunction);
 	SAND_TABLE_INTERNAL_CALL(NativeLogInt);
 	SAND_TABLE_INTERNAL_CALL(NativeLogVec3);
 	SAND_TABLE_INTERNAL_CALL(NativeLogVec3Dot);
