@@ -215,7 +215,7 @@ void SceneHierarchyPanel::DrawEntityNode(const Ref<Entity>& spEntity)
 	{
 		if (m_spSelectedEntity != nullptr && *m_spSelectedEntity == *spEntity)
 			m_spSelectedEntity = nullptr;
-		spEntity->Destrory();
+		m_spScene->RemoveEntity(spEntity);
 	}
 }
 

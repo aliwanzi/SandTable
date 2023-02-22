@@ -53,27 +53,26 @@ Scene::Scene(const Ref<Scene>& spScene):
 	m_uiHeight(spScene->m_uiHeight),
 	m_spPhysicsSystem2D(nullptr)
 {
-	std::unordered_map<UUID, Ref<Entity>> mapEntity;
-
 	auto spSrcRegistry = spScene->m_spRegistry;
 	auto entity = spSrcRegistry->view<IDComponent>();
+	m_mapEntity.clear();
 
 	for (auto e : entity)
 	{
 		const auto& uuid = spSrcRegistry->get<IDComponent>(e).ID;
 		const auto& name = spSrcRegistry->get<TagComponent>(e).Tag;
 		auto spNewEntity = CreateEntityWithUUID(uuid, name);
-		mapEntity[uuid] = spNewEntity;
+		m_mapEntity[uuid] = spNewEntity;
 	}
 
-	CopyComponent<TransformComponent>(spSrcRegistry, mapEntity);
-	CopyComponent<SpriteRenderComponent>(spSrcRegistry, mapEntity);
-	CopyComponent<CircleRenderComponent>(spSrcRegistry, mapEntity);
-	CopyComponent<CameraComponent>(spSrcRegistry, mapEntity);
-	CopyComponent<RigidBody2DComponent>(spSrcRegistry, mapEntity);
-	CopyComponent<BoxCollider2DComponent>(spSrcRegistry, mapEntity);
-	CopyComponent<CircleCollider2DComponent>(spSrcRegistry, mapEntity);
-	CopyComponent<ScriptComponent>(spSrcRegistry, mapEntity);
+	CopyComponent<TransformComponent>(spSrcRegistry, m_mapEntity);
+	CopyComponent<SpriteRenderComponent>(spSrcRegistry, m_mapEntity);
+	CopyComponent<CircleRenderComponent>(spSrcRegistry, m_mapEntity);
+	CopyComponent<CameraComponent>(spSrcRegistry, m_mapEntity);
+	CopyComponent<RigidBody2DComponent>(spSrcRegistry, m_mapEntity);
+	CopyComponent<BoxCollider2DComponent>(spSrcRegistry, m_mapEntity);
+	CopyComponent<CircleCollider2DComponent>(spSrcRegistry, m_mapEntity);
+	CopyComponent<ScriptComponent>(spSrcRegistry, m_mapEntity);
 }
 
 Ref<Entity> Scene::CreateEntity(const Ref<Entity>& spSrcEntity)
@@ -102,7 +101,16 @@ Ref<Entity> Scene::CreateEntityWithUUID(const UUID& uuid, const std::string& sNa
 	spEntity->AddComponent<IDComponent>(uuid);
 	spEntity->AddComponent<TransformComponent>();
 	spEntity->AddComponent<TagComponent>(sName.empty() ? "Entity" : sName);
+
+	m_mapEntity[uuid] = spEntity;
+
 	return spEntity;
+}
+
+void Scene::RemoveEntity(Ref<Entity> spEntity)
+{
+	m_mapEntity.erase(spEntity->GetUUID());
+	spEntity->Destrory();
 }
 
 void Scene::OnRuntimeStart()
@@ -319,6 +327,18 @@ Ref<Entity> Scene::GetPrimaryCameraEntity()
 		}
 	}
 	return nullptr;
+}
+
+Ref<Entity> Scene::GetEntityByUUID(UUID uiEntityID)
+{
+	if (m_mapEntity.find(uiEntityID) != m_mapEntity.end())
+	{
+		return m_mapEntity[uiEntityID];
+	}
+	else
+	{
+		return nullptr;
+	}
 }
 
 void Scene::RenderScene(const Ref<Camera>& spCamera)

@@ -22,6 +22,7 @@ public:
 	Ref<Entity> CreateEntity(const Ref<Entity>& spSrcEntity);
 	Ref<Entity> CreateEntity(const std::string& sName = std::string());
 	Ref<Entity> CreateEntityWithUUID(const UUID& uuid, const std::string& sName);
+	void RemoveEntity(Ref<Entity> spEntity);
 
 	void OnRuntimeStart();
 	void OnRuntimeStop();
@@ -38,6 +39,7 @@ public:
 	const Ref<entt::registry>& Registry()const;
 
 	Ref<Entity> GetPrimaryCameraEntity();
+	Ref<Entity> GetEntityByUUID(UUID uiEntityID);
 
 private:
 	void OnPhysics2DStart();
@@ -52,6 +54,7 @@ private:
 	unsigned int m_uiHeight;
 	Ref<entt::registry> m_spRegistry;
 	Ref<PhysicsSystem2D> m_spPhysicsSystem2D;
+	std::unordered_map<UUID, Ref<Entity>> m_mapEntity;
 };
 
 SAND_TABLE_NAMESPACE_END

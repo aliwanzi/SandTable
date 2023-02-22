@@ -17,14 +17,14 @@ namespace
 	struct ScriptEngineData
 	{
 		Ref<MonoDomain> RootDomain = nullptr;
-		Ref<MonoDomain> AppDomain = nullptr;
+		Ref<MonoDomain> ScriptDomain = nullptr;
 
 		Ref<MonoAssembly> CoreAssembly = nullptr;
 		Ref<MonoImage> CoreMonoImage = nullptr;
 
-		Ref<ScriptClass> EntityScriptClass;
-		std::unordered_map<std::string, Ref<ScriptClass>> EntityClass;
-		std::unordered_map<UUID, Ref<ScriptInstance>> EntityInstance;
+		Ref<ScriptClass> ScriptEntityClass;
+		std::unordered_map<std::string, Ref<ScriptClass>> ScriptClass;
+		std::unordered_map<UUID, Ref<ScriptInstance>> ScriptInstance;
 
 		//
 		Ref<Scene> SceneContext;
@@ -53,8 +53,8 @@ void ScriptEngine::InitMono()
 
 void ScriptEngine::LoadAssembly(const std::filesystem::path& sAssemblyPath)
 {
-	spScriptEngineData->AppDomain = Ref<MonoDomain>(mono_domain_create_appdomain("SandTableScriptRuntime", nullptr));
-	mono_domain_set(spScriptEngineData->AppDomain.get(), true);
+	spScriptEngineData->ScriptDomain = Ref<MonoDomain>(mono_domain_create_appdomain("SandTableScriptRuntime", nullptr));
+	mono_domain_set(spScriptEngineData->ScriptDomain.get(), true);
 
 	std::ifstream stream(sAssemblyPath, std::ios::binary | std::ios::ate);
 	if (!stream)
@@ -93,12 +93,12 @@ void ScriptEngine::LoadAssembly(const std::filesystem::path& sAssemblyPath)
 
 bool ScriptEngine::EntityClassExit(const std::string& sFullClassName)
 {
-	return spScriptEngineData->EntityClass.find(sFullClassName) != spScriptEngineData->EntityClass.end();
+	return spScriptEngineData->ScriptClass.find(sFullClassName) != spScriptEngineData->ScriptClass.end();
 }
 
 const std::unordered_map<std::string, Ref<ScriptClass>>& ScriptEngine::GetEntityClass()
 {
-	return spScriptEngineData->EntityClass;
+	return spScriptEngineData->ScriptClass;
 }
 
 void ScriptEngine::OnCreateEntity(Ref<Entity> spEntity)
@@ -106,16 +106,17 @@ void ScriptEngine::OnCreateEntity(Ref<Entity> spEntity)
 	const auto& scriptComponent = spEntity->GetComponent<ScriptComponent>();
 	if (EntityClassExit(scriptComponent.ClassName))
 	{
-		auto spScriptInstance = CreateRef<ScriptInstance>(spScriptEngineData->EntityClass[scriptComponent.ClassName]);
-		spScriptEngineData->EntityInstance[spEntity->GetUUID()] = spScriptInstance;
+		auto spScriptInstance = CreateRef<ScriptInstance>(spScriptEngineData->ScriptEntityClass,
+			spScriptEngineData->ScriptClass[scriptComponent.ClassName], spEntity->GetUUID());
+		spScriptEngineData->ScriptInstance[spEntity->GetUUID()] = spScriptInstance;
 		spScriptInstance->InvokeOnCreate();
 	}
 }
 
 void ScriptEngine::OnUpdateEntity(Ref<Entity> spEntity, TimeStep fTimeStep)
 {
-	auto spScriptInstance = spScriptEngineData->EntityInstance.find(spEntity->GetUUID());
-	SAND_TABLE_ASSERT(spScriptInstance != spScriptEngineData->EntityInstance.end(), "not find Script Instance");
+	auto spScriptInstance = spScriptEngineData->ScriptInstance.find(spEntity->GetUUID());
+	SAND_TABLE_ASSERT(spScriptInstance != spScriptEngineData->ScriptInstance.end(), "not find Script Instance");
 
 	spScriptInstance->second->InVokeOnUpdate(fTimeStep);
 }
@@ -125,18 +126,20 @@ void ScriptEngine::OnRuntimeStart(Ref<Scene> spScene)
 	spScriptEngineData->SceneContext = spScene;
 }
 
+const Ref<Scene>& ScriptEngine::GetRuntimeScene()
+{
+	return spScriptEngineData->SceneContext;
+}
+
 void ScriptEngine::OnRuntimeStop()
 {
 	spScriptEngineData->SceneContext = nullptr;
-	spScriptEngineData->EntityInstance.clear();
+	spScriptEngineData->ScriptInstance.clear();
 }
 
 void ScriptEngine::InvokeClass(const std::string& sClassNameSpace, const std::string& sClassName)
 {
-	spScriptEngineData->EntityScriptClass = CreateRef<ScriptClass>(sClassNameSpace, sClassName,
-		spScriptEngineData->AppDomain, spScriptEngineData->CoreMonoImage);
-
-	auto pPrintMessageFunc = spScriptEngineData->EntityScriptClass->GetMonoMethod("PrintMessage", 0);
+	/*auto pPrintMessageFunc = spScriptEngineData->EntityScriptClass->GetMonoMethod("PrintMessage", 0);
 	spScriptEngineData->EntityScriptClass->InvokeMethod(pPrintMessageFunc);
 
 	auto spPrintIntFunc = spScriptEngineData->EntityScriptClass->GetMonoMethod("PrintInt", 1);
@@ -152,15 +155,18 @@ void ScriptEngine::InvokeClass(const std::string& sClassNameSpace, const std::st
 	};
 	spScriptEngineData->EntityScriptClass->InvokeMethod(spPrintIntsFunc, pParams);
 
-	MonoString* pMonoString = mono_string_new(spScriptEngineData->AppDomain.get(), "Hello World from c++");
+	MonoString* pMonoString = mono_string_new(spScriptEngineData->ScriptDomain.get(), "Hello World from c++");
 	auto spPrintCustomMessageFunc = spScriptEngineData->EntityScriptClass->GetMonoMethod("PrintCustomMessage", 1);
 	void* sParam = pMonoString;
-	spScriptEngineData->EntityScriptClass->InvokeMethod(spPrintCustomMessageFunc,&sParam);
+	spScriptEngineData->EntityScriptClass->InvokeMethod(spPrintCustomMessageFunc,&sParam);*/
 }
 
 
 void ScriptEngine::LoadAssemblyClass()
 {
+	spScriptEngineData->ScriptEntityClass = CreateRef<ScriptClass>("SandTable", "Entity",
+		spScriptEngineData->ScriptDomain, spScriptEngineData->CoreMonoImage);
+
 	const auto& pMonoImage = spScriptEngineData->CoreMonoImage.get();
 	const MonoTableInfo* pTypeDefinitionsTable = mono_image_get_table_info(pMonoImage, MONO_TABLE_TYPEDEF);
 	int iNumTypes = mono_table_info_get_rows(pTypeDefinitionsTable);
@@ -195,8 +201,8 @@ void ScriptEngine::LoadAssemblyClass()
 			continue;
 		}
 
-		spScriptEngineData->EntityClass[sFullName] = CreateRef<ScriptClass>(pClassNameSpace, pClassName,
-			spScriptEngineData->AppDomain, spScriptEngineData->CoreMonoImage);
+		spScriptEngineData->ScriptClass[sFullName] = CreateRef<ScriptClass>(pClassNameSpace, pClassName,
+			spScriptEngineData->ScriptDomain, spScriptEngineData->CoreMonoImage);
 
 		LOG_DEV_INFO("{}.{}", pClassNameSpace, pClassName);
 	}

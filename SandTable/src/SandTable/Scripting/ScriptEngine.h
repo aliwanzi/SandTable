@@ -16,6 +16,7 @@ public:
 	static void OnUpdateEntity(Ref<Entity> spEntity,TimeStep fTimeStep);
 
 	static void OnRuntimeStart(Ref<Scene> spScene);
+	static const Ref<Scene>& GetRuntimeScene();
 	static void OnRuntimeStop();
 private:
 	static void InitMono();
