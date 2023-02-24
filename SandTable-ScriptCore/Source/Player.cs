@@ -5,14 +5,18 @@ namespace SandTable
 {
     public class Player : Entity
     {
+        private TransformComponent Transform;
+        private RigidBody2DComponent RigidBody2D;
+
         void OnCreate()
         {
             Console.WriteLine($"Player.OnCreate-{EntityID}");
+            Transform = GetComponent<TransformComponent>();
+            RigidBody2D = GetComponent<RigidBody2DComponent>();
         }
+
         void OnUpdate(float ts)
         {
-            //Console.WriteLine($"Player.OnUpdate:{ts}");
-
             float speed = 1.0f;
             Vector3 velocity = Vector3.Zero;
 
@@ -36,11 +40,11 @@ namespace SandTable
 
             velocity *= speed;
 
-            var translation = Translation;
-            translation += velocity * ts;
-            Translation = translation;
+            RigidBody2D.ApplyLinearImpulse(velocity.XY, true);
 
-            Console.WriteLine($"Player.OnUpdate:{Translation.X}");
+            //var translation = Transform.Translation;
+            //translation += velocity * ts;
+            //Transform.Translation = translation;
         }
     }
 }

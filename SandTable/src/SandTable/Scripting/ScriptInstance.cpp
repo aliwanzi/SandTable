@@ -17,13 +17,19 @@ ScriptInstance::ScriptInstance(Ref<ScriptClass>spEntityClass, Ref<ScriptClass> s
 
 void ScriptInstance::InvokeOnCreate()
 {
-	m_spScriptClass->InvokeMethod(m_pMonoMethodOnCreate);
+	if (m_pMonoMethodOnCreate != nullptr)
+	{
+		m_spScriptClass->InvokeMethod(m_pMonoMethodOnCreate);
+	}
 }
 
 void ScriptInstance::InVokeOnUpdate(TimeStep fTimeStep)
 {
-	void* pParam = &fTimeStep;
-	m_spScriptClass->InvokeMethod(m_pMonoMethodOnUpdate, &pParam);
+	if (m_pMonoMethodOnUpdate!=nullptr)
+	{
+		void* pParam = &fTimeStep;
+		m_spScriptClass->InvokeMethod(m_pMonoMethodOnUpdate, &pParam);
+	}
 }
 
 SAND_TABLE_NAMESPACE_END

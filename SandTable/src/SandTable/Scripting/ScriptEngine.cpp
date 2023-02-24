@@ -1,7 +1,6 @@
 #include "pch.h"
 #include "ScriptEngine.h"
 #include "ScriptGlue.h"
-#include "ScriptClass.h"
 #include "ScriptInstance.h"
 #include "mono/jit/jit.h"
 #include "mono/metadata/assembly.h"
@@ -38,6 +37,7 @@ void ScriptEngine::Init()
 	LoadAssembly("Resources/Scripts/SandTable-ScriptCore.dll");
 
 	ScriptGlue::RegisterFunctions();
+	ScriptGlue::RegisterComponents();
 	LoadAssemblyClass();
 	InvokeClass("SandTable", "Entity");
 }
@@ -206,6 +206,11 @@ void ScriptEngine::LoadAssemblyClass()
 
 		LOG_DEV_INFO("{}.{}", pClassNameSpace, pClassName);
 	}
+}
+
+const Ref<MonoImage>& ScriptEngine::GetCoreAssemblyImage()
+{
+	return spScriptEngineData->CoreMonoImage;
 }
 
 SAND_TABLE_NAMESPACE_END

@@ -21,6 +21,16 @@
             Z = z;
         }
 
+        public Vector2 XY
+        {
+            get => new Vector2(X, Y);
+            set
+            {
+                X = value.X;
+                Y = value.Y;
+            }
+        }
+
         public static Vector3 operator +(Vector3 vector0, Vector3 vector1)
         {
             return new Vector3(vector0.X + vector1.X, vector0.Y + vector1.Y, vector0.Z + vector1.Z);

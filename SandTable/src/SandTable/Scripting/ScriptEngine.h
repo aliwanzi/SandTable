@@ -1,7 +1,7 @@
 #pragma once
+#include "ScriptClass.h"
 
 SAND_TABLE_NAMESPACE_BEGIN
-class ScriptClass;
 class Scene;
 class Entity;
 class ScriptEngine
@@ -9,6 +9,8 @@ class ScriptEngine
 public:
 	static void Init();
 	static void LoadAssembly(const std::filesystem::path& sAssemblyPath);
+
+	static const Ref<MonoImage>& GetCoreAssemblyImage();
 
 	static bool EntityClassExit(const std::string& sFullClassName);
 	static const std::unordered_map<std::string, Ref<ScriptClass>>& GetEntityClass();
