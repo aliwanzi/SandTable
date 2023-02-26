@@ -1,5 +1,4 @@
-﻿
-using System;
+﻿using System;
 
 namespace SandTable
 {
@@ -8,11 +7,16 @@ namespace SandTable
         private TransformComponent Transform;
         private RigidBody2DComponent RigidBody2D;
 
+        public float Speed;
+        public Vector3 Velocity;
+
         void OnCreate()
         {
             Console.WriteLine($"Player.OnCreate-{EntityID}");
             Transform = GetComponent<TransformComponent>();
             RigidBody2D = GetComponent<RigidBody2DComponent>();
+
+            Speed = 2.5f;
         }
 
         void OnUpdate(float ts)

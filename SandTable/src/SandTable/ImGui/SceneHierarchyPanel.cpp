@@ -7,6 +7,7 @@
 #include "SandTable/Render/Render2D.h"
 
 #include "SandTable/Script/ScriptEngine.h"
+#include "SandTable/Script/ScriptInstance.h"
 
 #include <imgui.h>
 #include <imgui_internal.h>
@@ -335,7 +336,7 @@ void SceneHierarchyPanel::DrawComponents(const Ref<Entity>& spEntity)
 			}
 		});
 
-	DrawComponent<ScriptComponent>("Script", spEntity, [](auto& component)
+	DrawComponent<ScriptComponent>("Script", spEntity, [spEntity](auto& component)
 		{
 			bool bScriptClassExists = ScriptEngine::EntityClassExit(component.ClassName);
 			if (!bScriptClassExists)
@@ -348,6 +349,24 @@ void SceneHierarchyPanel::DrawComponents(const Ref<Entity>& spEntity)
 			if (ImGui::InputText("Class", spBuffer.get(), UCHAR_MAX))
 			{
 				component.ClassName = std::string(spBuffer.get());
+			}
+
+			auto spScriptInstance = ScriptEngine::GetEntityScriptInstance(spEntity->GetUUID());
+			if (spScriptInstance!=nullptr)
+			{
+				auto spScriptClass = spScriptInstance->GetScriptClass();
+				auto mapScriptFields = spScriptClass->GetScriptFields();
+				for (auto& field : mapScriptFields)
+				{
+					if (field.second.Type == ScriptFieldType::Float)
+					{
+						float fData = spScriptClass->GetFieldValue<float>(field.first);
+						if (ImGui::DragFloat(field.first.c_str(), &fData))
+						{
+							spScriptClass->SetFieldValue<float>(field.first, fData);
+						}
+					}
+				}
 			}
 
 			if (!bScriptClassExists)

@@ -15,6 +15,11 @@ ScriptInstance::ScriptInstance(Ref<ScriptClass>spEntityClass, Ref<ScriptClass> s
 	m_spScriptClass->InvokeMethod(m_pMonoMethodConStruct, &pParam);
 }
 
+Ref<ScriptClass> ScriptInstance::GetScriptClass()
+{
+	return m_spScriptClass;
+}
+
 void ScriptInstance::InvokeOnCreate()
 {
 	if (m_pMonoMethodOnCreate != nullptr)

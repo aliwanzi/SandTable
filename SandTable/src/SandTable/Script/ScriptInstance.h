@@ -7,6 +7,7 @@ class ScriptInstance
 {
 public:
 	ScriptInstance(Ref<ScriptClass> spScriptEntityClass, Ref<ScriptClass> spScriptClass, UUID entityID);
+	Ref<ScriptClass> GetScriptClass();
 	void InvokeOnCreate();
 	void InVokeOnUpdate(TimeStep fTimeStep);
 private:
