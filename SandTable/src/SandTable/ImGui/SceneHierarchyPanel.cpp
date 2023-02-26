@@ -6,7 +6,7 @@
 #include "SandTable/Render/Texture/Texture2D.h"
 #include "SandTable/Render/Render2D.h"
 
-#include "SandTable/Scripting/ScriptEngine.h"
+#include "SandTable/Script/ScriptEngine.h"
 
 #include <imgui.h>
 #include <imgui_internal.h>

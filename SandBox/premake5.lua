@@ -1,4 +1,4 @@
-project "Sandbox"
+project "SandBox"
 	kind "ConsoleApp"
 	language "C++"
 	cppdialect "C++17"
@@ -26,6 +26,11 @@ project "Sandbox"
 	links
 	{
 		"SandTable"
+	}
+
+	postbuildcommands
+	{
+		"{COPY} %{Binary.mono}  %{cfg.targetdir}"
 	}
 
 	filter "system:windows"

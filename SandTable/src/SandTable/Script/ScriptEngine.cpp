@@ -34,7 +34,7 @@ namespace
 void ScriptEngine::Init()
 {
 	InitMono();
-	LoadAssembly("Resources/Scripts/SandTable-ScriptCore.dll");
+	LoadAssembly("assets/script/SandTableScript.dll");
 
 	ScriptGlue::RegisterFunctions();
 	ScriptGlue::RegisterComponents();

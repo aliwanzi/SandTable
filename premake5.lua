@@ -3,7 +3,7 @@ include "Dependencies.lua"
 
 workspace "SandTable"
 	architecture "x86_64"
-	startproject "Sandbox"
+	startproject "SandBox"
 
 	configurations
 	{
@@ -23,11 +23,12 @@ group "Dependencies"
 	include "SandTable/vendor/Box2D"
 group ""
 
-group "Core"
+group "SandTable"
 	include "SandTable"
-	include "SandTable-ScriptCore"
+	include "SandTableScript"
 group ""
 
-group "Misc"
-	include "Sandbox"
+group "SandBox"
+	include "SandBox"
+	include "SandBoxScript"
 group ""

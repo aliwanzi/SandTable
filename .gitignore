@@ -366,9 +366,9 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
-/SandBox/SandTableProfile-Startup.json
-/SandBox/SandTableProfile-Runtime.json
+*.json
 *.idb
-/SandTable/Resources/Scripts/SandTable-ScriptCore.dll
 *.csproj
-/SandBox/Resources/Scripts/SandTable-ScriptCore.dll
+/bin-int/
+/bin/
+/SandBox/assets/script/

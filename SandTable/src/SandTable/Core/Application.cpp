@@ -5,7 +5,7 @@
 #include "SandTable/Render/Render.h"
 #include "SandTable/Render/Render2D.h"
 #include "SandTable/Debug/Instrumentor.h"
-#include "SandTable/Scripting/ScriptEngine.h"
+#include "SandTable/Script/ScriptEngine.h"
 
 SAND_TABLE_NAMESPACE_BEGIN
 

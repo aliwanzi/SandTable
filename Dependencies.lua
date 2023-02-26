@@ -17,3 +17,9 @@ LibraryDir["mono"] = "%{wks.location}/SandTable/vendor/mono/lib/%{cfg.buildcfg}"
 
 Library = {}
 Library["mono"] = "%{LibraryDir.mono}/mono-2.0-sgen.lib"
+
+BinaryDir = {}
+BinaryDir["mono"] = "%{wks.location}/SandTable/vendor/mono/bin/%{cfg.buildcfg}"
+
+Binary = {}
+Binary["mono"] = "%{BinaryDir.mono}/mono-2.0-sgen.dll"

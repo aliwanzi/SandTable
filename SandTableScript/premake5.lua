@@ -1,17 +1,16 @@
-project "SandTable-ScriptCore"
+project "SandTableScript"
 	kind "SharedLib"
 	language "C#"
 	dotnetframework "4.7.2"
 
-	targetdir ("../Sandbox/Resources/Scripts")
-	objdir ("../Sandbox/Resources/Scripts/Intermediates")
+	targetdir ("../SandBox/assets/script/")
+	objdir ("%{wks.location}/bin-int/" .. outputdir .. "/%{prj.name}")
 
 	files 
 	{
-		"Source/**.cs",
-		"Properties/**.cs"
+		"src/**.cs"
 	}
-	
+
 	filter "configurations:Debug"
 		optimize "Off"
 		symbols "Default"

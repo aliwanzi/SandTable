@@ -12,7 +12,7 @@
 #include "SandTable/Scene/UUID.h"
 #include "SandTable/Scene/Scene.h"
 
-#include "SandTable/Scripting/ScriptEngine.h"
+#include "SandTable/Script/ScriptEngine.h"
 
 
 SAND_TABLE_NAMESPACE_BEGIN
