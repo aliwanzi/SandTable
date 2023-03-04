@@ -7,7 +7,7 @@
 #include "SandTable/Render/Render2D.h"
 
 #include "SandTable/Script/ScriptEngine.h"
-#include "SandTable/Script/ScriptInstance.h"
+#include "SandTable/Script/ScriptEntityInstance.h"
 
 #include <imgui.h>
 #include <imgui_internal.h>
@@ -16,7 +16,7 @@ SAND_TABLE_NAMESPACE_BEGIN
 
 extern const std::filesystem::path sAssetsDirector;
 
-namespace 
+namespace
 {
 	static void DrawVec3Control(const std::string& sLabel, glm::vec3& values, float resetValue = 0.0f, float columnWidth = 100.0f)
 	{
@@ -125,7 +125,7 @@ namespace
 	}
 }
 
-SceneHierarchyPanel::SceneHierarchyPanel(const Ref<Scene>& spScene):
+SceneHierarchyPanel::SceneHierarchyPanel(const Ref<Scene>& spScene) :
 	m_spScene(spScene),
 	m_spSelectedEntity(nullptr)
 {
@@ -334,11 +334,12 @@ void SceneHierarchyPanel::DrawComponents(const Ref<Entity>& spEntity)
 			default:
 				break;
 			}
+
 		});
 
-	DrawComponent<ScriptComponent>("Script", spEntity, [spEntity](auto& component)
+	DrawComponent<ScriptComponent>("Script", spEntity, [spEntity, spScene = m_spScene](auto& component)
 		{
-			bool bScriptClassExists = ScriptEngine::EntityClassExit(component.ClassName);
+			bool bScriptClassExists = ScriptEngine::ScriptEntityClassExit(component.ClassName);
 			if (!bScriptClassExists)
 			{
 				ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.9f, 0.2f, 0.3f, 1.f));
@@ -351,24 +352,63 @@ void SceneHierarchyPanel::DrawComponents(const Ref<Entity>& spEntity)
 				component.ClassName = std::string(spBuffer.get());
 			}
 
-			auto spScriptInstance = ScriptEngine::GetEntityScriptInstance(spEntity->GetUUID());
-			if (spScriptInstance!=nullptr)
+			if (spScene->GetIsRunning())
 			{
-				auto spScriptClass = spScriptInstance->GetScriptClass();
-				auto mapScriptFields = spScriptClass->GetScriptFields();
-				for (auto& field : mapScriptFields)
+				auto spScriptInstance = ScriptEngine::GetScriptEntityInstance(spEntity->GetUUID());
+				if (spScriptInstance != nullptr)
 				{
-					if (field.second.Type == ScriptFieldType::Float)
+					auto spEntityClass = spScriptInstance->GetAppScriptEntityClass();
+					auto mapEntityFields = spEntityClass->GetScriptEntityFields();
+
+					for (auto& field : mapEntityFields)
 					{
-						float fData = spScriptClass->GetFieldValue<float>(field.first);
-						if (ImGui::DragFloat(field.first.c_str(), &fData))
+						if (field.second.FieldType == ScriptFieldType::Float)
 						{
-							spScriptClass->SetFieldValue<float>(field.first, fData);
+							float fData = spEntityClass->GetFieldValue<float>(field.first);
+							if (ImGui::DragFloat(field.first.c_str(), &fData))
+							{
+								spEntityClass->SetFieldValue<float>(field.first, fData);
+							}
 						}
 					}
 				}
 			}
+			else if (bScriptClassExists)
+			{
+				auto& mapScriptFields = ScriptEngine::GetScriptFieldMap(spEntity->GetUUID());
 
+				auto& spEntityClass = ScriptEngine::GetScriptEntityClass(component.ClassName);
+				const auto& mapEntityFields = spEntityClass->GetScriptEntityFields();
+				for (const auto& field : mapEntityFields)
+				{
+					auto& scriptField = mapScriptFields.find(field.first);
+					if (scriptField != mapScriptFields.end())
+					{
+						if (field.second.FieldType == ScriptFieldType::Float)
+						{
+							float fData = scriptField->second.FieldValue->GetValue<float>();
+							if (ImGui::DragFloat(scriptField->first.c_str(), &fData))
+							{
+								scriptField->second.FieldValue->SetValue<float>(fData);
+							}
+						}
+					}
+					else
+					{
+						auto& scriptFieldInstance = mapScriptFields[field.first];
+						scriptFieldInstance.FieldValue = CreateRef<ScriptFieldValue>();
+
+						if (field.second.FieldType == ScriptFieldType::Float)
+						{
+							float fData = 0.f;
+							if (ImGui::DragFloat(field.first.c_str(), &fData))
+							{
+								scriptFieldInstance.FieldValue->SetValue<float>(fData);
+							}
+						}
+					}
+				}
+			}
 			if (!bScriptClassExists)
 			{
 				ImGui::PopStyleColor();
@@ -394,7 +434,7 @@ void SceneHierarchyPanel::DrawComponents(const Ref<Entity>& spEntity)
 					{
 						LOG_DEV_WARN("Could not load {0} - not a texture file", filePath.filename().string());
 					}
-					
+
 				}
 				ImGui::EndDragDropTarget();
 			}
@@ -457,7 +497,7 @@ void SceneHierarchyPanel::DrawComponents(const Ref<Entity>& spEntity)
 			ImGui::DragFloat2("Size", glm::value_ptr(component.Size));
 			ImGui::DragFloat("Density", &component.Density, 0.01f, 0.f, 1.f);
 			ImGui::DragFloat("Friction", &component.Friction, 0.01f, 0.f, 1.f);
-			ImGui::DragFloat("Restitution",&component.Restitution, 0.01f, 0.f, 1.f);
+			ImGui::DragFloat("Restitution", &component.Restitution, 0.01f, 0.f, 1.f);
 			ImGui::DragFloat("Restitution Threshold", &component.RestitutionThreshold, 0.01f, 0.f);
 		});
 
@@ -467,14 +507,14 @@ void SceneHierarchyPanel::DrawComponents(const Ref<Entity>& spEntity)
 			ImGui::DragFloat("Radius", &component.Radius);
 			ImGui::DragFloat("Density", &component.Density, 0.01f, 0.f, 1.f);
 			ImGui::DragFloat("Friction", &component.Friction, 0.01f, 0.f, 1.f);
-			ImGui::DragFloat("Restitution",&component.Restitution, 0.01f, 0.f, 1.f);
+			ImGui::DragFloat("Restitution", &component.Restitution, 0.01f, 0.f, 1.f);
 			ImGui::DragFloat("Restitution Threshold", &component.RestitutionThreshold, 0.01f, 0.f);
 		});
 
 }
 
 template<typename T>
-void SceneHierarchyPanel::DisplayAddComponentEntry(const std::string& entryName) 
+void SceneHierarchyPanel::DisplayAddComponentEntry(const std::string& entryName)
 {
 	if (!m_spSelectedEntity->HasComponent<T>())
 	{

@@ -8,7 +8,7 @@ namespace SandTable
         private RigidBody2DComponent RigidBody2D;
 
         public float Speed;
-        public Vector3 Velocity;
+        public float Time = 0.0f;
 
         void OnCreate()
         {
@@ -21,6 +21,7 @@ namespace SandTable
 
         void OnUpdate(float ts)
         {
+            Time += ts;
             float speed = 1.0f;
             Vector3 velocity = Vector3.Zero;
 

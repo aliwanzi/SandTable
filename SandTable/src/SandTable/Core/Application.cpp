@@ -11,10 +11,11 @@ SAND_TABLE_NAMESPACE_BEGIN
 
 Ref<Application> Application::m_spApplication = nullptr;
 
-Application::Application() :m_bRunning(true), m_fLastFrameTime(0.f),m_bMinimized(false)
+Application::Application(Ref<ApplicationSpecification> spApplicationSpecification) :
+	m_bRunning(true), m_fLastFrameTime(0.f),m_bMinimized(false),m_spApplicationSpecification(spApplicationSpecification)
 {
 	SAND_TABLE_PROFILE_FUNCTION();
-	m_spWindow = Window::Create();
+	m_spWindow = Window::Create(WindowProps(spApplicationSpecification->Name));
 	m_spWindow->SetEventCallback(BIND_EVENT_FUN(Application::OnEvent));
 }
 
@@ -192,11 +193,17 @@ const Ref<Window>& Application::GetWindow() const
 	return m_spWindow;
 }
 
-Ref<Application> Application::GetApplication()
+const Ref<ApplicationSpecification>& Application::GetApplicationSpecification() const
+{
+	return m_spApplicationSpecification;
+}
+
+Ref<Application> Application::GetApplication(Ref<ApplicationSpecification> spApplicationSpecification)
 {
 	if (m_spApplication == nullptr)
 	{
-		m_spApplication = Ref<Application>(new Application());
+		SAND_TABLE_ASSERT(spApplicationSpecification, "Initialize Application Need Application Specification");
+		m_spApplication = Ref<Application>(new Application(spApplicationSpecification));
 		m_spApplication->Init();
 	}
 	return m_spApplication;

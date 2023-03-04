@@ -3,7 +3,7 @@ project "SandBoxScript"
 	language "C#"
 	dotnetframework "4.7.2"
 
-	targetdir ("../SandBox/assets/script/")
+	targetdir ("../SandBox/script/")
 	objdir ("%{wks.location}/bin-int/" .. outputdir .. "/%{prj.name}")
 
 	files 

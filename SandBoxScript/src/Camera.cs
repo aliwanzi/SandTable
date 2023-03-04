@@ -2,6 +2,15 @@
 {
     public class Camera:Entity
     {
+        public Entity OtherEntity;
+        public float DistanceFromPlayer = 5.0f;
+
+        void OnCreate()
+        {
+            Translation = new Vector3(Translation.XY, DistanceFromPlayer);
+
+        }
+
         void OnUpdate(float ts)
         {
             float speed = 1.0f;

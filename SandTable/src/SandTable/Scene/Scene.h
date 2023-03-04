@@ -41,6 +41,8 @@ public:
 	Ref<Entity> GetPrimaryCameraEntity();
 	Ref<Entity> GetEntityByUUID(UUID uiEntityID);
 
+	bool GetIsRunning();
+
 private:
 	void OnPhysics2DStart();
 	void OnPhysics2DStop();
@@ -55,6 +57,8 @@ private:
 	Ref<entt::registry> m_spRegistry;
 	Ref<PhysicsSystem2D> m_spPhysicsSystem2D;
 	std::unordered_map<UUID, Ref<Entity>> m_mapEntity;
+
+	bool m_bIsRunning;
 };
 
 SAND_TABLE_NAMESPACE_END

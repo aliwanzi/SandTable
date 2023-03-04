@@ -54,6 +54,12 @@ void SandBoxEditorLayer::OnAttach()
 
 	m_spCameraEntity = m_spEditorScene->CreateEntity("Circle Entity");
 	m_spCameraEntity->AddComponent<CircleRenderComponent>();
+
+	auto commandLineArgs = Application::GetApplication()->GetApplicationSpecification()->CommandLineArgs;
+	if (commandLineArgs.Count>1)
+	{
+		OpenScene(commandLineArgs[1]);
+	}
 }
 
 void SandBoxEditorLayer::OnDetach()
@@ -484,6 +490,8 @@ void SandBoxEditorLayer::OnScenePlay()
 
 	m_spActiveScene = CreateRef<Scene>(m_spEditorScene);
 	m_spActiveScene->OnRuntimeStart();
+
+	m_spSceneHierarchyPanel->SetSelectedScene(m_spActiveScene);
 }
 
 void SandBoxEditorLayer::OnSceneSimulate()

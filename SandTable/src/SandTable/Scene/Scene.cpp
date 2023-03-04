@@ -37,7 +37,8 @@ Scene::Scene():
 	m_spRegistry(CreateRef<entt::registry>()),
 	m_uiWidth(0),
 	m_uiHeight(0),
-	m_spPhysicsSystem2D(nullptr)
+	m_spPhysicsSystem2D(nullptr),
+	m_bIsRunning(false)
 {
 	LOG_DEV_INFO("Scene Creat");
 }
@@ -51,7 +52,8 @@ Scene::Scene(const Ref<Scene>& spScene):
 	m_spRegistry(CreateRef<entt::registry>()),
 	m_uiWidth(spScene->m_uiWidth),
 	m_uiHeight(spScene->m_uiHeight),
-	m_spPhysicsSystem2D(nullptr)
+	m_spPhysicsSystem2D(nullptr),
+	m_bIsRunning(spScene->m_bIsRunning)
 {
 	auto spSrcRegistry = spScene->m_spRegistry;
 	auto entity = spSrcRegistry->view<IDComponent>();
@@ -115,12 +117,14 @@ void Scene::RemoveEntity(Ref<Entity> spEntity)
 
 void Scene::OnRuntimeStart()
 {
+	m_bIsRunning = true;
 	OnPhysics2DStart();
 	OnScriptStart();
 }
 
 void Scene::OnRuntimeStop()
 {
+	m_bIsRunning = false;
 	OnPhysics2DStop();
 	OnScriptStop();
 }
@@ -339,6 +343,11 @@ Ref<Entity> Scene::GetEntityByUUID(UUID uiEntityID)
 	{
 		return nullptr;
 	}
+}
+
+bool Scene::GetIsRunning()
+{
+	return m_bIsRunning;
 }
 
 void Scene::RenderScene(const Ref<Camera>& spCamera)

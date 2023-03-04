@@ -5,6 +5,25 @@
 
 SAND_TABLE_NAMESPACE_BEGIN
 
+struct ApplicationCommandLineArgs
+{
+	int Count = 0;
+	char** Args = nullptr;
+
+	const char* operator[](int index) const
+	{
+		SAND_TABLE_ASSERT(index < Count,"index is less than count");
+		return Args[index];
+	}
+};
+
+struct ApplicationSpecification
+{
+	std::string Name = "SandBox Application";
+	std::string WorkingDirectory;
+	ApplicationCommandLineArgs CommandLineArgs;
+};
+
 class Application
 {
 public:
@@ -21,11 +40,13 @@ public:
 	int GetWindowWidth() const;
 	int GetWindowHeight() const;
 	const Ref<Window>& GetWindow()const;
+	const Ref<ApplicationSpecification>& GetApplicationSpecification()const;
 
-	static Ref<Application> GetApplication();
+	static Ref<Application> GetApplication(Ref<ApplicationSpecification> spApplicationSpecification = nullptr);
 private:
 	void Init();
-	Application();
+	Application() = default;
+	Application(Ref<ApplicationSpecification> spApplicationSpecification);
 	Application(Application&) = delete;
 	Application& operator=(const Application&) = delete;
 private:
@@ -48,6 +69,7 @@ private:
 	Ref<Window> m_spWindow;
 	Ref<LayerStack> m_spLayerStack;
 	Ref<ImGuiLayer> m_spImGuiLayer;
+	Ref<ApplicationSpecification> m_spApplicationSpecification;
 
 	static Ref<Application> m_spApplication;
 };

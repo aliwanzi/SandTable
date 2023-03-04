@@ -3,6 +3,8 @@
 #include "SandTable/Scene/Entity.h"
 #include "SandTable/Scene/Components.h"
 #include "SandTable/Render/Texture/Texture2D.h"
+#include "SandTable/Script/ScriptEngine.h"
+#include "SandTable/Script/ScriptEntityInstance.h"
 #include <yaml-cpp/yaml.h>
 
 
@@ -82,12 +84,46 @@ namespace YAML
 			return true;
 		}
 	};
+
+	template<>
+	struct convert<SandTable::UUID>
+	{
+		static Node encode(const SandTable::UUID& uuid)
+		{
+			Node node;
+			node.push_back((uint64_t)uuid);
+			return node;
+		}
+
+		static bool decode(const Node& node, SandTable::UUID& uuid)
+		{
+			uuid = node.as<uint64_t>();
+			return true;
+		}
+	};
 }
 
 SAND_TABLE_NAMESPACE_BEGIN
 
 namespace 
 {
+
+#define WRITE_SCRIPT_FIELD(FieldType, Type)				\
+	case ScriptFieldType::FieldType:				\
+	{													\
+		out << fieldValue->GetValue<Type>();	\
+		break;											\
+	}
+
+
+#define READ_SCRIPT_FIELD(FieldType, Type)             \
+	case ScriptFieldType::FieldType:            \
+	{                                                  \
+		Type data = scriptField["Data"].as<Type>();    \
+		fieldInstance.FieldValue->SetValue(data);       \
+		break;                                         \
+	}
+
 	YAML::Emitter& operator<<(YAML::Emitter& out, const glm::vec2& value)
 	{
 		out << YAML::Flow;
@@ -183,6 +219,46 @@ namespace
 			auto& scriptComponent = entity.GetComponent<ScriptComponent>();
 			out << YAML::Key << "ClassName" << YAML::Value << scriptComponent.ClassName;
 
+			const auto& mapScriptField = ScriptEngine::GetScriptFieldMap(entity.GetUUID());
+			auto spScriptClass = ScriptEngine::GetScriptEntityClass(scriptComponent.ClassName);
+			const auto& mapScriptEntityFields = spScriptClass->GetScriptEntityFields();
+
+			if (!mapScriptEntityFields.empty())
+			{
+
+				out << YAML::Key << "ScriptFields" << YAML::Value;
+				out << YAML::BeginSeq;
+
+				for (const auto& field : mapScriptEntityFields)
+				{
+					out << YAML::BeginMap;
+					out << YAML::Key << "Name" << YAML::Value << field.first;
+					out << YAML::Key << "Type" << YAML::Value << ScriptFieldTypeToString(field.second.FieldType);
+					out << YAML::Key << "Data" << YAML::Value;
+					auto& fieldValue = mapScriptField.at(field.first).FieldValue;
+					switch (field.second.FieldType)
+					{
+						WRITE_SCRIPT_FIELD(Float, float);
+						WRITE_SCRIPT_FIELD(Double, double);
+						WRITE_SCRIPT_FIELD(Bool, bool);
+						WRITE_SCRIPT_FIELD(Char, char);
+						WRITE_SCRIPT_FIELD(Byte, int8_t);
+						WRITE_SCRIPT_FIELD(Short, int16_t);
+						WRITE_SCRIPT_FIELD(Int, int32_t);
+						WRITE_SCRIPT_FIELD(Long, int64_t);
+						WRITE_SCRIPT_FIELD(UByte, uint8_t);
+						WRITE_SCRIPT_FIELD(UShort, uint16_t);
+						WRITE_SCRIPT_FIELD(UInt, uint32_t);
+						WRITE_SCRIPT_FIELD(ULong, uint64_t);
+						WRITE_SCRIPT_FIELD(Vector2, glm::vec2);
+						WRITE_SCRIPT_FIELD(Vector3, glm::vec3);
+						WRITE_SCRIPT_FIELD(Vector4, glm::vec4);
+						WRITE_SCRIPT_FIELD(Entity, UUID);
+					}
+					out << YAML::EndMap;
+				}
+				out << YAML::EndSeq;
+			}
 			out << YAML::EndMap; // SpriteRendererComponent
 		}
 
@@ -318,13 +394,13 @@ bool SceneSerializer::DeSerialize(const std::string& sFilePath)
 
 			LOG_DEV_TRACE("Deserialized entity with ID = {0}, name = {1}", uuid, sName);
 
-			Ref<Entity> deserializedEntity = m_spScene->CreateEntityWithUUID(uuid, sName);
+			Ref<Entity> spDeserializedEntity = m_spScene->CreateEntityWithUUID(uuid, sName);
 
 			auto transformComponent = entity["TransformComponent"];
 			if (transformComponent)
 			{
 				// Entities always have transforms
-				auto& tc = deserializedEntity->GetComponent<TransformComponent>();
+				auto& tc = spDeserializedEntity->GetComponent<TransformComponent>();
 				tc.Translation = transformComponent["Translation"].as<glm::vec3>();
 				tc.Rotation = transformComponent["Rotation"].as<glm::vec3>();
 				tc.Scale = transformComponent["Scale"].as<glm::vec3>();
@@ -333,7 +409,7 @@ bool SceneSerializer::DeSerialize(const std::string& sFilePath)
 			auto cameraComponent = entity["CameraComponent"];
 			if (cameraComponent)
 			{
-				auto& cc = deserializedEntity->AddComponent<CameraComponent>();
+				auto& cc = spDeserializedEntity->AddComponent<CameraComponent>();
 
 				auto& orthoCameraProps = cameraComponent["Ortho Camera"];
 				auto spOrthoCamera = std::dynamic_pointer_cast<OrthoGraphicCamera>(cc.OrthoCamera);
@@ -360,14 +436,52 @@ bool SceneSerializer::DeSerialize(const std::string& sFilePath)
 			auto scriptComponent = entity["ScriptComponent"];
 			if (scriptComponent)
 			{
-				auto& src = deserializedEntity->AddComponent<ScriptComponent>();
+				auto& src = spDeserializedEntity->AddComponent<ScriptComponent>();
 				src.ClassName = scriptComponent["ClassName"].as<std::string>();
+
+				auto ScriptFields = scriptComponent["ScriptFields"];
+				if (ScriptFields.IsDefined())
+				{
+					auto spEntityClass = ScriptEngine::GetScriptEntityClass(src.ClassName);
+					SAND_TABLE_ASSERT(spEntityClass, "Entity Class is null in DeSerialize");
+					auto& mapScriptFields = ScriptEngine::GetScriptFieldMap(spDeserializedEntity->GetUUID());
+					const auto& mapScriptEntityFields = spEntityClass->GetScriptEntityFields();
+					for (auto& scriptField : ScriptFields)
+					{
+						std::string sName = scriptField["Name"].as<std::string>();
+						std::string sType = scriptField["Type"].as<std::string>();
+						ScriptFieldType fieldType = ScriptFieldTypeFromString(sType);
+						SAND_TABLE_ASSERT(mapScriptEntityFields.find(sName) != mapScriptEntityFields.end(), "do not find entity fields");
+						
+						auto& fieldInstance = mapScriptFields.at(sName);
+						fieldInstance.FieldValue = CreateRef<ScriptFieldValue>();
+						switch (fieldType)
+						{
+							READ_SCRIPT_FIELD(Float, float);
+							READ_SCRIPT_FIELD(Double, double);
+							READ_SCRIPT_FIELD(Bool, bool);
+							READ_SCRIPT_FIELD(Char, char);
+							READ_SCRIPT_FIELD(Byte, int8_t);
+							READ_SCRIPT_FIELD(Short, int16_t);
+							READ_SCRIPT_FIELD(Int, int32_t);
+							READ_SCRIPT_FIELD(Long, int64_t);
+							READ_SCRIPT_FIELD(UByte, uint8_t);
+							READ_SCRIPT_FIELD(UShort, uint16_t);
+							READ_SCRIPT_FIELD(UInt, uint32_t);
+							READ_SCRIPT_FIELD(ULong, uint64_t);
+							READ_SCRIPT_FIELD(Vector2, glm::vec2);
+							READ_SCRIPT_FIELD(Vector3, glm::vec3);
+							READ_SCRIPT_FIELD(Vector4, glm::vec4);
+							READ_SCRIPT_FIELD(Entity, UUID);
+						}
+					}
+				}
 			}
 
 			auto spriteRenderComponent = entity["SpriteRenderComponent"];
 			if (spriteRenderComponent)
 			{
-				auto& src = deserializedEntity->AddComponent<SpriteRenderComponent>();
+				auto& src = spDeserializedEntity->AddComponent<SpriteRenderComponent>();
 				src.spQuadPrimitive->SetColor(spriteRenderComponent["Color"].as<glm::vec4>());
 				if (spriteRenderComponent["TexturePath"].IsDefined())
 				{
@@ -379,7 +493,7 @@ bool SceneSerializer::DeSerialize(const std::string& sFilePath)
 			auto circleRenderComponent = entity["CircleRenderComponent"];
 			if (circleRenderComponent)
 			{
-				auto& src = deserializedEntity->AddComponent<CircleRenderComponent>();
+				auto& src = spDeserializedEntity->AddComponent<CircleRenderComponent>();
 				src.spCirclePrimitive->SetColor(circleRenderComponent["Color"].as<glm::vec4>());
 				src.spCirclePrimitive->SetThickness(circleRenderComponent["Thickness"].as<float>());
 				src.spCirclePrimitive->SetFade(circleRenderComponent["Fade"].as<float>());
@@ -393,7 +507,7 @@ bool SceneSerializer::DeSerialize(const std::string& sFilePath)
 			auto rigidBody2DComponent = entity["RigidBody2DComponent"];
 			if (rigidBody2DComponent)
 			{
-				auto& rigidBody2D = deserializedEntity->AddComponent<RigidBody2DComponent>();
+				auto& rigidBody2D = spDeserializedEntity->AddComponent<RigidBody2DComponent>();
 				rigidBody2D.Type = static_cast<BodyType>(rigidBody2DComponent["BodyType"].as<int>());
 				rigidBody2D.FixedRotation = rigidBody2DComponent["FixedRotation"].as<bool>();
 			}
@@ -401,7 +515,7 @@ bool SceneSerializer::DeSerialize(const std::string& sFilePath)
 			auto boxCollider2DComponent = entity["BoxCollider2DComponent"];
 			if (boxCollider2DComponent)
 			{
-				auto& boxCollider2D = deserializedEntity->AddComponent<BoxCollider2DComponent>();
+				auto& boxCollider2D = spDeserializedEntity->AddComponent<BoxCollider2DComponent>();
 				boxCollider2D.Offset = boxCollider2DComponent["Offset"].as<glm::vec2>();
 				boxCollider2D.Size = boxCollider2DComponent["Size"].as<glm::vec2>();
 				boxCollider2D.Density = boxCollider2DComponent["Density"].as<float>();
@@ -413,7 +527,7 @@ bool SceneSerializer::DeSerialize(const std::string& sFilePath)
 			auto circleCollider2DComponent = entity["CircleCollider2DComponent"];
 			if (circleCollider2DComponent)
 			{
-				auto& circleCollider2D = deserializedEntity->AddComponent<CircleCollider2DComponent>();
+				auto& circleCollider2D = spDeserializedEntity->AddComponent<CircleCollider2DComponent>();
 				circleCollider2D.Offset = circleCollider2DComponent["Offset"].as<glm::vec2>();
 				circleCollider2D.Radius = circleCollider2DComponent["Radius"].as<float>();
 				circleCollider2D.Density = circleCollider2DComponent["Density"].as<float>();
