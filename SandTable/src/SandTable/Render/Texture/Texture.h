@@ -13,6 +13,9 @@ public:
 	virtual void UnBind()const = 0;
 	virtual unsigned int GetRenderID() const = 0;
 	virtual const std::string& GetTexturePath()const = 0;
+
+protected:
+	inline static std::unordered_map<std::string, Ref<Texture>> m_mapTexture;
 };
 
 SAND_TABLE_NAMESPACE_END

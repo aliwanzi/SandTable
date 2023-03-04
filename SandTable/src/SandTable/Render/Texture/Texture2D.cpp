@@ -39,7 +39,18 @@ Ref<Texture> Texture2D::Create(const std::string& sPath)
 	switch (RenderAPI::GetAPIType())
 	{
 	case RenderAPI::APIType::OpenGL:
-		return CreateRef<OpenGLTexture2D>(sPath);
+	{
+		auto iter = m_mapTexture.find(sPath);
+		if (iter != m_mapTexture.end())
+		{
+			return iter->second;
+		}
+		else
+		{
+			m_mapTexture[sPath] = CreateRef<OpenGLTexture2D>(sPath);
+			return m_mapTexture[sPath];
+		}
+	}
 	default:
 		SAND_TABLE_ASSERT(false, "Unknown RenderAPI");
 		return nullptr;
