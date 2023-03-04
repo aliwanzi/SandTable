@@ -14,6 +14,11 @@ ScriptEntityClass::ScriptEntityClass(const std::string& sClassNameSpace, const s
 	mono_runtime_object_init(m_pMonoObject);
 }
 
+MonoObject* ScriptEntityClass::GetMonoObject()
+{
+	return m_pMonoObject;
+}
+
 MonoMethod* ScriptEntityClass::GetMonoMethod(const std::string& sMethodName, unsigned int uiParaCount)
 {
 	return mono_class_get_method_from_name(m_pMonoClass, sMethodName.c_str(), uiParaCount);

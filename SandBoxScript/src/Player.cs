@@ -21,31 +21,38 @@ namespace SandTable
 
         void OnUpdate(float ts)
         {
-            Time += ts;
-            float speed = 1.0f;
-            Vector3 velocity = Vector3.Zero;
+			Time += ts;
+			// Console.WriteLine($"Player.OnUpdate: {ts}");
 
-            if (Input.IsKeyDown(KeyCode.W))
+			float speed = Speed;
+			Vector3 velocity = Vector3.Zero;
+
+			if (Input.IsKeyDown(KeyCode.W))
+				velocity.Y = 5.0f;
+			else if (Input.IsKeyDown(KeyCode.S))
+				velocity.Y = -5.0f;
+
+			if (Input.IsKeyDown(KeyCode.A))
+				velocity.X = -5.0f;
+			else if (Input.IsKeyDown(KeyCode.D))
+				velocity.X = 5.0f;
+
+            if(Input.IsKeyDown(KeyCode.Space))
+                velocity.Y = 10.0f;
+
+            Entity cameraEntity = FindEntityByName("Camera");
+            if (cameraEntity != null)
             {
-                velocity.Y = 1.0f;
-            }
-            else if (Input.IsKeyDown(KeyCode.S))
-            {
-                velocity.Y = -1.0f;
+                Camera camera = cameraEntity.As<Camera>();
+
+                if (Input.IsKeyDown(KeyCode.Q))
+                    camera.DistanceFromPlayer += speed * 2.0f * ts;
+                else if (Input.IsKeyDown(KeyCode.E))
+                    camera.DistanceFromPlayer -= speed * 2.0f * ts;
             }
 
-            if (Input.IsKeyDown(KeyCode.A))
-            {
-                velocity.X = -1.0f;
-            }
-            else if (Input.IsKeyDown(KeyCode.D))
-            {
-                velocity.X = 1.0f;
-            }
-
-            velocity *= speed;
-
-            RigidBody2D.ApplyLinearImpulse(velocity.XY, true);
+            velocity *= speed * ts;
+			RigidBody2D.ApplyLinearImpulse(velocity.XY, true);
 
             //var translation = Transform.Translation;
             //translation += velocity * ts;

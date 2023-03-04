@@ -207,6 +207,7 @@ namespace
 
 			out << YAML::Key << "Primary" << YAML::Value << cameraComponent.Primary;
 			out << YAML::Key << "FixedAspectRatio" << YAML::Value << cameraComponent.FixedAspectRatio;
+			out << YAML::Key << "Projection" << YAML::Value << static_cast<int>(cameraComponent.Projection);
 
 			out << YAML::EndMap; // CameraComponent
 		}
@@ -431,6 +432,7 @@ bool SceneSerializer::DeSerialize(const std::string& sFilePath)
 
 				cc.Primary = cameraComponent["Primary"].as<bool>();
 				cc.FixedAspectRatio = cameraComponent["FixedAspectRatio"].as<bool>();
+				cc.Projection = static_cast<ProjectionType>(cameraComponent["Projection"].as<int>());
 			}
 
 			auto scriptComponent = entity["ScriptComponent"];
@@ -453,7 +455,7 @@ bool SceneSerializer::DeSerialize(const std::string& sFilePath)
 						ScriptFieldType fieldType = ScriptFieldTypeFromString(sType);
 						SAND_TABLE_ASSERT(mapScriptEntityFields.find(sName) != mapScriptEntityFields.end(), "do not find entity fields");
 						
-						auto& fieldInstance = mapScriptFields.at(sName);
+						auto& fieldInstance = mapScriptFields[sName];
 						fieldInstance.FieldValue = CreateRef<ScriptFieldValue>();
 						switch (fieldType)
 						{

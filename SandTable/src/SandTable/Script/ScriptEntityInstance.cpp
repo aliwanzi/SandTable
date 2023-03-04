@@ -38,4 +38,9 @@ void ScriptEntityInstance::InVokeOnUpdate(TimeStep fTimeStep)
 	}
 }
 
+MonoObject* ScriptEntityInstance::GetMonoObject()
+{
+	return m_spAppEntityClass->GetMonoObject();
+}
+
 SAND_TABLE_NAMESPACE_END

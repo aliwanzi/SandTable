@@ -7,6 +7,10 @@ namespace SandTable
     {
         [MethodImplAttribute(MethodImplOptions.InternalCall)]
         internal extern static bool EntityHasComponet(ulong entityID, Type componentType);
+        [MethodImplAttribute(MethodImplOptions.InternalCall)]
+        internal extern static ulong EntityFindEntityByName(string name);
+        [MethodImplAttribute(MethodImplOptions.InternalCall)]
+        internal extern static object GetScriptEntityInstance(ulong entityID);
 
         [MethodImplAttribute(MethodImplOptions.InternalCall)]
         internal extern static void TransformComponentGetTranslation(ulong entityID, out Vector3 translation);

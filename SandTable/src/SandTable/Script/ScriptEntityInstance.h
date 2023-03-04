@@ -12,6 +12,7 @@ public:
 	Ref<ScriptEntityClass> GetAppScriptEntityClass();
 	void InvokeOnCreate();
 	void InVokeOnUpdate(TimeStep fTimeStep);
+	MonoObject* GetMonoObject();
 private:
 	Ref<ScriptEntityClass> m_spAppEntityClass;
 	MonoMethod* m_pMonoMethodConStruct;

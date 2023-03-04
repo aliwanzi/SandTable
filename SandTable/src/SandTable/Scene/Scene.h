@@ -40,6 +40,7 @@ public:
 
 	Ref<Entity> GetPrimaryCameraEntity();
 	Ref<Entity> GetEntityByUUID(UUID uiEntityID);
+	Ref<Entity> GetEntityByName(const std::string_view& sEntityName);
 
 	bool GetIsRunning();
 

@@ -10,6 +10,8 @@ public:
 	ScriptEntityClass(const std::string& sClassNameSpace, const std::string& sClassName,
 		const Ref<MonoImage>& spMonoImage, const Ref<MonoDomain>& spMonoDomain);
 
+	MonoObject* GetMonoObject();
+
 	MonoMethod* GetMonoMethod(const std::string& sMethodName, unsigned int uiParaCount);
 	void InvokeMethod(MonoMethod* pMonoMethod, void** params = nullptr);
 

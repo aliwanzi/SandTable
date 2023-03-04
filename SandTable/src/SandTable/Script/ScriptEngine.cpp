@@ -17,7 +17,7 @@ SAND_TABLE_NAMESPACE_BEGIN
 namespace
 {
 	struct ScriptEngineData
-	{  
+	{
 		Ref<MonoDomain> RootDomain = nullptr;
 		Ref<MonoDomain> AppDomain = nullptr;
 
@@ -78,7 +78,7 @@ namespace
 	ScriptFieldType MonoTypeToScriptFieldType(MonoType* pMonoType)
 	{
 		std::string sTypeName = mono_type_get_name(pMonoType);
-		SAND_TABLE_ASSERT(ScriptFieldTypeMap.find(sTypeName) != ScriptFieldTypeMap.end(),"do not find MonoType in ScriptEngine");
+		SAND_TABLE_ASSERT(ScriptFieldTypeMap.find(sTypeName) != ScriptFieldTypeMap.end(), "do not find MonoType in ScriptEngine");
 		return ScriptFieldTypeMap.at(sTypeName);
 	}
 }
@@ -150,10 +150,9 @@ const MapScriptEntityClass& ScriptEngine::GetScriptEntityClassMap()
 	return spScriptEngineData->AppScriptEntityClassMap;
 }
 
-
 bool ScriptEngine::ScriptEntityClassExit(const std::string& sEntityName)
 {
-	return spScriptEngineData->AppScriptEntityClassMap.find(sEntityName) 
+	return spScriptEngineData->AppScriptEntityClassMap.find(sEntityName)
 		!= spScriptEngineData->AppScriptEntityClassMap.end();
 }
 
@@ -185,6 +184,19 @@ MapScriptField& ScriptEngine::GetScriptFieldMap(const UUID& uiEntityID)
 	return spScriptEngineData->ScriptFieldMap[uiEntityID];
 }
 
+MonoObject* ScriptEngine::GetMonoObject(const UUID& uiEntityID)
+{
+	auto iter = spScriptEngineData->ScriptEntityInstanceMap.find(uiEntityID);
+	if (iter != spScriptEngineData->ScriptEntityInstanceMap.end())
+	{
+		return iter->second->GetMonoObject();
+	}
+	else
+	{
+		return nullptr;
+	}
+}
+
 void ScriptEngine::OnRuntimeStart(Ref<Scene> spScene)
 {
 	spScriptEngineData->SceneContext = spScene;
@@ -205,7 +217,7 @@ void ScriptEngine::LoadAssemblyClass()
 {
 	spScriptEngineData->CoreScriptEntityClass = CreateRef<ScriptEntityClass>("SandTable", "Entity",
 		spScriptEngineData->CoreMonoImage, spScriptEngineData->AppDomain);
-	MonoClass* pCoreClass = mono_class_from_name(spScriptEngineData->CoreMonoImage.get(), 
+	MonoClass* pCoreClass = mono_class_from_name(spScriptEngineData->CoreMonoImage.get(),
 		"SandTable", "Entity");
 
 	const auto& pMonoImage = spScriptEngineData->AppMonoImage.get();

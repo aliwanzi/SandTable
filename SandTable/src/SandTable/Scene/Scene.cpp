@@ -345,6 +345,20 @@ Ref<Entity> Scene::GetEntityByUUID(UUID uiEntityID)
 	}
 }
 
+Ref<Entity> Scene::GetEntityByName(const std::string_view& sEntityName)
+{
+	auto view = m_spRegistry->view<TagComponent>();
+	for (auto entity : view)
+	{
+		const TagComponent& tc = view.get<TagComponent>(entity);
+		if (tc.Tag == sEntityName)
+		{
+			return CreateRef<Entity>(m_spRegistry, entity);
+		}
+	}
+	return nullptr;
+}
+
 bool Scene::GetIsRunning()
 {
 	return m_bIsRunning;

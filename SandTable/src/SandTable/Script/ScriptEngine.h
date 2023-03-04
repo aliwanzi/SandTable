@@ -24,6 +24,8 @@ public:
 
 	static MapScriptField& GetScriptFieldMap(const UUID& uiEntityID);
 
+	static MonoObject* GetMonoObject(const UUID& uiEntityID);
+
 	static void OnRuntimeStart(Ref<Scene> spScene);
 	static const Ref<Scene>& GetRuntimeScene();
 	static void OnRuntimeStop();

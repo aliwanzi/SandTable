@@ -53,6 +53,28 @@ namespace
 		return false;
 	}
 
+	uint64_t EntityFindEntityByName(MonoString* sEntityName)
+	{
+		char* pEntityName = mono_string_to_utf8(sEntityName);
+		
+		auto spScene = ScriptEngine::GetRuntimeScene();
+		auto spEntity = spScene->GetEntityByName(pEntityName);
+		mono_free(pEntityName);
+		if (spEntity == nullptr)
+		{
+			return 0;
+		}
+		else
+		{
+			return spEntity->GetUUID();
+		}
+	}
+
+	MonoObject* GetScriptEntityInstance(UUID entityID)
+	{
+		return ScriptEngine::GetMonoObject(entityID);
+	}
+
 	void TransformComponentGetTranslation(UUID entityID, glm::vec3* vec3Par)
 	{
 		auto spScene = ScriptEngine::GetRuntimeScene();
@@ -96,6 +118,8 @@ namespace
 void ScriptGlue::RegisterFunctions()
 {  
 	SAND_TABLE_INTERNAL_CALL(EntityHasComponet);
+	SAND_TABLE_INTERNAL_CALL(EntityFindEntityByName);
+	SAND_TABLE_INTERNAL_CALL(GetScriptEntityInstance);
 
 	SAND_TABLE_INTERNAL_CALL(TransformComponentGetTranslation);
 	SAND_TABLE_INTERNAL_CALL(TransformComponentSetTranslation);
