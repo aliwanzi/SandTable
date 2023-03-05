@@ -1,7 +1,7 @@
 #include "pch.h"
 #include "OpenGLVertexArray.h"
 #include "GL/gl3w.h"
-#include "SandTable/Debug/Instrumentor.h"
+#include "SandTable/Statics/Instrumentor.h"
 
 SAND_TABLE_NAMESPACE_BEGIN
 

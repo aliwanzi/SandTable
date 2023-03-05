@@ -4,7 +4,7 @@
 #include "GLFW/glfw3.h"
 #include "examples/imgui_impl_glfw.h"
 #include "examples/imgui_impl_opengl3.h"
-#include "SandTable/Debug/Instrumentor.h"
+#include "SandTable/Statics/Instrumentor.h"
 #include "ImGuizmo.h"
 
 SAND_TABLE_NAMESPACE_BEGIN

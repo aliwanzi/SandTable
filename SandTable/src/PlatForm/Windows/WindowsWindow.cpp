@@ -3,7 +3,7 @@
 #include "GL/gl3w.h"
 #include "WindowsWindow.h"
 #include "PlatForm/OpenGL/OpenGLContext.h"
-#include "SandTable/Debug/Instrumentor.h"
+#include "SandTable/Statics/Instrumentor.h"
 
 SAND_TABLE_NAMESPACE_BEGIN
 

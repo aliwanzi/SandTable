@@ -8,11 +8,11 @@
 #include "SandTable/Render/Buffer/IndexBuffer.h"
 #include "SandTable/Render/Texture/Texture2D.h"
 
-#include "SandTable/Debug/Instrumentor.h"
-#include "SandTable/Debug/DrawStatistics/DrawStatistics.h"
-#include "SandTable/Debug/DrawStatistics/QuadDrawStatics.h"
-#include "SandTable/Debug/DrawStatistics/CircleDrawStatics.h"
-#include "SandTable/Debug/DrawStatistics/LineDrawStatics.h"
+#include "SandTable/Statics/Instrumentor.h"
+#include "SandTable/Statics/DrawStatistics/DrawStatistics.h"
+#include "SandTable/Statics/DrawStatistics/QuadDrawStatics.h"
+#include "SandTable/Statics/DrawStatistics/CircleDrawStatics.h"
+#include "SandTable/Statics/DrawStatistics/LineDrawStatics.h"
 
 #include "SandTable/Scene/Components.h"
 

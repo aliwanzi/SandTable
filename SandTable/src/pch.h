@@ -18,7 +18,7 @@
 
 #include "SandTable/Core/Core.h"
 #include "SandTable/Core/Logger.h"
-#include "SandTable/Debug/Instrumentor.h"
+#include "SandTable/Statics/Instrumentor.h"
 #include "SandTable/Core/TimeStep.h"
 
 #define GLM_ENABLE_EXPERIMENTAL

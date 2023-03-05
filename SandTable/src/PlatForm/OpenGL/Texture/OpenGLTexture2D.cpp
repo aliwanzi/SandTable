@@ -2,7 +2,7 @@
 #include "OpenGLTexture2D.h"
 #include "GL/gl3w.h"
 #include "stb_image.h"
-#include "SandTable/Debug/Instrumentor.h"
+#include "SandTable/Statics/Instrumentor.h"
 
 SAND_TABLE_NAMESPACE_BEGIN
 namespace

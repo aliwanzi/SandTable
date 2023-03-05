@@ -1,23 +1,108 @@
 Scene: Untitled
 Entities:
+  - Entity: 11625224711956992940
+    TagComponent:
+      Tag: Floor
+    TransformComponent:
+      Translation: [-6.59199238, -0.2398213, 0]
+      Rotation: [0, 0, -1.56544507]
+      Scale: [9.40447998, 0.999970675, 0.999996662]
+    SpriteRenderComponent:
+      Color: [1, 1, 1, 1]
+      TexturePath: assets\games\Angry Birds\elementWood012.png
+    RigidBody2DComponent:
+      BodyType: 0
+      FixedRotation: false
+    BoxCollider2DComponent:
+      Offset: [0, 0]
+      Size: [0.5, 0.5]
+      Density: 1
+      Friction: 0.5
+      Restitution: 0
+      RestitutionThreshold: 0.5
+  - Entity: 13956043482832086674
+    TagComponent:
+      Tag: Dynamic
+    TransformComponent:
+      Translation: [2.86578631, -3.20945764, -0.00100000005]
+      Rotation: [0.054967124, 2.47731293e-07, -2.63344901e-13]
+      Scale: [1.5, 1.50000012, 0.999980211]
+    SpriteRenderComponent:
+      Color: [1, 1, 1, 1]
+      TexturePath: assets\games\Angry Birds\elementWood038.png
+    RigidBody2DComponent:
+      BodyType: 1
+      FixedRotation: false
+    BoxCollider2DComponent:
+      Offset: [0, 0]
+      Size: [0.5, 0.5]
+      Density: 0.879999995
+      Friction: 0.100000001
+      Restitution: 0.819999993
+      RestitutionThreshold: 0.5
+  - Entity: 5764277066226701586
+    TagComponent:
+      Tag: Circle Entity
+    TransformComponent:
+      Translation: [-3.33286309, 0.445802897, -1.14684191e-07]
+      Rotation: [0.133266538, -0.0705394894, 0.484024078]
+      Scale: [1, 0.999999762, 0.999999881]
+    CircleRenderComponent:
+      Color: [1, 1, 1, 1]
+      Thickness: 1
+      Fade: 0.00499999989
+      TexturePath: assets\games\Angry Birds\pig.png
+    RigidBody2DComponent:
+      BodyType: 1
+      FixedRotation: false
+    CircleCollider2DComponent:
+      Offset: [0, 0]
+      Radius: 0.5
+      Density: 0.100000001
+      Friction: 0.5
+      Restitution: 0.850000024
+      RestitutionThreshold: 0.5
+  - Entity: 18295094160298867612
+    TagComponent:
+      Tag: Circle Entity
+    TransformComponent:
+      Translation: [0.0157400221, 3.3285501, 0]
+      Rotation: [0.133266538, -0.0705394894, 0.484024078]
+      Scale: [1, 0.999999762, 0.999999881]
+    CircleRenderComponent:
+      Color: [1, 1, 1, 1]
+      Thickness: 1
+      Fade: 0.00499999989
+      TexturePath: assets\games\Angry Birds\pig.png
+    RigidBody2DComponent:
+      BodyType: 1
+      FixedRotation: false
+    CircleCollider2DComponent:
+      Offset: [0, 0]
+      Radius: 0.5
+      Density: 0.100000001
+      Friction: 0.5
+      Restitution: 0.850000024
+      RestitutionThreshold: 0.5
   - Entity: 4403475048105556496
     TagComponent:
       Tag: Player
     TransformComponent:
-      Translation: [-0.0206119455, 5.13242722, 0]
+      Translation: [-0.737471282, -1.28054678, 0]
       Rotation: [0, 0, 0]
-      Scale: [1, 1, 1]
+      Scale: [1.25, 1.25, 1]
     ScriptComponent:
       ClassName: SandTable.Player
       ScriptFields:
         - Name: Speed
           Type: Float
-          Data: 1.25
+          Data: 3
         - Name: Time
           Type: Float
           Data: 0
     SpriteRenderComponent:
       Color: [1, 1, 1, 1]
+      TexturePath: assets\games\Angry Birds\bird.png
     RigidBody2DComponent:
       BodyType: 1
       FixedRotation: false
@@ -52,9 +137,9 @@ Entities:
     TagComponent:
       Tag: Floor
     TransformComponent:
-      Translation: [-6.59199238, -0.2398213, 0]
-      Rotation: [0, 0, -1.56544507]
-      Scale: [9.40447998, 0.999970675, 0.999996662]
+      Translation: [-0.101502299, 4.9719286, 0]
+      Rotation: [0, 0, 0]
+      Scale: [13.6645231, 0.999962807, 0.999996662]
     SpriteRenderComponent:
       Color: [1, 1, 1, 1]
       TexturePath: assets\games\Angry Birds\elementWood012.png
@@ -132,7 +217,7 @@ Entities:
     TagComponent:
       Tag: Circle Entity
     TransformComponent:
-      Translation: [0.0157400295, 3.34792423, 0]
+      Translation: [3.75578427, -0.354141355, 0]
       Rotation: [0.133266538, -0.0705394894, 0.484024078]
       Scale: [1, 0.999999762, 0.999999881]
     CircleRenderComponent:
@@ -148,7 +233,7 @@ Entities:
       Radius: 0.5
       Density: 1
       Friction: 0.5
-      Restitution: 0
+      Restitution: 0.850000024
       RestitutionThreshold: 0.5
   - Entity: 6358530233907356829
     TagComponent:
@@ -221,19 +306,19 @@ Entities:
           Data: 0
         - Name: DistanceFromPlayer
           Type: Float
-          Data: 8
+          Data: 12
   - Entity: 11357024064893281421
     TagComponent:
       Tag: Dynamic
     TransformComponent:
-      Translation: [4.86145544, -3.20945764, -0.00100000005]
+      Translation: [-0.679917157, 0.994996667, -0.00100000005]
       Rotation: [0.054967124, 2.47731293e-07, -2.63344901e-13]
       Scale: [1.5, 1.50000012, 0.999980211]
     SpriteRenderComponent:
       Color: [1, 1, 1, 1]
       TexturePath: assets\games\Angry Birds\elementWood038.png
     RigidBody2DComponent:
-      BodyType: 1
+      BodyType: 0
       FixedRotation: false
     BoxCollider2DComponent:
       Offset: [0, 0]
@@ -266,7 +351,7 @@ Entities:
     TagComponent:
       Tag: Dynamic
     TransformComponent:
-      Translation: [-5.03901005, -3.16912985, -0.00100000005]
+      Translation: [-4.20586681, -3.22725606, -0.00100000005]
       Rotation: [0, 0, 0]
       Scale: [1.5, 1.5, 1]
     SpriteRenderComponent:

@@ -2,7 +2,7 @@
 #include "OpenGLShader.h"
 #include "GL/gl3w.h"
 #include "SandTable/Core/Logger.h"
-#include "SandTable/Debug/Instrumentor.h"
+#include "SandTable/Statics/Instrumentor.h"
 
 SAND_TABLE_NAMESPACE_BEGIN
 
