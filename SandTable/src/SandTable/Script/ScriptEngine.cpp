@@ -18,14 +18,14 @@ namespace
 {
 	struct ScriptEngineData
 	{
-		Ref<MonoDomain> RootDomain = nullptr;
-		Ref<MonoDomain> AppDomain = nullptr;
+		MonoDomain* RootDomain = nullptr;
+		MonoDomain* AppDomain = nullptr;
 
-		Ref<MonoAssembly> CoreAssembly = nullptr;
-		Ref<MonoImage> CoreMonoImage = nullptr;
+		MonoAssembly* CoreAssembly = nullptr;
+		MonoImage* CoreMonoImage = nullptr;
 
-		Ref<MonoAssembly> AppAssembly = nullptr;
-		Ref<MonoImage> AppMonoImage = nullptr;
+		MonoAssembly* AppAssembly = nullptr;
+		MonoImage* AppMonoImage = nullptr;
 
 		Ref<ScriptEntityClass> CoreScriptEntityClass;
 		MapScriptEntityClass AppScriptEntityClassMap;
@@ -35,10 +35,22 @@ namespace
 
 		//
 		Ref<Scene> SceneContext;
+
+		~ScriptEngineData()
+		{
+			LOG_DEV_INFO("ScriptEngineData Dtor");
+			mono_domain_set(mono_get_root_domain(), false);
+
+			mono_domain_unload(AppDomain);
+			AppDomain = nullptr;
+
+			mono_jit_cleanup(RootDomain);
+			RootDomain = nullptr;
+		}
 	};
 	static Ref<ScriptEngineData> spScriptEngineData;
 
-	void LoadAssembly(const std::filesystem::path& sAssemblyPath, Ref<MonoAssembly>& spMonoAssembly, Ref<MonoImage>& spMonoImage)
+	void LoadAssembly(const std::filesystem::path& sAssemblyPath, MonoAssembly*& pMonoAssembly, MonoImage*& pMonoImage)
 	{
 		std::ifstream stream(sAssemblyPath, std::ios::binary | std::ios::ate);
 		if (!stream)
@@ -59,19 +71,19 @@ namespace
 		stream.close();
 
 		MonoImageOpenStatus status;
-		MonoImage* pMonoImage = mono_image_open_from_data_full(spFileData.get(), iFileSize, true, &status, false);
+		MonoImage* MonoImage = mono_image_open_from_data_full(spFileData.get(), iFileSize, true, &status, false);
 		if (status != MONO_IMAGE_OK)
 		{
 			SAND_TABLE_ASSERT(false, mono_image_strerror(status));
 		}
 
-		spMonoAssembly = Ref<MonoAssembly>(mono_assembly_load_from_full(pMonoImage, sAssemblyPath.string().c_str(), &status, false));
+		pMonoAssembly = mono_assembly_load_from_full(MonoImage, sAssemblyPath.string().c_str(), &status, false);
 		if (status != MONO_IMAGE_OK)
 		{
 			SAND_TABLE_ASSERT(false, mono_image_strerror(status));
 		}
 
-		spMonoImage = Ref<MonoImage>(mono_assembly_get_image(spMonoAssembly.get()));
+		pMonoImage = mono_assembly_get_image(pMonoAssembly);
 		mono_image_close(pMonoImage);
 	}
 
@@ -99,16 +111,17 @@ void ScriptEngine::InitMono()
 	mono_set_assemblies_path("script/mono/lib");
 
 	spScriptEngineData = CreateRef<ScriptEngineData>();
-	spScriptEngineData->RootDomain = Ref<MonoDomain>(mono_jit_init("SandTableScriptRuntime"));
-	SAND_TABLE_ASSERT(spScriptEngineData->RootDomain, "RootDomain is null in InitMono");
 
-	spScriptEngineData->AppDomain = Ref<MonoDomain>(mono_domain_create_appdomain("SandTableScriptRuntime", nullptr));
-	SAND_TABLE_ASSERT(spScriptEngineData->AppDomain, "AppDomain is null in InitMono");
-	mono_domain_set(spScriptEngineData->AppDomain.get(), true);
+	spScriptEngineData->RootDomain = mono_jit_init("SandTableScriptRuntime");
+	SAND_TABLE_ASSERT(spScriptEngineData->RootDomain, "RootDomain is null in InitMono");
 }
 
 void ScriptEngine::LoadAssemblyAndMonoImage()
 {
+	spScriptEngineData->AppDomain = mono_domain_create_appdomain("SandTableScriptRuntime", nullptr);
+	SAND_TABLE_ASSERT(spScriptEngineData->AppDomain, "AppDomain is null in InitMono");
+	mono_domain_set(spScriptEngineData->AppDomain, true);
+
 	LoadAssembly("script/SandTableScript.dll", spScriptEngineData->CoreAssembly, spScriptEngineData->CoreMonoImage);
 	LoadAssembly("script/SandBoxScript.dll", spScriptEngineData->AppAssembly, spScriptEngineData->AppMonoImage);
 }
@@ -213,14 +226,26 @@ void ScriptEngine::OnRuntimeStop()
 	spScriptEngineData->ScriptEntityInstanceMap.clear();
 }
 
+void ScriptEngine::ReloadAssembly()
+{
+	mono_domain_set(mono_get_root_domain(), false);
+
+	mono_domain_unload(spScriptEngineData->AppDomain);
+
+	LoadAssemblyAndMonoImage();
+
+	LoadAssemblyClass();
+
+	ScriptGlue::RegisterComponents();
+}
+
 void ScriptEngine::LoadAssemblyClass()
 {
 	spScriptEngineData->CoreScriptEntityClass = CreateRef<ScriptEntityClass>("SandTable", "Entity",
 		spScriptEngineData->CoreMonoImage, spScriptEngineData->AppDomain);
-	MonoClass* pCoreClass = mono_class_from_name(spScriptEngineData->CoreMonoImage.get(),
-		"SandTable", "Entity");
+	MonoClass* pCoreClass = mono_class_from_name(spScriptEngineData->CoreMonoImage,"SandTable", "Entity");
 
-	const auto& pMonoImage = spScriptEngineData->AppMonoImage.get();
+	const auto& pMonoImage = spScriptEngineData->AppMonoImage;
 	const MonoTableInfo* pClassNameType = mono_image_get_table_info(pMonoImage, MONO_TABLE_TYPEDEF);
 	int iClassNum = mono_table_info_get_rows(pClassNameType);
 
@@ -277,7 +302,7 @@ void ScriptEngine::LoadAssemblyClass()
 	}
 }
 
-const Ref<MonoImage>& ScriptEngine::GetCoreAssemblyImage()
+MonoImage* ScriptEngine::GetCoreAssemblyImage()
 {
 	return spScriptEngineData->CoreMonoImage;
 }

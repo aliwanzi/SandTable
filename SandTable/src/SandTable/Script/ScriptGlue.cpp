@@ -29,7 +29,7 @@ namespace
 		std::string sStructName = sTypeName.substr(iPos + 1);
 		std::string sComponentName = fmt::format("SandTable.{}", sStructName);
 
-		MonoType* pMonoType = mono_reflection_type_from_name(sComponentName.data(), ScriptEngine::GetCoreAssemblyImage().get());
+		MonoType* pMonoType = mono_reflection_type_from_name(sComponentName.data(), ScriptEngine::GetCoreAssemblyImage());
 		if (pMonoType == nullptr)
 		{
 			LOG_DEV_ERROR("could not find component {}", sComponentName);

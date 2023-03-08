@@ -8,7 +8,7 @@ class ScriptEntityClass
 public:
 	ScriptEntityClass();
 	ScriptEntityClass(const std::string& sClassNameSpace, const std::string& sClassName,
-		const Ref<MonoImage>& spMonoImage, const Ref<MonoDomain>& spMonoDomain);
+		MonoImage* pMonoImage, MonoDomain* pMonoDomain);
 
 	MonoObject* GetMonoObject();
 

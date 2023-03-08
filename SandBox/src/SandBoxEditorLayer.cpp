@@ -205,6 +205,16 @@ void SandBoxEditorLayer::OnImGuiRender()
 			if (ImGui::MenuItem("Exit")) { Application::GetApplication()->Close(); }
 			ImGui::EndMenu();
 		}
+
+		if (ImGui::BeginMenu("Script"))
+		{
+			if (ImGui::MenuItem("Reload assembly","Ctrl+R"))
+			{
+				ScriptEngine::ReloadAssembly();
+			}
+			ImGui::EndMenu();
+		}
+
 		ImGui::EndMenuBar();
 	}
 

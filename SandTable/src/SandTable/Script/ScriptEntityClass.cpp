@@ -7,10 +7,10 @@
 SAND_TABLE_NAMESPACE_BEGIN
 
 ScriptEntityClass::ScriptEntityClass(const std::string& sClassNameSpace, const std::string& sClassName,
-	const Ref<MonoImage>& spMonoImage, const Ref<MonoDomain>& spMonoDomain)
+	MonoImage* pMonoImage, MonoDomain* pMonoDomain)
 {
-	m_pMonoClass = mono_class_from_name(spMonoImage.get(), sClassNameSpace.c_str(), sClassName.c_str());
-	m_pMonoObject = mono_object_new(spMonoDomain.get(), m_pMonoClass);
+	m_pMonoClass = mono_class_from_name(pMonoImage, sClassNameSpace.c_str(), sClassName.c_str());
+	m_pMonoObject = mono_object_new(pMonoDomain, m_pMonoClass);
 	mono_runtime_object_init(m_pMonoObject);
 }
 

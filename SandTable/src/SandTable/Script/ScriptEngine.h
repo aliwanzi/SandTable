@@ -12,7 +12,7 @@ class ScriptEngine
 public:
 	static void Init();
 
-	static const Ref<MonoImage>& GetCoreAssemblyImage();
+	static MonoImage* GetCoreAssemblyImage();
 
 	static void OnCreateEntity(Ref<Entity> spEntity);
 	static void OnUpdateEntity(Ref<Entity> spEntity,TimeStep fTimeStep);
@@ -29,6 +29,8 @@ public:
 	static void OnRuntimeStart(Ref<Scene> spScene);
 	static const Ref<Scene>& GetRuntimeScene();
 	static void OnRuntimeStop();
+
+	static void ReloadAssembly();
 private:
 	static void InitMono();
 	static void LoadAssemblyAndMonoImage();
