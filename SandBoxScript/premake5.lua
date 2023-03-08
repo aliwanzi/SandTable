@@ -1,3 +1,24 @@
+local SandTableRootDir = '../'
+include (SandTableRootDir .. "/vendor/premake/premake_customization/solution_items.lua")
+
+workspace "SandBoxScript"
+	architecture "x86_64"
+	startproject "SandBoxScript"
+
+	configurations
+	{
+		"Debug",
+		"Release",
+		"Dist"
+	}
+
+	flags
+	{
+		"MultiProcessorCompile"
+	}
+
+outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
+
 project "SandBoxScript"
 	kind "SharedLib"
 	language "C#"
@@ -15,7 +36,7 @@ project "SandBoxScript"
 	{
 		"SandTableScript"
 	}
-	
+
 	filter "configurations:Debug"
 		optimize "Off"
 		symbols "Default"
@@ -27,3 +48,6 @@ project "SandBoxScript"
 	filter "configurations:Dist"
 		optimize "Full"
 		symbols "Off"
+
+
+include (SandTableRootDir .. "/SandTableScript")
