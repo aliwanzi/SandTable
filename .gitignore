@@ -372,3 +372,6 @@ FodyWeavers.xsd
 /bin-int/
 /bin/
 /SandBox/assets/script/
+/SandBoxScript/bin-int/
+SandTableScript.dll
+SandBoxScript.dll
