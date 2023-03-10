@@ -20,7 +20,8 @@ project "SandBox"
 		"%{wks.location}/SandTable/vendor",
 		"%{IncludeDir.glm}",
 		"%{IncludeDir.entt}",
-		"%{IncludeDir.Box2D}"
+		"%{IncludeDir.Box2D}",
+		"%{IncludeDir.filewatch}"
 	}
 
 	links

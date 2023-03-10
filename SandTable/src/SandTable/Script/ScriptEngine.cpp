@@ -3,6 +3,7 @@
 #include "ScriptGlue.h"
 #include "ScriptEntityInstance.h"
 #include "ScriptEntityClass.h"
+#include "SandTable/Core/Application.h"
 
 #include "mono/jit/jit.h"
 #include "mono/metadata/assembly.h"
@@ -11,6 +12,8 @@
 
 #include "SandTable/Scene/Scene.h"
 #include "SandTable/Scene/Entity.h"
+
+#include "FileWatch.h"
 
 SAND_TABLE_NAMESPACE_BEGIN
 
@@ -33,8 +36,12 @@ namespace
 		MapScriptEntityInstance ScriptEntityInstanceMap;
 		std::unordered_map<UUID, MapScriptField> ScriptFieldMap;
 
-		//
 		Ref<Scene> SceneContext;
+
+		Scope<filewatch::FileWatch<std::string>> AppAssemblyFileWatcher;
+		bool AssemblyReloadPending = false;
+
+		bool EnableDebugging = true;
 
 		~ScriptEngineData()
 		{
@@ -93,6 +100,20 @@ namespace
 		SAND_TABLE_ASSERT(ScriptFieldTypeMap.find(sTypeName) != ScriptFieldTypeMap.end(), "do not find MonoType in ScriptEngine");
 		return ScriptFieldTypeMap.at(sTypeName);
 	}
+
+	void OnAppAssemblyFileSystemEvent(const std::string& sFilePath, const filewatch::Event eventType)
+	{
+		LOG_DEV_INFO("Path is {0}, Event Type is {1}", sFilePath, int(eventType));
+		if (!spScriptEngineData->AssemblyReloadPending && eventType == filewatch::Event::modified)
+		{
+			spScriptEngineData->AssemblyReloadPending = true;
+			Application::GetApplication()->SubmitToMainThreadQueue([]()
+				{
+					spScriptEngineData->AppAssemblyFileWatcher.reset();
+					ScriptEngine::ReloadAssembly();
+				});
+		}
+	}
 }
 
 void ScriptEngine::Init()
@@ -124,6 +145,10 @@ void ScriptEngine::LoadAssemblyAndMonoImage()
 
 	LoadAssembly("script/SandTableScript.dll", spScriptEngineData->CoreAssembly, spScriptEngineData->CoreMonoImage);
 	LoadAssembly("script/SandBoxScript.dll", spScriptEngineData->AppAssembly, spScriptEngineData->AppMonoImage);
+
+	spScriptEngineData->AssemblyReloadPending = false;
+	spScriptEngineData->AppAssemblyFileWatcher = CreateScope<filewatch::FileWatch<std::string>>(
+		"script/SandBoxScript.dll", OnAppAssemblyFileSystemEvent);
 }
 
 void ScriptEngine::OnCreateEntity(Ref<Entity> spEntity)
@@ -228,6 +253,7 @@ void ScriptEngine::OnRuntimeStop()
 
 void ScriptEngine::ReloadAssembly()
 {
+	LOG_DEV_INFO("ReloadAssembly Begin");
 	mono_domain_set(mono_get_root_domain(), false);
 
 	mono_domain_unload(spScriptEngineData->AppDomain);
@@ -237,6 +263,7 @@ void ScriptEngine::ReloadAssembly()
 	LoadAssemblyClass();
 
 	ScriptGlue::RegisterComponents();
+	LOG_DEV_INFO("ReloadAssembly End");
 }
 
 void ScriptEngine::LoadAssemblyClass()

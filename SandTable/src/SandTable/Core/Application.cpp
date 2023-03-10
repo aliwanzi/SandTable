@@ -100,6 +100,8 @@ void Application::Run()
 		TimeStep timeStep = fTime - m_fLastFrameTime;
 		m_fLastFrameTime = fTime;
 
+		ExecuteMainThreadQueue();
+
 		const auto& listLayers = m_spLayerStack->GetLayers();
 
 		if (!m_bMinimized)
@@ -207,6 +209,22 @@ Ref<Application> Application::GetApplication(Ref<ApplicationSpecification> spApp
 		m_spApplication->Init();
 	}
 	return m_spApplication;
+}
+
+void Application::SubmitToMainThreadQueue(const std::function<void()>& func)
+{
+	std::scoped_lock<std::mutex> lock(m_mutexMainThreadQueue);
+	m_vecMainThreadQueue.emplace_back(func);
+}
+
+void Application::ExecuteMainThreadQueue()
+{
+	std::scoped_lock<std::mutex> lock(m_mutexMainThreadQueue);
+	for (auto& func : m_vecMainThreadQueue)
+	{
+		func();
+	}
+	m_vecMainThreadQueue.clear();
 }
 
 SAND_TABLE_NAMESPACE_END

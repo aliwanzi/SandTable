@@ -40,9 +40,12 @@ public:
 	int GetWindowWidth() const;
 	int GetWindowHeight() const;
 	const Ref<Window>& GetWindow()const;
-	const Ref<ApplicationSpecification>& GetApplicationSpecification()const;
 
+	const Ref<ApplicationSpecification>& GetApplicationSpecification()const;
 	static Ref<Application> GetApplication(Ref<ApplicationSpecification> spApplicationSpecification = nullptr);
+
+	void SubmitToMainThreadQueue(const std::function<void()>& func);
+	void ExecuteMainThreadQueue();
 private:
 	void Init();
 	Application() = default;
@@ -72,6 +75,9 @@ private:
 	Ref<ApplicationSpecification> m_spApplicationSpecification;
 
 	static Ref<Application> m_spApplication;
+
+	std::vector<std::function<void()>> m_vecMainThreadQueue;
+	std::mutex m_mutexMainThreadQueue;
 };
 
 SAND_TABLE_NAMESPACE_END

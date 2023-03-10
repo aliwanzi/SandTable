@@ -11,6 +11,7 @@ IncludeDir["glm"] = "%{wks.location}/SandTable/vendor/glm"
 IncludeDir["entt"] = "%{wks.location}/SandTable/vendor/entt/include"
 IncludeDir["Box2D"] = "%{wks.location}/SandTable/vendor/Box2D/include"
 IncludeDir["mono"] = "%{wks.location}/SandTable/vendor/mono/include"
+IncludeDir["filewatch"] = "%{wks.location}/SandTable/vendor/filewatch/"
 
 LibraryDir = {}
 LibraryDir["mono"] = "%{wks.location}/SandTable/vendor/mono/lib/%{cfg.buildcfg}"
