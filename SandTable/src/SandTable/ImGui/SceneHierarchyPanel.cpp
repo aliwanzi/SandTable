@@ -225,11 +225,11 @@ void SceneHierarchyPanel::DrawComponents(const Ref<Entity>& spEntity)
 	if (spEntity->HasComponent<TagComponent>())
 	{
 		auto& tagComponent = spEntity->GetComponent<TagComponent>();
-		auto spBuffer = Ref<char>(new char[UCHAR_MAX], std::default_delete<char>());
-		strcpy_s(spBuffer.get(), UCHAR_MAX, tagComponent.Tag.c_str());
-		if (ImGui::InputText("Tag", spBuffer.get(), UCHAR_MAX))
+		auto spDataBuffer = CreateRef<DataBuffer>(UCHAR_MAX);
+		spDataBuffer->SetDataBuffer(tagComponent.Tag.c_str());
+		if (ImGui::InputText("Tag", spDataBuffer->As<char>(), UCHAR_MAX))
 		{
-			tagComponent.Tag = std::string(spBuffer.get());
+			tagComponent.Tag = std::string(spDataBuffer->As<char>());
 		}
 	}
 
@@ -345,11 +345,11 @@ void SceneHierarchyPanel::DrawComponents(const Ref<Entity>& spEntity)
 				ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.9f, 0.2f, 0.3f, 1.f));
 			}
 
-			auto spBuffer = Ref<char>(new char[UCHAR_MAX], std::default_delete<char>());
-			strcpy_s(spBuffer.get(), UCHAR_MAX, component.ClassName.c_str());
-			if (ImGui::InputText("Class", spBuffer.get(), UCHAR_MAX))
+			auto spDataBuffer = CreateRef<DataBuffer>(UCHAR_MAX);
+			spDataBuffer->SetDataBuffer(component.ClassName.c_str());
+			if (ImGui::InputText("Class", spDataBuffer->As<char>(), UCHAR_MAX))
 			{
-				component.ClassName = std::string(spBuffer.get());
+				component.ClassName = std::string(spDataBuffer->As<char>());
 			}
 
 			if (spScene->GetIsRunning())

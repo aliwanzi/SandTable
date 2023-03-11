@@ -26,7 +26,8 @@ MonoMethod* ScriptEntityClass::GetMonoMethod(const std::string& sMethodName, uns
 
 void ScriptEntityClass::InvokeMethod(MonoMethod* pMonoMethod, void** pParams)
 {
-	mono_runtime_invoke(pMonoMethod, m_pMonoObject, pParams, nullptr);
+	MonoObject* exception(nullptr);
+	mono_runtime_invoke(pMonoMethod, m_pMonoObject, pParams, &exception);
 }
 
 void ScriptEntityClass::AddScriptEntityField(const std::string& sFieldName, const ScriptField& scriptField)

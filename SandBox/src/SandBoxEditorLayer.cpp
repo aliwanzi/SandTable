@@ -452,7 +452,7 @@ void SandBoxEditorLayer::NewScene()
 
 void SandBoxEditorLayer::OpenScene()
 {
-	auto sFilePath = PlatformUtils::OpenFile("SandTable Scene (*.scene)\0*.scene\0");
+	auto sFilePath = FileSystem::OpenFile("SandTable Scene (*.scene)\0*.scene\0");
 	if (!sFilePath.empty())
 	{
 		OpenScene(sFilePath);
@@ -480,7 +480,7 @@ void SandBoxEditorLayer::OpenScene(const std::filesystem::path& path)
 
 void SandBoxEditorLayer::SaveSceneAs()
 {
-	auto sFilePath = PlatformUtils::SaveFile("SandTable Scene (*.scene)\0*.scene\0");
+	auto sFilePath = FileSystem::SaveFile("SandTable Scene (*.scene)\0*.scene\0");
 	if (!sFilePath.empty())
 	{
 		m_spSceneSerializer->Serialize(sFilePath);

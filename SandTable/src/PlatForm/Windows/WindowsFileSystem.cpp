@@ -1,5 +1,5 @@
 #include "pch.h"
-#include "SandTable/Utils/PlatformUtils.h"
+#include "SandTable/Core/FileSystem.h"
 #include "SandTable/Core/Application.h"
 #include <commdlg.h>
 #include <GLFW/glfw3.h>
@@ -9,7 +9,7 @@
 
 SAND_TABLE_NAMESPACE_BEGIN
 
-std::string PlatformUtils::OpenFile(const char* filter)
+std::string FileSystem::OpenFile(const char* filter)
 {
 	OPENFILENAMEA ofn;
 	CHAR szFile[UCHAR_MAX] = { 0 };
@@ -32,7 +32,7 @@ std::string PlatformUtils::OpenFile(const char* filter)
 
 }
 
-std::string PlatformUtils::SaveFile(const char* filter)
+std::string FileSystem::SaveFile(const char* filter)
 {
 	OPENFILENAMEA ofn;
 	CHAR szFile[UCHAR_MAX] = { 0 };
@@ -55,6 +55,30 @@ std::string PlatformUtils::SaveFile(const char* filter)
 		return ofn.lpstrFile;
 
 	return std::string();
+}
+
+Ref<DataBuffer> FileSystem::ReadFileDataBuffer(const std::filesystem::path& sFilePath)
+{
+	std::ifstream stream(sFilePath, std::ios::binary | std::ios::ate);
+	if (!stream)
+	{
+		SAND_TABLE_ASSERT(false, "Read File {0} Failed", sFilePath);
+		return nullptr;
+	}
+
+	std::streampos end = stream.tellg();
+	stream.seekg(0, std::ios::beg);
+	uint32_t uiFileData = static_cast<uint32_t>(end - stream.tellg());
+	if (uiFileData == 0)
+	{
+		SAND_TABLE_ASSERT(false, "Read File {0} is Null", sFilePath);
+		return nullptr;
+	}
+
+	auto spDataBuffer = CreateRef<DataBuffer>(uiFileData);
+	stream.read(spDataBuffer->As<char>(), uiFileData);
+	stream.close();
+	return spDataBuffer;
 }
 
 SAND_TABLE_NAMESPACE_END

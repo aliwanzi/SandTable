@@ -7,6 +7,7 @@
 #include "SandTable/Core/KeyCode.h"
 #include "SandTable/Core/MouseCode.h"
 #include "SandTable/Core/Input.h"
+#include "SandTable/Core/FileSystem.h"
 
 #include "SandTable/ImGui/ImGuiLayer.h"
 #include "SandTable/ImGui/SceneHierarchyPanel.h"
@@ -31,8 +32,6 @@
 #include "SandTable/Statics/DrawStatistics/QuadDrawStatics.h"
 
 #include "SandTable/System/ParticleSystem2D.h"
-
-#include "SandTable/Utils/PlatformUtils.h"
 
 #include "SandTable/Math/MathUtils.h"
 

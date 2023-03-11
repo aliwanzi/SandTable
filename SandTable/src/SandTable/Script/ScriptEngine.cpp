@@ -1,14 +1,19 @@
 #include "pch.h"
 #include "ScriptEngine.h"
 #include "ScriptGlue.h"
+
 #include "ScriptEntityInstance.h"
 #include "ScriptEntityClass.h"
+
 #include "SandTable/Core/Application.h"
+#include "SandTable/Core/FileSystem.h"
 
 #include "mono/jit/jit.h"
 #include "mono/metadata/assembly.h"
 #include "mono/metadata/object.h"
 #include "mono/metadata/tabledefs.h"
+#include "mono/metadata/mono-debug.h"
+#include "mono/metadata/threads.h"
 
 #include "SandTable/Scene/Scene.h"
 #include "SandTable/Scene/Entity.h"
@@ -59,29 +64,24 @@ namespace
 
 	void LoadAssembly(const std::filesystem::path& sAssemblyPath, MonoAssembly*& pMonoAssembly, MonoImage*& pMonoImage)
 	{
-		std::ifstream stream(sAssemblyPath, std::ios::binary | std::ios::ate);
-		if (!stream)
-		{
-			SAND_TABLE_ASSERT(false, "Read Assembly {0} Failed", sAssemblyPath);;
-		}
-
-		std::streampos end = stream.tellg();
-		stream.seekg(0, std::ios::beg);
-		uint32_t iFileSize = static_cast<uint32_t>(end - stream.tellg());
-		if (iFileSize == 0)
-		{
-			SAND_TABLE_ASSERT(false, "Read Assembly {0} is Null", sAssemblyPath);
-		}
-
-		auto spFileData = Ref<char>(new char[iFileSize], std::default_delete<char>());
-		stream.read(spFileData.get(), iFileSize);
-		stream.close();
-
+		auto spAssemblyData = FileSystem::ReadFileDataBuffer(sAssemblyPath);
 		MonoImageOpenStatus status;
-		MonoImage* MonoImage = mono_image_open_from_data_full(spFileData.get(), iFileSize, true, &status, false);
+		MonoImage* MonoImage = mono_image_open_from_data_full(spAssemblyData->As<char>(), spAssemblyData->GetDataBufferSize(), true, &status, false);
 		if (status != MONO_IMAGE_OK)
 		{
 			SAND_TABLE_ASSERT(false, mono_image_strerror(status));
+		}
+
+		if (spScriptEngineData->EnableDebugging)
+		{
+			std::filesystem::path sPdbPath = sAssemblyPath;
+			sPdbPath.replace_extension(".pdb");
+			if (std::filesystem::exists(sPdbPath))
+			{
+				auto spPdbData = FileSystem::ReadFileDataBuffer(sPdbPath);
+				mono_debug_open_image_from_memory(MonoImage, spPdbData->As<const mono_byte>(), spPdbData->GetDataBufferSize());
+				LOG_DEV_INFO("Trying to load pdb: {}", sPdbPath);
+			}
 		}
 
 		pMonoAssembly = mono_assembly_load_from_full(MonoImage, sAssemblyPath.string().c_str(), &status, false);
@@ -92,6 +92,8 @@ namespace
 
 		pMonoImage = mono_assembly_get_image(pMonoAssembly);
 		mono_image_close(pMonoImage);
+
+
 	}
 
 	ScriptFieldType MonoTypeToScriptFieldType(MonoType* pMonoType)
@@ -132,9 +134,25 @@ void ScriptEngine::InitMono()
 	mono_set_assemblies_path("script/mono/lib");
 
 	spScriptEngineData = CreateRef<ScriptEngineData>();
+	if (spScriptEngineData->EnableDebugging)
+	{
+		const char* argv[2] = {
+			"--debugger-agent=transport=dt_socket,address=127.0.0.1:2550,server=y,suspend=n,loglevel=3,logfile=MonoDebugger.log",
+			"--soft-breakpoints"
+		};
 
+		mono_jit_parse_options(2, (char**)argv);
+		mono_debug_init(MONO_DEBUG_FORMAT_MONO);
+	}
 	spScriptEngineData->RootDomain = mono_jit_init("SandTableScriptRuntime");
 	SAND_TABLE_ASSERT(spScriptEngineData->RootDomain, "RootDomain is null in InitMono");
+
+	if (spScriptEngineData->EnableDebugging)
+	{
+		mono_debug_domain_create(spScriptEngineData->RootDomain);
+	}
+
+	mono_thread_set_main(mono_thread_current());
 }
 
 void ScriptEngine::LoadAssemblyAndMonoImage()
@@ -270,7 +288,7 @@ void ScriptEngine::LoadAssemblyClass()
 {
 	spScriptEngineData->CoreScriptEntityClass = CreateRef<ScriptEntityClass>("SandTable", "Entity",
 		spScriptEngineData->CoreMonoImage, spScriptEngineData->AppDomain);
-	MonoClass* pCoreClass = mono_class_from_name(spScriptEngineData->CoreMonoImage,"SandTable", "Entity");
+	MonoClass* pCoreClass = mono_class_from_name(spScriptEngineData->CoreMonoImage, "SandTable", "Entity");
 
 	const auto& pMonoImage = spScriptEngineData->AppMonoImage;
 	const MonoTableInfo* pClassNameType = mono_image_get_table_info(pMonoImage, MONO_TABLE_TYPEDEF);
@@ -278,11 +296,15 @@ void ScriptEngine::LoadAssemblyClass()
 
 	for (int i = 0; i < iClassNum; i++)
 	{
-		auto spTableInfos = Ref<uint32_t>(new uint32_t[MONO_TYPEDEF_SIZE], std::default_delete<uint32_t>());
-		mono_metadata_decode_row(pClassNameType, i, spTableInfos.get(), MONO_TYPEDEF_SIZE);
+		//auto spTableInfos = Ref<uint32_t>(new uint32_t[MONO_TYPEDEF_SIZE], std::default_delete<uint32_t>());
+		auto uint8 = sizeof(uint8_t);
+		auto uint32 = sizeof(uint32_t);
 
-		const char* pClassNameSpace = mono_metadata_string_heap(pMonoImage, spTableInfos.get()[MONO_TYPEDEF_NAMESPACE]);
-		const char* pClassName = mono_metadata_string_heap(pMonoImage, spTableInfos.get()[MONO_TYPEDEF_NAME]);
+		auto spTableInfo = CreateRef<DataBuffer>(MONO_TYPEDEF_SIZE * sizeof(uint32_t));
+		mono_metadata_decode_row(pClassNameType, i, spTableInfo->As<uint32_t>(), MONO_TYPEDEF_SIZE);
+
+		const char* pClassNameSpace = mono_metadata_string_heap(pMonoImage, spTableInfo->As<uint32_t>()[MONO_TYPEDEF_NAMESPACE]);
+		const char* pClassName = mono_metadata_string_heap(pMonoImage, spTableInfo->As<uint32_t>()[MONO_TYPEDEF_NAME]);
 		std::string sEntityClassName("");
 		if (strlen(pClassNameSpace) != 0)
 		{
