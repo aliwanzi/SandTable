@@ -62,7 +62,7 @@ Ref<DataBuffer> FileSystem::ReadFileDataBuffer(const std::filesystem::path& sFil
 	std::ifstream stream(sFilePath, std::ios::binary | std::ios::ate);
 	if (!stream)
 	{
-		SAND_TABLE_ASSERT(false, "Read File {0} Failed", sFilePath);
+		LOG_DEV_ERROR("Read File {0} Failed", sFilePath);
 		return nullptr;
 	}
 
@@ -71,7 +71,7 @@ Ref<DataBuffer> FileSystem::ReadFileDataBuffer(const std::filesystem::path& sFil
 	uint32_t uiFileData = static_cast<uint32_t>(end - stream.tellg());
 	if (uiFileData == 0)
 	{
-		SAND_TABLE_ASSERT(false, "Read File {0} is Null", sFilePath);
+		LOG_DEV_ERROR("Read File {0} is Null", sFilePath);
 		return nullptr;
 	}
 

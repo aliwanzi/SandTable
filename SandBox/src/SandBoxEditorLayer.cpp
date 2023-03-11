@@ -634,7 +634,10 @@ void SandBoxEditorLayer::UIToolbar()
 
 	if (bSimulate)
 	{
-		ImGui::SameLine();
+		if (bPlay)
+		{
+			ImGui::SameLine();
+		}
 		{
 			auto spIconTexture = (m_eSceneState == SceneState::Edit || m_eSceneState == SceneState::Play)
 				? m_spIcomSimulate : m_spIconStop;

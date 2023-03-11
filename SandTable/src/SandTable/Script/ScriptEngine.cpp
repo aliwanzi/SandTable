@@ -65,6 +65,10 @@ namespace
 	void LoadAssembly(const std::filesystem::path& sAssemblyPath, MonoAssembly*& pMonoAssembly, MonoImage*& pMonoImage)
 	{
 		auto spAssemblyData = FileSystem::ReadFileDataBuffer(sAssemblyPath);
+		if (spAssemblyData == nullptr)
+		{
+			return;
+		}
 		MonoImageOpenStatus status;
 		MonoImage* MonoImage = mono_image_open_from_data_full(spAssemblyData->As<char>(), spAssemblyData->GetDataBufferSize(), true, &status, false);
 		if (status != MONO_IMAGE_OK)
@@ -92,8 +96,6 @@ namespace
 
 		pMonoImage = mono_assembly_get_image(pMonoAssembly);
 		mono_image_close(pMonoImage);
-
-
 	}
 
 	ScriptFieldType MonoTypeToScriptFieldType(MonoType* pMonoType)
@@ -121,7 +123,10 @@ namespace
 void ScriptEngine::Init()
 {
 	InitMono();
-	LoadAssemblyAndMonoImage();
+	if (!LoadAssemblyAndMonoImage())
+	{
+		return;
+	}
 
 	ScriptGlue::RegisterFunctions();
 	ScriptGlue::RegisterComponents();
@@ -155,7 +160,7 @@ void ScriptEngine::InitMono()
 	mono_thread_set_main(mono_thread_current());
 }
 
-void ScriptEngine::LoadAssemblyAndMonoImage()
+bool ScriptEngine::LoadAssemblyAndMonoImage()
 {
 	spScriptEngineData->AppDomain = mono_domain_create_appdomain("SandTableScriptRuntime", nullptr);
 	SAND_TABLE_ASSERT(spScriptEngineData->AppDomain, "AppDomain is null in InitMono");
@@ -163,10 +168,17 @@ void ScriptEngine::LoadAssemblyAndMonoImage()
 
 	LoadAssembly("script/SandTableScript.dll", spScriptEngineData->CoreAssembly, spScriptEngineData->CoreMonoImage);
 	LoadAssembly("script/SandBoxScript.dll", spScriptEngineData->AppAssembly, spScriptEngineData->AppMonoImage);
+	if (spScriptEngineData->CoreAssembly==nullptr || spScriptEngineData->AppAssembly==nullptr)
+	{
+		LOG_DEV_ERROR("Load Assembly failed");
+		return false;
+	}
 
 	spScriptEngineData->AssemblyReloadPending = false;
 	spScriptEngineData->AppAssemblyFileWatcher = CreateScope<filewatch::FileWatch<std::string>>(
 		"script/SandBoxScript.dll", OnAppAssemblyFileSystemEvent);
+
+	return true;
 }
 
 void ScriptEngine::OnCreateEntity(Ref<Entity> spEntity)
@@ -196,9 +208,10 @@ void ScriptEngine::OnCreateEntity(Ref<Entity> spEntity)
 void ScriptEngine::OnUpdateEntity(Ref<Entity> spEntity, TimeStep fTimeStep)
 {
 	auto iter = spScriptEngineData->ScriptEntityInstanceMap.find(spEntity->GetUUID());
-	SAND_TABLE_ASSERT(iter != spScriptEngineData->ScriptEntityInstanceMap.end(), "not find Script Instance");
-
-	iter->second->InVokeOnUpdate(fTimeStep);
+	if (iter != spScriptEngineData->ScriptEntityInstanceMap.end())
+	{
+		iter->second->InVokeOnUpdate(fTimeStep);
+	}
 }
 
 const MapScriptEntityClass& ScriptEngine::GetScriptEntityClassMap()
@@ -276,7 +289,10 @@ void ScriptEngine::ReloadAssembly()
 
 	mono_domain_unload(spScriptEngineData->AppDomain);
 
-	LoadAssemblyAndMonoImage();
+	if (!LoadAssemblyAndMonoImage())
+	{
+		return;
+	}
 
 	LoadAssemblyClass();
 

@@ -33,7 +33,7 @@ public:
 	static void ReloadAssembly();
 private:
 	static void InitMono();
-	static void LoadAssemblyAndMonoImage();
+	static bool LoadAssemblyAndMonoImage();
 	static void LoadAssemblyClass();
 };
 
