@@ -24,7 +24,7 @@ namespace SandTable
 			Time += ts;
             // Console.WriteLine($"Player.OnUpdate: {ts}");
 
-            float speed = Speed*2;
+            float speed = Speed;
 			Vector3 velocity = Vector3.Zero;
 
 			if (Input.IsKeyDown(KeyCode.W))

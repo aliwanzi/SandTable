@@ -8,7 +8,8 @@ enum class SceneState
 {
 	Play = 0,
 	Edit,
-	Simulate
+	Simulate,
+	Pause
 };
 
 class UUID;
@@ -43,7 +44,10 @@ public:
 	Ref<Entity> GetEntityByName(const std::string_view& sEntityName);
 
 	bool GetIsRunning();
+	void SetPaused(bool bPaused);
+	bool GetPaused();
 
+	void Step(int iFrames = 1);
 private:
 	void OnPhysics2DStart();
 	void OnPhysics2DStop();
@@ -60,6 +64,8 @@ private:
 	std::unordered_map<UUID, Ref<Entity>> m_mapEntity;
 
 	bool m_bIsRunning;
+	bool m_bIsPaused;
+	int m_iStepFrames;
 };
 
 SAND_TABLE_NAMESPACE_END

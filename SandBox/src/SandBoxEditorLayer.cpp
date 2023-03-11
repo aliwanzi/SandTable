@@ -38,6 +38,8 @@ SandBoxEditorLayer::SandBoxEditorLayer()
 	m_spIconPlay = Texture2D::Create("assets/textures/Icons/PlayButton.png");
 	m_spIcomSimulate = Texture2D::Create("assets/textures/Icons/SimulateButton.png");
 	m_spIconStop = Texture2D::Create("assets/textures/Icons/StopButton.png");
+	m_spIconPause = Texture2D::Create("assets/textures/Icons/PauseButton.png");
+	m_spIconStep = Texture2D::Create("assets/textures/Icons/StepButton.png");
 }
 
 SandBoxEditorLayer::~SandBoxEditorLayer()
@@ -530,6 +532,16 @@ void SandBoxEditorLayer::OnSceneStop()
 
 }
 
+void SandBoxEditorLayer::OnScenePause()
+{
+	if (m_eSceneState == SceneState::Edit)
+	{
+		return;
+	}
+	m_eSceneState = SceneState::Pause;
+	m_spActiveScene->SetPaused(true);
+}
+
 void SandBoxEditorLayer::OnDuplicateEntity()
 {
 	if (m_eSceneState == SceneState::Edit)
@@ -583,13 +595,21 @@ void SandBoxEditorLayer::UIToolbar()
 	ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(buttonActive.x, buttonActive.y, buttonActive.z, 0.5f));
 
 	ImGui::Begin("#toolbar", nullptr, ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse);
-	
-	float size = ImGui::GetWindowHeight() - 4.0f;
+
 	ImVec4 tintColor = ImVec4(1, 1, 1, 1);
+
+	float size = ImGui::GetWindowHeight() - 4.0f;
+	ImGui::SetCursorPosX(ImGui::GetWindowContentRegionMax().x * 0.5f - size * 0.5f);
+
+
+	bool bPlay = m_eSceneState == SceneState::Edit || m_eSceneState == SceneState::Play;
+	bool bSimulate = m_eSceneState == SceneState::Edit || m_eSceneState == SceneState::Simulate;
+	bool bPause = m_eSceneState != SceneState::Edit;
+
+	if(bPlay)
 	{
 		auto spIconTexture = (m_eSceneState == SceneState::Edit || m_eSceneState == SceneState::Simulate)
 			? m_spIconPlay : m_spIconStop;
-		ImGui::SetCursorPosX(ImGui::GetWindowContentRegionMax().x * 0.5f - size * 0.5f);
 		if (ImGui::ImageButton((ImTextureID)(uint64_t)spIconTexture->GetRenderID(), ImVec2(size, size),
 			ImVec2(0, 0), ImVec2(1, 1), 0, ImVec4(0.0f, 0.0f, 0.0f, 0.0f), tintColor))
 		{
@@ -611,29 +631,56 @@ void SandBoxEditorLayer::UIToolbar()
 			}
 		}
 	}
-	ImGui::SameLine();
+
+	if (bSimulate)
 	{
-		auto spIconTexture = (m_eSceneState == SceneState::Edit || m_eSceneState == SceneState::Play)
-			? m_spIcomSimulate : m_spIconStop;
-		//ImGui::SetCursorPosX(ImGui::GetWindowContentRegionMax().x * 0.5f - size * 0.5f);
-		if (ImGui::ImageButton((ImTextureID)(uint64_t)spIconTexture->GetRenderID(), ImVec2(size, size),
-			ImVec2(0, 0), ImVec2(1, 1), 0, ImVec4(0.0f, 0.0f, 0.0f, 0.0f), tintColor))
+		ImGui::SameLine();
 		{
-			switch (m_eSceneState)
+			auto spIconTexture = (m_eSceneState == SceneState::Edit || m_eSceneState == SceneState::Play)
+				? m_spIcomSimulate : m_spIconStop;
+			if (ImGui::ImageButton((ImTextureID)(uint64_t)spIconTexture->GetRenderID(), ImVec2(size, size),
+				ImVec2(0, 0), ImVec2(1, 1), 0, ImVec4(0.0f, 0.0f, 0.0f, 0.0f), tintColor))
 			{
-			case SceneState::Simulate:
-			{
-				OnSceneStop();
-				break;
+				switch (m_eSceneState)
+				{
+				case SceneState::Simulate:
+				{
+					OnSceneStop();
+					break;
+				}
+				case SceneState::Edit:
+				case SceneState::Play:
+				{
+					OnSceneSimulate();
+					break;
+				}
+				default:
+					break;
+				}
 			}
-			case SceneState::Edit:
-			case SceneState::Play:
+		}
+	}
+
+	if (bPause)
+	{
+		bool bIsPaused = m_spActiveScene->GetPaused();
+		ImGui::SameLine();
+		{
+			if (ImGui::ImageButton((ImTextureID)(uint64_t)m_spIconPause->GetRenderID(), ImVec2(size, size),
+				ImVec2(0, 0), ImVec2(1, 1), 0, ImVec4(0.0f, 0.0f, 0.0f, 0.0f), tintColor))
 			{
-				OnSceneSimulate();
-				break;
+				m_spActiveScene->SetPaused(!bIsPaused);
 			}
-			default:
-				break;
+		}
+		if (bIsPaused)
+		{
+			ImGui::SameLine();
+			{
+				if (ImGui::ImageButton((ImTextureID)(uint64_t)m_spIconStep->GetRenderID(), ImVec2(size, size),
+					ImVec2(0, 0), ImVec2(1, 1), 0, ImVec4(0.0f, 0.0f, 0.0f, 0.0f), tintColor))
+				{
+					m_spActiveScene->Step();
+				}
 			}
 		}
 	}

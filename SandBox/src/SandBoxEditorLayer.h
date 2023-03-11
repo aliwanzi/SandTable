@@ -28,6 +28,7 @@ private:
 	void OnScenePlay();
 	void OnSceneSimulate();
 	void OnSceneStop();
+	void OnScenePause();
 
 	void UIToolbar();
 	void OnDuplicateEntity();
@@ -36,6 +37,8 @@ private:
 	Ref<Texture> m_spIconPlay;
 	Ref<Texture> m_spIcomSimulate;
 	Ref<Texture> m_spIconStop;
+	Ref<Texture> m_spIconPause;
+	Ref<Texture> m_spIconStep;
 
 	glm::vec4 m_vec4Color;
 

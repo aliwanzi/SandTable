@@ -38,7 +38,9 @@ Scene::Scene():
 	m_uiWidth(0),
 	m_uiHeight(0),
 	m_spPhysicsSystem2D(nullptr),
-	m_bIsRunning(false)
+	m_bIsRunning(false),
+	m_bIsPaused(false),
+	m_iStepFrames(0)
 {
 	LOG_DEV_INFO("Scene Creat");
 }
@@ -53,7 +55,9 @@ Scene::Scene(const Ref<Scene>& spScene):
 	m_uiWidth(spScene->m_uiWidth),
 	m_uiHeight(spScene->m_uiHeight),
 	m_spPhysicsSystem2D(nullptr),
-	m_bIsRunning(spScene->m_bIsRunning)
+	m_bIsRunning(spScene->m_bIsRunning),
+	m_bIsPaused(spScene->m_bIsPaused),
+	m_iStepFrames(spScene->m_iStepFrames)
 {
 	auto spSrcRegistry = spScene->m_spRegistry;
 	auto entity = spSrcRegistry->view<IDComponent>();
@@ -230,26 +234,29 @@ void Scene::OnShowPhysicsCollider(const Ref<Camera>& spCamera)
 
 void Scene::OnUpdate(const TimeStep& timeStep)
 {
+	if (!m_bIsPaused || m_iStepFrames -- > 0)
 	{
-		auto view = m_spRegistry->view<ScriptComponent>();
-		for (auto component : view)
 		{
-			auto spEntity = CreateRef<Entity>(m_spRegistry, component);
-			ScriptEngine::OnUpdateEntity(spEntity, timeStep);
+			auto view = m_spRegistry->view<ScriptComponent>();
+			for (auto component : view)
+			{
+				auto spEntity = CreateRef<Entity>(m_spRegistry, component);
+				ScriptEngine::OnUpdateEntity(spEntity, timeStep);
+			}
 		}
-	}
 
-	{
-		m_spPhysicsSystem2D->OnUpdate(timeStep);
-
-		auto components = m_spRegistry->view<RigidBody2DComponent>();
-		for (auto component : components)
 		{
-			auto spEntity = CreateRef<Entity>(m_spRegistry, component);
-			auto& transform = spEntity->GetComponent<TransformComponent>();
-			auto& rigidBody2D = spEntity->GetComponent<RigidBody2DComponent>();
+			m_spPhysicsSystem2D->OnUpdate(timeStep);
 
-			m_spPhysicsSystem2D->UpdateSystem(rigidBody2D, transform);
+			auto components = m_spRegistry->view<RigidBody2DComponent>();
+			for (auto component : components)
+			{
+				auto spEntity = CreateRef<Entity>(m_spRegistry, component);
+				auto& transform = spEntity->GetComponent<TransformComponent>();
+				auto& rigidBody2D = spEntity->GetComponent<RigidBody2DComponent>();
+
+				m_spPhysicsSystem2D->UpdateSystem(rigidBody2D, transform);
+			}
 		}
 	}
 
@@ -267,7 +274,6 @@ void Scene::OnUpdate(const TimeStep& timeStep)
 			}
 		}
 	}
-
 }
 
 void Scene::OnUpdate(const Ref<Camera>& spCamera)
@@ -277,6 +283,7 @@ void Scene::OnUpdate(const Ref<Camera>& spCamera)
 
 void Scene::OnUpdate(const TimeStep& timeStep, const Ref<Camera>& spCamera)
 {
+	if(!m_bIsPaused || m_iStepFrames-- > 0)
 	{
 		m_spPhysicsSystem2D->OnUpdate(timeStep);
 
@@ -362,6 +369,21 @@ Ref<Entity> Scene::GetEntityByName(const std::string_view& sEntityName)
 bool Scene::GetIsRunning()
 {
 	return m_bIsRunning;
+}
+
+void Scene::SetPaused(bool bPaused)
+{
+	m_bIsPaused = bPaused;
+}
+
+bool Scene::GetPaused()
+{
+	return m_bIsPaused;
+}
+
+void Scene::Step(int iFrames)
+{
+	m_iStepFrames = iFrames;
 }
 
 void Scene::RenderScene(const Ref<Camera>& spCamera)
