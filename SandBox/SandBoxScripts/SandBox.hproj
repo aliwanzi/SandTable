@@ -1,0 +1,5 @@
+Project:
+  Name: SandBox
+  StartScene: "scenes/player.scene"
+  AssetDirectory: "assets"
+  ScriptModulePath: "scripts/Binaries/SandBoxScript.dll"

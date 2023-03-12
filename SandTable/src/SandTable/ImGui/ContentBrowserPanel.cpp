@@ -1,10 +1,9 @@
 #include "pch.h"
 #include "SandTable/ImGui/ContentBrowserPanel.h"
 #include "SandTable/Render/Texture/Texture2D.h"
+#include "SandTable/Project/Project.h"
 #include <imgui.h>
 SAND_TABLE_NAMESPACE_BEGIN
-
-extern const std::filesystem::path sAssetsDirector = "assets";
 
 namespace
 {
@@ -13,20 +12,21 @@ namespace
 	const float fCellSize = fPadding + fThumbnailSize;
 }
 
-ContentBrowserPanel::ContentBrowserPanel() :
-	m_currentDirectory(sAssetsDirector)
+ContentBrowserPanel::ContentBrowserPanel()
 {
-	m_spDirectoryIcon = Texture2D::Create("assets/textures/Icons/ContentBrowser/DirectoryIcon.png");
-	m_spFileIcon = Texture2D::Create("assets/textures/Icons/ContentBrowser/FileIcon.png");
+	m_sBaseDirectory = Project::GetProjectInstance()->GetAssetDirectory();
+	m_sCurrentDirectory = m_sBaseDirectory;
+	m_spDirectoryIcon = Texture2D::Create("resources/Icons/ContentBrowser/DirectoryIcon.png");
+	m_spFileIcon = Texture2D::Create("resources/Icons/ContentBrowser/FileIcon.png");
 }
 
 void ContentBrowserPanel::OnImGuiRender()
 {
 	ImGui::Begin("Context Browser");
-	if (m_currentDirectory != std::filesystem::path(sAssetsDirector) &&
+	if (m_sCurrentDirectory != std::filesystem::path(m_sBaseDirectory) &&
 		ImGui::Button("<-"))
 	{
-		m_currentDirectory = m_currentDirectory.parent_path();
+		m_sCurrentDirectory = m_sCurrentDirectory.parent_path();
 	}
 
 	float panelWidth = ImGui::GetContentRegionAvail().x;
@@ -36,7 +36,7 @@ void ContentBrowserPanel::OnImGuiRender()
 
 	ImGui::Columns(iColumnCount, 0, false);
 
-	for (auto& directoryEntry : std::filesystem::directory_iterator(m_currentDirectory))
+	for (auto& directoryEntry : std::filesystem::directory_iterator(m_sCurrentDirectory))
 	{
 		const auto& path = directoryEntry.path();
 		std::string filenameString = path.filename().string();
@@ -49,8 +49,7 @@ void ContentBrowserPanel::OnImGuiRender()
 
 		if (ImGui::BeginDragDropSource())
 		{
-			auto relativePath = std::filesystem::relative(path, sAssetsDirector);
-			const wchar_t* itemPath = relativePath.c_str();
+			const wchar_t* itemPath = path.c_str();
 			ImGui::SetDragDropPayload("CONTENT_BROWSER_ITEM", itemPath, (wcslen(itemPath) + 1) * sizeof(wchar_t));
 			ImGui::EndDragDropSource();
 		}
@@ -59,7 +58,7 @@ void ContentBrowserPanel::OnImGuiRender()
 		if (ImGui::IsItemHovered() && ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left))
 		{
 			if (directoryEntry.is_directory())
-				m_currentDirectory /= path.filename();
+				m_sCurrentDirectory /= path.filename();
 		}
 		ImGui::TextWrapped(filenameString.c_str());
 

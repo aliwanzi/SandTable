@@ -3,8 +3,6 @@
 
 SAND_TABLE_NAMESPACE_BEGIN
 
-extern const std::filesystem::path sAssetsDirector;
-
 SandBoxEditorLayer::SandBoxEditorLayer()
 	:m_vec4Color(glm::vec4(0.2f, 0.3f, 0.8f, 1.0f)),
 	m_bViewportHovered(false),
@@ -20,7 +18,6 @@ SandBoxEditorLayer::SandBoxEditorLayer()
 
 	m_spEditorScene = CreateRef<Scene>();
 	m_spSceneHierarchyPanel = CreateRef<SceneHierarchyPanel>(m_spEditorScene);
-	m_spContentBrowserPanel = CreateRef<ContentBrowserPanel>();
 	m_spSceneSerializer = CreateRef<SceneSerializer>(m_spEditorScene);
 
 	std::vector<FrameBufferTextureSpecification> vecFrameBufferTextureSpecification =
@@ -35,11 +32,11 @@ SandBoxEditorLayer::SandBoxEditorLayer()
 
 	m_spFrameBuffer = FrameBuffer::Create(spFrameBufferSpecification);
 
-	m_spIconPlay = Texture2D::Create("assets/textures/Icons/PlayButton.png");
-	m_spIcomSimulate = Texture2D::Create("assets/textures/Icons/SimulateButton.png");
-	m_spIconStop = Texture2D::Create("assets/textures/Icons/StopButton.png");
-	m_spIconPause = Texture2D::Create("assets/textures/Icons/PauseButton.png");
-	m_spIconStep = Texture2D::Create("assets/textures/Icons/StepButton.png");
+	m_spIconPlay = Texture2D::Create("resources/Icons/PlayButton.png");
+	m_spIcomSimulate = Texture2D::Create("resources/Icons/SimulateButton.png");
+	m_spIconStop = Texture2D::Create("resources/Icons/StopButton.png");
+	m_spIconPause = Texture2D::Create("resources/Icons/PauseButton.png");
+	m_spIconStep = Texture2D::Create("resources/Icons/StepButton.png");
 }
 
 SandBoxEditorLayer::~SandBoxEditorLayer()
@@ -48,19 +45,14 @@ SandBoxEditorLayer::~SandBoxEditorLayer()
 
 void SandBoxEditorLayer::OnAttach()
 {
-	m_spCameraEntity = m_spEditorScene->CreateEntity("Camera Entity");
-	m_spCameraEntity->AddComponent<CameraComponent>();
-
-	m_spSquareEntity = m_spEditorScene->CreateEntity("Square Entity");
-	m_spSquareEntity->AddComponent<SpriteRenderComponent>();
-
-	m_spCameraEntity = m_spEditorScene->CreateEntity("Circle Entity");
-	m_spCameraEntity->AddComponent<CircleRenderComponent>();
-
 	auto commandLineArgs = Application::GetApplication()->GetApplicationSpecification()->CommandLineArgs;
 	if (commandLineArgs.Count>1)
 	{
-		OpenScene(commandLineArgs[1]);
+		OpenProject(commandLineArgs[1]);
+	}
+	else
+	{
+		OpenProject();
 	}
 }
 
@@ -291,7 +283,7 @@ void SandBoxEditorLayer::OnImGuiRender()
 		if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM"))
 		{
 			const wchar_t* path = (const wchar_t*)payload->Data;
-			OpenScene(std::filesystem::path(sAssetsDirector) / path);
+			OpenScene(path);
 		}
 		ImGui::EndDragDropTarget();
 	}
@@ -494,6 +486,30 @@ void SandBoxEditorLayer::SaveScene()
 	{
 		m_spSceneSerializer->Serialize(m_sEditorScenePath.string());
 	}
+}
+
+void SandBoxEditorLayer::OpenProject()
+{
+	std::string filepath = FileSystem::OpenFile("Hazel Project (*.hproj)\0*.hproj\0");
+	OpenProject(filepath);
+}
+
+void SandBoxEditorLayer::OpenProject(const std::filesystem::path& path)
+{
+	if (Project::Load(path))
+	{
+		ScriptEngine::Init();
+
+		auto sStartScenePath = Project::GetProjectInstance()->GetAssetFileSystemPath
+		(Project::GetProjectInstance()->GetProjectConfig()->StartScene);
+		OpenScene(sStartScenePath);
+		m_spContentBrowserPanel = CreateRef<ContentBrowserPanel>();
+	}
+}
+
+void SandBoxEditorLayer::SaveProject()
+{
+	//Project::SaveActive()
 }
 
 void SandBoxEditorLayer::OnScenePlay()

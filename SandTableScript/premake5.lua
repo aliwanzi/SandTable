@@ -3,7 +3,7 @@ project "SandTableScript"
 	language "C#"
 	dotnetframework "4.7.2"
 
-	targetdir ("../SandBox/script/")
+	targetdir ("../SandBox/resources/script/")
 	objdir ("%{wks.location}/bin-int/" .. outputdir .. "/%{prj.name}")
 
 	files 

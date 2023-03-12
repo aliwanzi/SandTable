@@ -3,16 +3,21 @@
 
 #ifdef SAND_TABLE_PLATFORM_WINDOWS
 
-int main()
+int main(int argc, char** argv)
 {
+	using namespace SandTable;
 	LOG_DEV_WARN("Initialize Log!");
 
+	auto spApplicationSpecification = CreateRef<ApplicationSpecification>();
+	spApplicationSpecification->Name = "SandBox";
+	spApplicationSpecification->CommandLineArgs = { argc, argv };
+	auto spApplication = SandTable::Application::GetApplication(spApplicationSpecification);
+
 	SAND_TABLE_PROFILE_BEGIN_SESSION("Startup", "SandTableProfile-Startup.json");
-	SandTable::Application::CreateApplication();
+	Application::CreateApplication();
 	SAND_TABLE_PROFILE_END_SESSION();
 
 	SAND_TABLE_PROFILE_BEGIN_SESSION("Runtime", "SandTableProfile-Runtime.json");
-	auto spApplication = SandTable::Application::GetApplication();
 	spApplication->Run();
 	SAND_TABLE_PROFILE_END_SESSION();
 

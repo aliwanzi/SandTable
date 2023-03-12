@@ -371,8 +371,7 @@ FodyWeavers.xsd
 *.csproj
 /bin-int/
 /bin/
-/SandBox/assets/script/
-/SandBoxScript/bin-int/
 SandTableScript.dll
 SandBoxScript.dll
 /SandTable/vendor
+/SandBox/SandBoxScripts/assets/scripts/bin-int/

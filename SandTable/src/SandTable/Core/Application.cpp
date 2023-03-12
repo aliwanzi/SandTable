@@ -24,7 +24,6 @@ void Application::Init()
 	SAND_TABLE_PROFILE_FUNCTION();
 	Render::Init();
 	Render2D::Init();
-	ScriptEngine::Init();
 	m_spLayerStack = CreateRef<LayerStack>();
 	m_spImGuiLayer = CreateRef<ImGuiLayer>();
 	PushOverlay(m_spImGuiLayer);

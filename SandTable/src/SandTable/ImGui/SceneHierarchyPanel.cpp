@@ -14,8 +14,6 @@
 
 SAND_TABLE_NAMESPACE_BEGIN
 
-extern const std::filesystem::path sAssetsDirector;
-
 namespace
 {
 	static void DrawVec3Control(const std::string& sLabel, glm::vec3& values, float resetValue = 0.0f, float columnWidth = 100.0f)
@@ -427,8 +425,7 @@ void SceneHierarchyPanel::DrawComponents(const Ref<Entity>& spEntity)
 					std::filesystem::path filePath((const wchar_t*)payload->Data);
 					if (filePath.extension().string() == ".png")
 					{
-						auto texturePath = sAssetsDirector / filePath;
-						component.spTexture = Texture2D::Create(texturePath.string());
+						component.spTexture = Texture2D::Create(filePath.string());
 					}
 					else
 					{
@@ -456,8 +453,7 @@ void SceneHierarchyPanel::DrawComponents(const Ref<Entity>& spEntity)
 					std::filesystem::path filePath((const wchar_t*)payload->Data);
 					if (filePath.extension().string() == ".png")
 					{
-						auto texturePath = sAssetsDirector / filePath;
-						component.spTexture = Texture2D::Create(texturePath.string());
+						component.spTexture = Texture2D::Create(filePath.string());
 					}
 					else
 					{

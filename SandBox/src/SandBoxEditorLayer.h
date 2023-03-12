@@ -19,11 +19,16 @@ public:
 private:
 	bool OnKeyPressed(KeyPressedEvent& e);
 	bool OnMousePressed(MouseButtonPressedEvent& e);
+
 	void NewScene();
 	void OpenScene();
 	void OpenScene(const std::filesystem::path& path);
 	void SaveSceneAs();
 	void SaveScene();
+
+	void OpenProject();
+	void OpenProject(const std::filesystem::path& path);
+	void SaveProject();
 
 	void OnScenePlay();
 	void OnSceneSimulate();

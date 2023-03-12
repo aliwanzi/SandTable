@@ -18,6 +18,8 @@
 #include "SandTable/Scene/Scene.h"
 #include "SandTable/Scene/Entity.h"
 
+#include "SandTable/Project/Project.h"
+
 #include "FileWatch.h"
 
 SAND_TABLE_NAMESPACE_BEGIN
@@ -136,7 +138,7 @@ void ScriptEngine::Init()
 
 void ScriptEngine::InitMono()
 {
-	mono_set_assemblies_path("script/mono/lib");
+	mono_set_assemblies_path("mono/lib");
 
 	spScriptEngineData = CreateRef<ScriptEngineData>();
 	if (spScriptEngineData->EnableDebugging)
@@ -166,8 +168,11 @@ bool ScriptEngine::LoadAssemblyAndMonoImage()
 	SAND_TABLE_ASSERT(spScriptEngineData->AppDomain, "AppDomain is null in InitMono");
 	mono_domain_set(spScriptEngineData->AppDomain, true);
 
-	LoadAssembly("script/SandTableScript.dll", spScriptEngineData->CoreAssembly, spScriptEngineData->CoreMonoImage);
-	LoadAssembly("script/SandBoxScript.dll", spScriptEngineData->AppAssembly, spScriptEngineData->AppMonoImage);
+	LoadAssembly("resources/script/SandTableScript.dll", spScriptEngineData->CoreAssembly, spScriptEngineData->CoreMonoImage);
+
+	auto scriptModulePath = Project::GetProjectInstance()->GetAssetDirectory() /
+		Project::GetProjectInstance()->GetProjectConfig()->ScriptModulePath;
+	LoadAssembly(scriptModulePath, spScriptEngineData->AppAssembly, spScriptEngineData->AppMonoImage);
 	if (spScriptEngineData->CoreAssembly==nullptr || spScriptEngineData->AppAssembly==nullptr)
 	{
 		LOG_DEV_ERROR("Load Assembly failed");
@@ -176,7 +181,7 @@ bool ScriptEngine::LoadAssemblyAndMonoImage()
 
 	spScriptEngineData->AssemblyReloadPending = false;
 	spScriptEngineData->AppAssemblyFileWatcher = CreateScope<filewatch::FileWatch<std::string>>(
-		"script/SandBoxScript.dll", OnAppAssemblyFileSystemEvent);
+		scriptModulePath.string(), OnAppAssemblyFileSystemEvent);
 
 	return true;
 }

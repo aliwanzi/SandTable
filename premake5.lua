@@ -1,5 +1,5 @@
 include "./vendor/premake/premake_customization/solution_items.lua"
-include "Dependencies.lua"
+include "dependence.lua"
 
 workspace "SandTable"
 	architecture "x86_64"
@@ -24,5 +24,9 @@ group "Dependencies"
 group ""
 
 
-include "SandTable"
+group "Core"
+	include "SandTable"
+	include "SandTableScript"
+group ""
+
 include "SandBox"

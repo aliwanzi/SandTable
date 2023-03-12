@@ -1,4 +1,4 @@
-local SandTableRootDir = '../'
+local SandTableRootDir = '../../../..'
 include (SandTableRootDir .. "/vendor/premake/premake_customization/solution_items.lua")
 
 workspace "SandBoxScript"
@@ -24,8 +24,8 @@ project "SandBoxScript"
 	language "C#"
 	dotnetframework "4.7.2"
 
-	targetdir ("../SandBox/script/")
-	objdir ("%{wks.location}/bin-int/" .. outputdir .. "/%{prj.name}")
+	targetdir ("Binaries")
+	objdir ("Intermediates")
 
 	files 
 	{

@@ -5,6 +5,7 @@
 #include "SandTable/Render/Texture/Texture2D.h"
 #include "SandTable/Script/ScriptEngine.h"
 #include "SandTable/Script/ScriptEntityInstance.h"
+#include "SandTable/Project/Project.h"
 #include <yaml-cpp/yaml.h>
 
 
@@ -368,11 +369,17 @@ void SceneSerializer::SerializeRuntime(const std::string& sFilePath)
 
 bool SceneSerializer::DeSerialize(const std::string& sFilePath)
 {
-	std::ifstream stream(sFilePath);
-	std::stringstream sStream;
-	sStream << stream.rdbuf();
+	YAML::Node data;
+	try
+	{
+		data = YAML::LoadFile(sFilePath);
+	}
+	catch (YAML::ParserException e)
+	{
+		LOG_DEV_ERROR("Failed to load file '{0}'\n    {1}", sFilePath, e.what());
+		return false;
+	}
 
-	YAML::Node data = YAML::Load(sStream.str());
 	if (!data["Scene"])
 	{
 		return false;
@@ -489,8 +496,9 @@ bool SceneSerializer::DeSerialize(const std::string& sFilePath)
 				src.spQuadPrimitive->SetColor(spriteRenderComponent["Color"].as<glm::vec4>());
 				if (spriteRenderComponent["TexturePath"].IsDefined())
 				{
-					std::string sPath = spriteRenderComponent["TexturePath"].as<std::string>();
-					src.spTexture = Texture2D::Create(sPath);
+					std::string sTexturePath = spriteRenderComponent["TexturePath"].as<std::string>();
+					auto sPath = Project::GetProjectInstance()->GetAssetFileSystemPath(sTexturePath);
+					src.spTexture = Texture2D::Create(sPath.string());
 				}
 			}
 
@@ -503,8 +511,9 @@ bool SceneSerializer::DeSerialize(const std::string& sFilePath)
 				src.spCirclePrimitive->SetFade(circleRenderComponent["Fade"].as<float>());
 				if (circleRenderComponent["TexturePath"].IsDefined())
 				{
-					std::string sPath = circleRenderComponent["TexturePath"].as<std::string>();
-					src.spTexture = Texture2D::Create(sPath);
+					std::string sTexturePath = circleRenderComponent["TexturePath"].as<std::string>();
+					auto sPath = Project::GetProjectInstance()->GetAssetFileSystemPath(sTexturePath);
+					src.spTexture = Texture2D::Create(sPath.string());
 				}
 			}
 
