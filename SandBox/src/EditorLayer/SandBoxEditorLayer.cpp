@@ -1,8 +1,6 @@
 #include "SandBoxEditorLayer.h"
 #include "ImGuizmo/ImGuizmo.h"
 
-SAND_TABLE_NAMESPACE_BEGIN
-
 SandBoxEditorLayer::SandBoxEditorLayer()
 	:m_vec4Color(glm::vec4(0.2f, 0.3f, 0.8f, 1.0f)),
 	m_bViewportHovered(false),
@@ -707,6 +705,4 @@ void SandBoxEditorLayer::UIToolbar()
 	ImGui::PopStyleVar(2);
 	ImGui::PopStyleColor(3);
 	ImGui::End();
-
 }
-SAND_TABLE_NAMESPACE_END

@@ -69,7 +69,7 @@ void Render2D::Init()
 	}
 
 	int uiWiteTextureData = 0xffffffff;
-	m_spRender2DStroge->spWhiteTexture = Texture2D::Create(1, 1);
+	m_spRender2DStroge->spWhiteTexture = Texture2D::Create(1, 1, InternalFormat::RGBA8, DataFormat::RGBA);
 	m_spRender2DStroge->spWhiteTexture->SetData(&uiWiteTextureData, sizeof(uiWiteTextureData));
 
 	m_spRender2DStroge->CameraUniformBuffer = std::dynamic_pointer_cast<UniformBuffer>

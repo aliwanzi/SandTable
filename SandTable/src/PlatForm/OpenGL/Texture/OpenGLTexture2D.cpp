@@ -37,10 +37,53 @@ namespace
 		}
 	}
 
+	GLenum InternalFormatToOpenGL(InternalFormat eInternalFormat)
+	{
+		switch (eInternalFormat)
+		{
+			case InternalFormat::NONE:
+				return 0;
+			case InternalFormat::RED:
+				return GL_RED;
+			case InternalFormat::RGB:
+				return GL_RGB;
+			case InternalFormat::RGBA:
+				return GL_RGBA;
+			case InternalFormat::RGBA8:
+				return GL_RGBA8;
+			case InternalFormat::RGBA32F:
+				return GL_RGBA32F;
+			default:
+			{
+				LOG_DEV_ERROR("Unkown Internal Format");
+				return 0;
+			}
+		}
+	}
+
+	GLenum DataFormatToOpenGL(DataFormat eDataFormat)
+	{
+		switch (eDataFormat)
+		{
+			case DataFormat::NONE:
+				return 0;
+			case DataFormat::RED:
+				return GL_RED;
+			case DataFormat::RGB:
+				return GL_RGB;
+			case DataFormat::RGBA:
+				return GL_RGBA;
+			default:
+			{
+				LOG_DEV_ERROR("Unkown Data Format");
+				return 0;
+			}
+		}
+	}
 }
 
-OpenGLTexture2D::OpenGLTexture2D(int iWidth, int iHeight) :
-	m_uiInternalFormat(GL_RGBA8), m_uiDataFormat(GL_RGBA), Texture2D(iWidth, iHeight)
+OpenGLTexture2D::OpenGLTexture2D(int iWidth, int iHeight, InternalFormat eInternalFormat, DataFormat eDataFormat) :
+	m_uiInternalFormat(InternalFormatToOpenGL(eInternalFormat)), m_uiDataFormat(DataFormatToOpenGL(eDataFormat)), Texture2D(iWidth, iHeight)
 {
 	SAND_TABLE_PROFILE_FUNCTION();
 	glGenTextures(1, &m_uiRenderID);
@@ -96,7 +139,7 @@ void OpenGLTexture2D::Bind(unsigned int uiPos) const
 	glBindTexture(GL_TEXTURE_2D, m_uiRenderID);
 }
 
-void OpenGLTexture2D::SetData(void* pData, unsigned int uiSize)
+void OpenGLTexture2D::SetData(const void* pData, unsigned int uiSize)
 {
 	SAND_TABLE_PROFILE_FUNCTION();
 	int iChannel = m_uiDataFormat == GL_RGBA ? 4 : 3;

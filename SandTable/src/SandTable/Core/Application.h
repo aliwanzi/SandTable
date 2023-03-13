@@ -28,7 +28,7 @@ class Application
 {
 public:
 	//For Application
-	static void CreateApplication();
+	static void CreateApplication(int argc, char** argv);
 
 	virtual ~Application();
 	void Run();

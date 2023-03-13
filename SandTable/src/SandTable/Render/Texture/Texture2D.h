@@ -10,7 +10,8 @@ public:
 	virtual int GetWidth() const override;
 	virtual int GetHeight() const override;
 	static Ref<Texture> Create(const std::string& sPath);
-	static Ref<Texture> Create(unsigned int uiWidth, unsigned int uiHeight);
+	static Ref<Texture> Create(unsigned int uiWidth, unsigned int uiHeight,
+		InternalFormat eInternalFormat, DataFormat eDataFormat);
 	virtual unsigned int GetRenderID() const override;
 	virtual const std::string& GetTexturePath()const;
 protected:

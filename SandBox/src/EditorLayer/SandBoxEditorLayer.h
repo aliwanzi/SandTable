@@ -3,8 +3,6 @@
 #include <imgui/imgui.h>
 #include "SandTable/Scene/SceneSerializer.h"
 
-SAND_TABLE_NAMESPACE_BEGIN
-
 class SandBoxEditorLayer:public Layer
 {
 public:
@@ -75,6 +73,3 @@ private:
 
 	Ref<Camera> m_spEditCamera;
 };
-
-SAND_TABLE_NAMESPACE_END
-

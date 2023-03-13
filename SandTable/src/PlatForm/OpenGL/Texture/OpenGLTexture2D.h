@@ -5,11 +5,11 @@ SAND_TABLE_NAMESPACE_BEGIN
 class OpenGLTexture2D :public Texture2D
 {
 public:
-	OpenGLTexture2D(int iWidth,int iHeight);
+	OpenGLTexture2D(int iWidth, int iHeight, InternalFormat eInternalFormat, DataFormat eDataFormat);
 	OpenGLTexture2D(const std::string& sPath);
 	~OpenGLTexture2D();
 	virtual void Bind(unsigned int uiPos = 0) const override;
-	virtual void SetData(void* pData, unsigned int uiSize) override;
+	virtual void SetData(const void* pData, unsigned int uiSize) override;
 	virtual void UnBind()const override;
 private:
 	unsigned int m_uiInternalFormat;

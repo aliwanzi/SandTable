@@ -24,18 +24,23 @@
 #include "SandTable/Render/Texture/SubTexture2D.h"
 #include "SandTable/Render/Camera/OrthoGraphicCameraController.h"
 #include "SandTable/Render/Camera/EditorCamera.h"
+#include "SandTable/Render/Image/Image.h"
 
 #include "SandTable/Scene/Scene.h"
 #include "SandTable/Scene/Components.h"
 #include "SandTable/Scene/Entity.h"
 
 #include "SandTable/Statics/DrawStatistics/QuadDrawStatics.h"
+#include "SandTable/Statics/Timer.h"
 
 #include "SandTable/System/ParticleSystem2D.h"
 
 #include "SandTable/Math/MathUtils.h"
+#include "SandTable/Math/Random.h"
 
 #include "SandTable/Script/ScriptEngine.h"
 
 #include "SandTable/Project/Project.h"
+
+using namespace SandTable;
 

@@ -5,7 +5,7 @@
 SAND_TABLE_NAMESPACE_BEGIN
 
 UUID::UUID():
-	m_uiUUID(Random::Uint64_t())
+	m_uiUUID(Random::Uint64())
 {
 
 }

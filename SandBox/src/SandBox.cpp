@@ -1,10 +1,14 @@
-
-#include "SandBoxEditorLayer.h"
+#include "EditorLayer/RayTracingEditorLayer.h"
+#include "EditorLayer/SandBoxEditorLayer.h"
 #include "SandTable/Core/EntryPoint.h"
 
-void SandTable::Application::CreateApplication()
+void Application::CreateApplication(int argc, char** argv)
 {
-	auto spSandBox = Application::GetApplication();
-	auto spSandBoxLayer = std::make_shared<SandBoxEditorLayer>();
-	spSandBox->PushLayer(spSandBoxLayer);
+	auto spApplicationSpecification = CreateRef<ApplicationSpecification>();
+	spApplicationSpecification->Name = "SandBox";
+	spApplicationSpecification->CommandLineArgs = { argc, argv };
+	auto spApplication = Application::GetApplication(spApplicationSpecification);
+
+	auto spSandBoxLayer = std::make_shared<RayTracingEditorLayer>();
+	spApplication->PushLayer(spSandBoxLayer);
 }

@@ -57,12 +57,12 @@ Ref<Texture> Texture2D::Create(const std::string& sPath)
 	}
 }
 
-Ref<Texture> Texture2D::Create(unsigned int uiWidth, unsigned int uiHeight)
+Ref<Texture> Texture2D::Create(unsigned int uiWidth, unsigned int uiHeight, InternalFormat eInternalFormat, DataFormat eDataFormat)
 {
 	switch (RenderAPI::GetAPIType())
 	{
 	case RenderAPI::APIType::OpenGL:
-		return CreateRef<OpenGLTexture2D>(uiWidth, uiHeight);
+		return CreateRef<OpenGLTexture2D>(uiWidth, uiHeight, eInternalFormat, eDataFormat);
 	default:
 		SAND_TABLE_ASSERT(false, "Unknown RenderAPI");
 		return nullptr;

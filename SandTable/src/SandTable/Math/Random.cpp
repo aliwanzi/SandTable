@@ -4,21 +4,23 @@
 
 SAND_TABLE_NAMESPACE_BEGIN
 
-namespace
-{
-	static std::random_device RandomDevice;
-	static std::mt19937_64 RandomEngine(RandomDevice());
-	static std::uniform_int_distribution<uint64_t> UniformDistribution;
-}
+std::mt19937 Random::m_sRandomEngine;
+std::uniform_int_distribution<std::mt19937::result_type> Random::m_sDistribution;
+
 
 float Random::Float()
 {
-	return static_cast<float>(UniformDistribution(RandomEngine)) / static_cast<float>(UINT64_MAX);
+	return static_cast<float>(m_sDistribution(m_sRandomEngine)) / static_cast<float>(std::numeric_limits<uint32_t>::max());
 }
 
-uint64_t Random::Uint64_t()
+uint32_t Random::Uint32()
 {
-	return static_cast<uint64_t>(UniformDistribution(RandomEngine));
+	return static_cast<uint32_t>(m_sDistribution(m_sRandomEngine));
+}
+
+uint64_t Random::Uint64()
+{
+	return static_cast<uint64_t>(m_sDistribution(m_sRandomEngine));
 }
 
 
