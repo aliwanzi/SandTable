@@ -3,7 +3,6 @@
 
 RayTracingEditorLayer::RayTracingEditorLayer() :
 	m_vec2RenderViewPortSize(ImVec2(0.0f, 0.0f)),
-	m_spImage(nullptr),
 	m_spTimer(CreateRef<Timer>()),
 	m_fLastRenderTime(0.f)
 {
@@ -86,7 +85,7 @@ void RayTracingEditorLayer::OnImGuiRender()
 		ImGui::EndMenuBar();
 	}
 
-	ImGui::Begin("Settints");
+	ImGui::Begin("Settings");
 	ImGui::Text("Last render: %.3fms", m_fLastRenderTime);
 	if (ImGui::Button("Render"))
 	{
@@ -100,9 +99,10 @@ void RayTracingEditorLayer::OnImGuiRender()
 	m_vec2RenderViewPortSize.x = ImGui::GetContentRegionAvail().x;
 	m_vec2RenderViewPortSize.y = ImGui::GetContentRegionAvail().y;
 
-	if (m_spImage != nullptr)
+	auto image = RenderImage::GetImage();
+	if (image > 0)
 	{
-		ImGui::Image((void*)m_spImage->GetImage(), m_vec2RenderViewPortSize, ImVec2(0, 1), ImVec2(1, 0));
+		ImGui::Image((void*)image, m_vec2RenderViewPortSize, ImVec2(0, 1), ImVec2(1, 0));
 	}
 
 	ImGui::End();
@@ -116,18 +116,7 @@ void RayTracingEditorLayer::OnImGuiRender()
 void RayTracingEditorLayer::Render()
 {
 	m_spTimer->Reset();
-	if (m_spImage == nullptr || m_vec2RenderViewPortSize.x != m_spImage->GetWidth()
-		|| m_vec2RenderViewPortSize.y != m_spImage->GetHeight())
-	{
-		m_spImage = CreateRef<Image>(m_vec2RenderViewPortSize.x, m_vec2RenderViewPortSize.y, InternalFormat::RGBA32F, DataFormat::RGBA);
-	}
-
-	auto pImageData = m_spImage->GetImageData();
-	for (auto i = 0; i < m_vec2RenderViewPortSize.x * m_vec2RenderViewPortSize.y; i++)
-	{
-		pImageData[i] = Random::Uint32();
-		pImageData[i] |= 0xff000000;
-	}
-
+	RenderImage::OnWindowResize(m_vec2RenderViewPortSize.x, m_vec2RenderViewPortSize.y);
+	RenderImage::OnRender();
 	m_fLastRenderTime = m_spTimer->ElapsedMillis();
 }

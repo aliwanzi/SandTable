@@ -317,11 +317,7 @@ void ScriptEngine::LoadAssemblyClass()
 
 	for (int i = 0; i < iClassNum; i++)
 	{
-		//auto spTableInfos = Ref<uint32_t>(new uint32_t[MONO_TYPEDEF_SIZE], std::default_delete<uint32_t>());
-		auto uint8 = sizeof(uint8_t);
-		auto uint32 = sizeof(uint32_t);
-
-		auto spTableInfo = CreateRef<DataBuffer>(MONO_TYPEDEF_SIZE * sizeof(uint32_t));
+		auto spTableInfo = CreateRef<DataBuffer>(MONO_TYPEDEF_SIZE, sizeof(uint32_t) / sizeof(uint8_t));
 		mono_metadata_decode_row(pClassNameType, i, spTableInfo->As<uint32_t>(), MONO_TYPEDEF_SIZE);
 
 		const char* pClassNameSpace = mono_metadata_string_heap(pMonoImage, spTableInfo->As<uint32_t>()[MONO_TYPEDEF_NAMESPACE]);

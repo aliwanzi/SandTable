@@ -3,7 +3,8 @@
 
 SAND_TABLE_NAMESPACE_BEGIN
 
-DataBuffer::DataBuffer(uint64_t uiDataBufferSize)
+DataBuffer::DataBuffer(uint64_t uiDataBufferSize, uint8_t uiChannel) :
+	m_uiChannel(uiChannel)
 {
 	Resize(uiDataBufferSize);
 }
@@ -15,7 +16,7 @@ DataBuffer::~DataBuffer()
 
 void DataBuffer::Resize(uint64_t uiDataBufferSize)
 {
-	m_spDataBuffer = Ref<uint8_t>(new uint8_t[uiDataBufferSize], std::default_delete<uint8_t>());
+	m_spDataBuffer = Ref<uint8_t>(new uint8_t[uiDataBufferSize * m_uiChannel], std::default_delete<uint8_t>());
 	m_uiDataBufferSize = uiDataBufferSize;
 }
 
@@ -36,7 +37,7 @@ const Ref<uint8_t>& DataBuffer::GetDataBuffer() const
 
 Ref<DataBuffer> DataBuffer::DepthCopy(Ref<DataBuffer> spDataBuffer)
 {
-	auto spCopyBuffer = CreateRef<DataBuffer>(spDataBuffer->m_uiDataBufferSize);
+	auto spCopyBuffer = CreateRef<DataBuffer>(spDataBuffer->m_uiDataBufferSize, spDataBuffer->m_uiChannel);
 	memcpy(spCopyBuffer.get(), spDataBuffer->m_spDataBuffer.get(), spDataBuffer->m_uiDataBufferSize);
 	return spCopyBuffer;
 }

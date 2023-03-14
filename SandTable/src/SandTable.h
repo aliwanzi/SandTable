@@ -13,13 +13,16 @@
 #include "SandTable/ImGui/SceneHierarchyPanel.h"
 #include "SandTable/ImGui/ContentBrowserPanel.h"
 
-#include "SandTable/Render/Render.h"
-#include "SandTable/Render/Render2D.h"
-#include "SandTable/Render/RenderCommand.h"
-#include "SandTable/Render/VertexArray.h"
+#include "SandTable/Render/Render/Render.h"
+#include "SandTable/Render/Render/Render2D.h"
+#include "SandTable/Render/Render/RenderImage.h"
+
 #include "SandTable/Render/Buffer/VertexBuffer.h"
 #include "SandTable/Render/Buffer/IndexBuffer.h"
 #include "SandTable/Render/Buffer/FrameBuffer.h"
+
+#include "SandTable/Render/RenderCommand.h"
+#include "SandTable/Render/VertexArray.h"
 #include "SandTable/Render/Shader.h"
 #include "SandTable/Render/Texture/SubTexture2D.h"
 #include "SandTable/Render/Camera/OrthoGraphicCameraController.h"

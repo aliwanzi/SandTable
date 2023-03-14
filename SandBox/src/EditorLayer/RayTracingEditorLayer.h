@@ -13,7 +13,7 @@ private:
 	void Render();
 private:
 	ImVec2 m_vec2RenderViewPortSize;
-	Ref<Image> m_spImage;
+	//Ref<Image> m_spImage;
 
 	Ref<Timer> m_spTimer;
 	float m_fLastRenderTime;

@@ -88,7 +88,8 @@ OpenGLTexture2D::OpenGLTexture2D(int iWidth, int iHeight, InternalFormat eIntern
 	SAND_TABLE_PROFILE_FUNCTION();
 	glGenTextures(1, &m_uiRenderID);
 	glBindTexture(GL_TEXTURE_2D, m_uiRenderID);
-	glTextureStorage2D(m_uiRenderID, 1, m_uiInternalFormat, m_iWidth, m_iHeight);
+	glTexImage2D(GL_TEXTURE_2D, 0, m_uiInternalFormat, m_iWidth, m_iHeight, 0,
+		m_uiDataFormat, GL_UNSIGNED_BYTE, nullptr);
 
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
@@ -117,6 +118,7 @@ OpenGLTexture2D::OpenGLTexture2D(const std::string& sPath):
 	glBindTexture(GL_TEXTURE_2D, m_uiRenderID);
 	glTexImage2D(GL_TEXTURE_2D, 0, m_uiInternalFormat, m_iWidth, m_iHeight, 0,
 		m_uiDataFormat, GL_UNSIGNED_BYTE, pImageData);
+	glGenerateMipmap(GL_TEXTURE_2D);
 
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
@@ -151,6 +153,24 @@ void OpenGLTexture2D::SetData(const void* pData, unsigned int uiSize)
 void OpenGLTexture2D::UnBind() const
 {
 	glBindTexture(GL_TEXTURE_2D, 0);
+}
+
+void OpenGLTexture2D::Resize(unsigned int uiWidth, unsigned int uiHeight)
+{
+	if (uiWidth != m_iWidth || uiHeight != m_iHeight)
+	{
+		Texture2D::Resize(uiWidth, uiHeight);
+		glBindTexture(GL_TEXTURE_2D, m_uiRenderID);
+		glTexImage2D(GL_TEXTURE_2D, 0, m_uiInternalFormat, m_iWidth, m_iHeight, 0,
+			m_uiDataFormat, GL_UNSIGNED_BYTE, nullptr);
+
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+		glBindTexture(GL_TEXTURE_2D, 0);
+	}
 }
 
 

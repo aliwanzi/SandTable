@@ -74,6 +74,12 @@ unsigned int Texture2D::GetRenderID() const
 	return m_uiRenderID;
 }
 
+void Texture2D::Resize(unsigned int uiWidth, unsigned int uiHeight)
+{
+	m_iWidth = uiWidth;
+	m_iHeight = uiHeight;
+}
+
 const std::string& Texture2D::GetTexturePath() const
 {
 	return m_sPath;

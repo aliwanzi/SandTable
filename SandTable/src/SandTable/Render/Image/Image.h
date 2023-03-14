@@ -7,11 +7,18 @@ SAND_TABLE_NAMESPACE_BEGIN
 class Image
 {
 public:
-	Image(uint32_t uiWidth, uint32_t uiHeight, InternalFormat eInternalFormat, DataFormat eDataFormat);
-	uint32_t* GetImageData();
+	Image(InternalFormat eInternalFormat = InternalFormat::RGBA32F, DataFormat eDataFormat = DataFormat::RGBA);
+	Image(uint32_t uiWidth, uint32_t uiHeight,
+		InternalFormat eInternalFormat = InternalFormat::RGBA32F, DataFormat eDataFormat = DataFormat::RGBA);
+
 	uint32_t GetWidth()const;
 	uint32_t GetHeight()const;
+
+	void UpdateImage();
 	uint32_t GetImage()const;
+	uint32_t* GetImageData();
+
+	void Resize(uint32_t uiWidth, uint32_t uiHeight);
 private:
 	Ref<Texture2D> m_spTexture;
 	Ref<DataBuffer> m_spDataBuffer;

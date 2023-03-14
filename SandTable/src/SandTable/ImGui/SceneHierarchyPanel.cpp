@@ -4,7 +4,7 @@
 #include "SandTable/Render/Camera/OrthoGraphicCamera.h"
 #include "SandTable/Render/Camera/PerspectiveGraphicCamera.h"
 #include "SandTable/Render/Texture/Texture2D.h"
-#include "SandTable/Render/Render2D.h"
+#include "SandTable/Render/Render/Render2D.h"
 
 #include "SandTable/Script/ScriptEngine.h"
 #include "SandTable/Script/ScriptEntityInstance.h"
@@ -223,7 +223,7 @@ void SceneHierarchyPanel::DrawComponents(const Ref<Entity>& spEntity)
 	if (spEntity->HasComponent<TagComponent>())
 	{
 		auto& tagComponent = spEntity->GetComponent<TagComponent>();
-		auto spDataBuffer = CreateRef<DataBuffer>(UCHAR_MAX);
+		auto spDataBuffer = CreateRef<DataBuffer>(UCHAR_MAX, sizeof(char) / sizeof(uint8_t));
 		spDataBuffer->SetDataBuffer(tagComponent.Tag.c_str());
 		if (ImGui::InputText("Tag", spDataBuffer->As<char>(), UCHAR_MAX))
 		{
@@ -343,7 +343,7 @@ void SceneHierarchyPanel::DrawComponents(const Ref<Entity>& spEntity)
 				ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.9f, 0.2f, 0.3f, 1.f));
 			}
 
-			auto spDataBuffer = CreateRef<DataBuffer>(UCHAR_MAX);
+			auto spDataBuffer = CreateRef<DataBuffer>(UCHAR_MAX, sizeof(char) / sizeof(uint8_t));
 			spDataBuffer->SetDataBuffer(component.ClassName.c_str());
 			if (ImGui::InputText("Class", spDataBuffer->As<char>(), UCHAR_MAX))
 			{

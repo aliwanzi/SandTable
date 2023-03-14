@@ -6,13 +6,15 @@ SAND_TABLE_NAMESPACE_BEGIN
 class Texture2D :public Texture
 {
 public:
-	// 通过 Texture 继承
-	virtual int GetWidth() const override;
-	virtual int GetHeight() const override;
 	static Ref<Texture> Create(const std::string& sPath);
 	static Ref<Texture> Create(unsigned int uiWidth, unsigned int uiHeight,
 		InternalFormat eInternalFormat, DataFormat eDataFormat);
+
+	// 通过 Texture 继承
+	virtual int GetWidth() const override;
+	virtual int GetHeight() const override;
 	virtual unsigned int GetRenderID() const override;
+	virtual void Resize(unsigned int uiWidth, unsigned int uiHeight);
 	virtual const std::string& GetTexturePath()const;
 protected:
 	Texture2D(const std::string& sPath);

@@ -5,7 +5,7 @@ SAND_TABLE_NAMESPACE_BEGIN
 class DataBuffer
 {
 public:
-	DataBuffer(uint64_t uiDataBufferSize);
+	DataBuffer(uint64_t uiDataBufferSize, uint8_t uiChannel);
 	DataBuffer() = default;
 	DataBuffer(const DataBuffer&) = default;
 	~DataBuffer();
@@ -29,6 +29,7 @@ public:
 private:
 	Ref<uint8_t> m_spDataBuffer;
 	uint64_t m_uiDataBufferSize;
+	uint8_t m_uiChannel;
 };
 
 SAND_TABLE_NAMESPACE_END

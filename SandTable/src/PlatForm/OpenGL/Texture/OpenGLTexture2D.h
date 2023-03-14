@@ -11,6 +11,7 @@ public:
 	virtual void Bind(unsigned int uiPos = 0) const override;
 	virtual void SetData(const void* pData, unsigned int uiSize) override;
 	virtual void UnBind()const override;
+	virtual void Resize(unsigned int uiWidth, unsigned int uiHeight) override;
 private:
 	unsigned int m_uiInternalFormat;
 	unsigned int m_uiDataFormat;

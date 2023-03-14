@@ -75,7 +75,7 @@ Ref<DataBuffer> FileSystem::ReadFileDataBuffer(const std::filesystem::path& sFil
 		return nullptr;
 	}
 
-	auto spDataBuffer = CreateRef<DataBuffer>(uiFileData);
+	auto spDataBuffer = CreateRef<DataBuffer>(uiFileData, sizeof(char) / sizeof(uint8_t));
 	stream.read(spDataBuffer->As<char>(), uiFileData);
 	stream.close();
 	return spDataBuffer;
