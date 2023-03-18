@@ -15,6 +15,7 @@
 #include <list>
 #include <unordered_map>
 #include <unordered_set>
+#include <map>
 
 #include "SandTable/Core/Core.h"
 #include "SandTable/Core/Logger.h"

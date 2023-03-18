@@ -1,7 +1,6 @@
 #include "pch.h"
 #include "RayTracingRenderImage.h"
-#include "SandTable/Scene/Primitive/SpherePrimitive.h"
-#include "SandTable/RayTracing/RayTracingMaterial.h"
+#include <omp.h>
 
 SAND_TABLE_NAMESPACE_BEGIN
 
@@ -37,7 +36,7 @@ void RayTracingRenderImage::EndScene()
 	m_spRenderStroge->spImage->UpdateImage();
 }
 
-void RayTracingRenderImage::RenderPrimitve(const std::vector<Ref<SpherePrimitive>>& vecSpherePrimitive)
+void RayTracingRenderImage::RenderPrimitve(const MapSphere& vecSpherePrimitive)
 {
 	if (vecSpherePrimitive.empty())
 	{
@@ -59,7 +58,7 @@ void RayTracingRenderImage::RenderPrimitve(const std::vector<Ref<SpherePrimitive
 			m_spRenderStroge->spRay->Direction = glm::vec3(m_spRenderStroge->matView
 				* glm::vec4(glm::normalize(glm::vec3(target) / target.w), 0));
 
-			pImageData[x + y * width] = Image::ConvertToRGBA(TraceRay(vecSpherePrimitive));
+			pImageData[x + y * width] = Image::ConvertToRGBA(PerPixel(m_spRenderStroge->spRay, vecSpherePrimitive));
 		}
 	}
 }
@@ -69,18 +68,53 @@ uint32_t RayTracingRenderImage::GetImage()
 	return m_spRenderStroge->spImage->GetImage();
 }
 
-glm::vec4 RayTracingRenderImage::TraceRay(const std::vector<Ref<SpherePrimitive>>& vecSpherePrimitive)
+glm::vec4 RayTracingRenderImage::PerPixel(Ref<Ray> ray, const MapSphere& mapSpherePrimitive)
+{
+	glm::vec3 vec3Color(0.f);
+	int fBounces(2);
+	float fMultiplier = 1.f;
+
+	auto spRay = CreateRef<Ray>();
+	spRay->Origin = ray->Origin;
+	spRay->Direction = ray->Direction;
+
+	for (int i = 0; i < fBounces; i++)
+	{
+		auto spHitPayLoad = TraceRay(spRay, mapSpherePrimitive);
+		if (spHitPayLoad == nullptr)
+		{
+			break;
+		}
+
+		glm::vec3 lightDir = glm::normalize(glm::vec3(-1.f));
+		float diffuse = glm::max(glm::dot(spHitPayLoad->WorldNormal, -lightDir), 0.f);
+
+		const auto& spSphere = mapSpherePrimitive.find(spHitPayLoad->EntityID)->second;
+		glm::vec3 vec3SphereColor(spSphere->GetMaterial()->GetAlbedo());
+		vec3SphereColor *= diffuse;
+
+		vec3Color += vec3SphereColor * fMultiplier;
+		fMultiplier *= 0.7f;
+
+		spRay->Origin = spHitPayLoad->WorldPosition + spHitPayLoad->WorldNormal * 0.0001f;
+		spRay->Direction = glm::reflect(spRay->Direction, spHitPayLoad->WorldNormal);
+	}
+
+	return glm::vec4(vec3Color, 1.f);
+}
+
+Ref<HitPayLoad> RayTracingRenderImage::TraceRay(const Ref<Ray>& spRay, const MapSphere& mapSpherePrimitive)
 {
 	float fHitDistance = std::numeric_limits<float>::max();
 	Ref<SpherePrimitive> spHitSphere(nullptr);
-	auto spRay = m_spRenderStroge->spRay;
-	for (auto& spSphere : vecSpherePrimitive)
+	for (const auto& iter : mapSpherePrimitive)
 	{
-		glm::vec3 origin = spRay->Origin - spSphere->GetPosition();
+		const auto& sphere = iter.second;
+		glm::vec3 origin = spRay->Origin - sphere->GetPosition();
 
 		float fA = glm::dot(spRay->Direction, spRay->Direction);
 		float fB = 2.f * glm::dot(origin, spRay->Direction);
-		float fC = glm::dot(origin, origin) - spSphere->GetRadius() * spSphere->GetRadius();
+		float fC = glm::dot(origin, origin) - sphere->GetRadius() * sphere->GetRadius();
 
 		float discriminant = fB * fB - 4.0f * fA * fC;
 		if (discriminant < 0.f)
@@ -88,26 +122,26 @@ glm::vec4 RayTracingRenderImage::TraceRay(const std::vector<Ref<SpherePrimitive>
 			continue;
 		}
 		float fCloset = (-fB - glm::sqrt(discriminant)) / (2.f * fA);
-		if (fCloset < fHitDistance)
+		if (fCloset > 0.f && fCloset < fHitDistance)
 		{
 			fHitDistance = fCloset;
-			spHitSphere = spSphere;
+			spHitSphere = sphere;
 		}
 	}
 
-	if (spHitSphere == nullptr)
+	if (spHitSphere != nullptr)
 	{
-		return glm::vec4(0.f, 0.f, 0.f, 1.f);
+		auto spHitPayLoad = CreateRef<HitPayLoad>();
+
+		glm::vec3 origin = spRay->Origin - spHitSphere->GetPosition();
+
+		spHitPayLoad->HitDistance = fHitDistance;
+		spHitPayLoad->WorldPosition = spRay->Origin + spRay->Direction * fHitDistance;
+		spHitPayLoad->WorldNormal = glm::normalize(spHitPayLoad->WorldPosition - spHitSphere->GetPosition());
+		spHitPayLoad->EntityID = spHitSphere->GetEntityID();
+		return spHitPayLoad;
 	}
-	glm::vec3 vec3HitPoint = spRay->Origin + spRay->Direction * fHitDistance;
-	glm::vec3 vec3Normal = glm::normalize(vec3HitPoint-spHitSphere->GetPosition());
-
-	glm::vec3 lightDir = glm::normalize(glm::vec3(-1.f));
-	float diffuse = glm::max(glm::dot(vec3Normal, -lightDir), 0.f);
-
-	glm::vec3 vec3SphereColor(spHitSphere->GetMaterial()->GetAlbedo());
-	vec3SphereColor *= diffuse;
-	return glm::vec4(vec3SphereColor, 1.f);
+	return nullptr;
 }
 
 SAND_TABLE_NAMESPACE_END

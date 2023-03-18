@@ -4,10 +4,10 @@
 
 SAND_TABLE_NAMESPACE_BEGIN
 
-void RayTracingScene::OnUpdate(const TimeStep& timeStep, const Ref<RayTracingCamera>& spCamera)
+void RayTracingScene::OnUpdate(const TimeStep& timeStep, Ref<RayTracingCamera>& spCamera)
 {
 	RayTracingRenderImage::BeginScene(spCamera);
-	RayTracingRenderImage::RenderPrimitve(m_vecSpherePrimitve);
+	RayTracingRenderImage::RenderPrimitve(m_mapSpherePrimitve);
 	RayTracingRenderImage::EndScene();
 }
 
@@ -18,12 +18,12 @@ void RayTracingScene::OnViewPortResize(unsigned int uiWidth, unsigned int uiHeig
 
 void RayTracingScene::AddSpherePrimive(const Ref<SpherePrimitive>& spSpherePrimive)
 {
-	m_vecSpherePrimitve.push_back(spSpherePrimive);
+	m_mapSpherePrimitve[spSpherePrimive->GetEntityID()] = spSpherePrimive;
 }
 
-std::vector<Ref<SpherePrimitive>>& RayTracingScene::GetSpherePrimives()
+MapSphere& RayTracingScene::GetSpherePrimives()
 {
-	return m_vecSpherePrimitve;
+	return m_mapSpherePrimitve;
 }
 
 uint32_t RayTracingScene::GetRenderImage() const

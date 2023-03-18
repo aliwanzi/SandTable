@@ -8,11 +8,25 @@ RayTracingEditorLayer::RayTracingEditorLayer() :
 	m_spRayTracingScene(std::make_shared<RayTracingScene>()),
 	m_spRayTracingCamera(CreateRef<RayTracingCamera>(45.f, 0.1f, 100.f))
 {
-	m_spRayTracingScene->AddSpherePrimive(std::make_shared<SpherePrimitive>(glm::vec3(0.f), 0.5f,
-		CreateRef<RayTracingMaterial>(glm::vec3(1.f, 0.f, 1.f))));
+	{
+		auto spMaterial = CreateRef<Material>();
+		spMaterial->SetAlbedo(glm::vec3(1.f, 0.f, 1.f));
 
-	m_spRayTracingScene->AddSpherePrimive(std::make_shared<SpherePrimitive>(glm::vec3(1.f, 0.f,-5.f), 1.5f,
-		CreateRef<RayTracingMaterial>(glm::vec3(0.2f, 0.3f, 1.f))));
+		auto spSpherePrimitive = CreateRef<SpherePrimitive>(glm::vec3(0.f), 1.0f, 0);
+		spSpherePrimitive->SetMaterial(spMaterial);
+
+		m_spRayTracingScene->AddSpherePrimive(spSpherePrimitive);
+	}
+
+	{
+		auto spMaterial = CreateRef<Material>();
+		spMaterial->SetAlbedo(glm::vec3(0.2f, 0.3f, 1.f));
+
+		auto spSpherePrimitive = CreateRef<SpherePrimitive>(glm::vec3(1.f, -101.f, -5.f), 100.f, 1);
+		spSpherePrimitive->SetMaterial(spMaterial);
+
+		m_spRayTracingScene->AddSpherePrimive(spSpherePrimitive);
+	}
 }
 
 void RayTracingEditorLayer::OnAttach()
@@ -113,15 +127,17 @@ void RayTracingEditorLayer::OnImGuiRender()
 	ImGui::End();
 
 	ImGui::Begin("Scene");
-	auto& vecSpherePrimitive = m_spRayTracingScene->GetSpherePrimives();
-	for (auto i = 0; i < vecSpherePrimitive.size(); i++)
+	auto& mapSphere = m_spRayTracingScene->GetSpherePrimives();
+	for (auto& iter = mapSphere.begin(); iter != mapSphere.end(); iter++)
 	{
-		ImGui::PushID(i);
-		ImGui::DragFloat3("Position", glm::value_ptr(vecSpherePrimitive[i]->GetPosition()), 0.1f);
-		ImGui::DragFloat("Radius", &vecSpherePrimitive[i]->GetRadius(), 0.1f);
-		ImGui::ColorEdit3("Albedo", glm::value_ptr(vecSpherePrimitive[i]->GetMaterial()->GetAlbedo()));
-		ImGui::Separator();
+		ImGui::PushID(iter->first);
+		ImGui::DragFloat3("Position", glm::value_ptr(iter->second->GetPosition()), 0.1f);
+		ImGui::DragFloat("Radius", &(iter->second->GetRadius()), 0.1f);
+		ImGui::ColorEdit3("Albedo", glm::value_ptr(iter->second->GetMaterial()->GetAlbedo()), 0.1f);
+		ImGui::DragFloat("Roughness",&(iter->second->GetMaterial()->GetRoughness()), 0.1f);
+		ImGui::DragFloat("Metallic",&(iter->second->GetMaterial()->GetMetallic()), 0.1f);
 		ImGui::PopID();
+		ImGui::Separator();
 	}
 
 	ImGui::End();
