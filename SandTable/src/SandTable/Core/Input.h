@@ -16,6 +16,7 @@ public:
 	static glm::vec2 GetMousePos();
 	static float GetMouseXPos();
 	static float GetMouseYPos();
+	static void SetCursorMode(CursorMode mode);
 
 	~Input() = default;
 protected:
@@ -24,6 +25,7 @@ protected:
 	virtual glm::vec2 GetMousePosImpl() = 0;
 	virtual float GetMouseXPosImpl() = 0;
 	virtual float GetMouseYPosImpl() = 0;
+	virtual void SetCursorModeImpl(CursorMode mode) = 0;
 
 protected:
 	Input() = default;

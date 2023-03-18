@@ -4,14 +4,28 @@
 RayTracingEditorLayer::RayTracingEditorLayer() :
 	m_vec2RenderViewPortSize(ImVec2(0.0f, 0.0f)),
 	m_spTimer(CreateRef<Timer>()),
-	m_fLastRenderTime(0.f)
+	m_fLastRenderTime(0.f),
+	m_spRayTracingScene(std::make_shared<RayTracingScene>()),
+	m_spRayTracingCamera(CreateRef<RayTracingCamera>(45.f, 0.1f, 100))
 {
-
 }
 
 void RayTracingEditorLayer::OnAttach()
 {
-	
+
+}
+
+void RayTracingEditorLayer::OnUpdate(const TimeStep& ts)
+{
+	m_spTimer->Reset();
+	if (m_vec2RenderViewPortSize.x > 0 && m_vec2RenderViewPortSize.y > 0)
+	{
+		m_spRayTracingCamera->OnResize(m_vec2RenderViewPortSize.x, m_vec2RenderViewPortSize.y);
+		m_spRayTracingCamera->OnUpdate(ts);
+		m_spRayTracingScene->OnViewPortResize(m_vec2RenderViewPortSize.x, m_vec2RenderViewPortSize.y);
+		m_spRayTracingScene->OnUpdate(ts, m_spRayTracingCamera);
+	}
+	m_fLastRenderTime = m_spTimer->ElapsedMillis();
 }
 
 void RayTracingEditorLayer::OnImGuiRender()
@@ -95,11 +109,10 @@ void RayTracingEditorLayer::OnImGuiRender()
 
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.f, 0.f));
 	ImGui::Begin("ViewPort");
-	
-	m_vec2RenderViewPortSize.x = ImGui::GetContentRegionAvail().x;
-	m_vec2RenderViewPortSize.y = ImGui::GetContentRegionAvail().y;
 
-	auto image = RenderImage::GetImage();
+	m_vec2RenderViewPortSize = ImGui::GetContentRegionAvail();
+
+	auto image = m_spRayTracingScene->GetRenderImage();
 	if (image > 0)
 	{
 		ImGui::Image((void*)image, m_vec2RenderViewPortSize, ImVec2(0, 1), ImVec2(1, 0));
@@ -109,14 +122,4 @@ void RayTracingEditorLayer::OnImGuiRender()
 	ImGui::PopStyleVar();
 
 	ImGui::End();
-
-	Render();
-}
-
-void RayTracingEditorLayer::Render()
-{
-	m_spTimer->Reset();
-	RenderImage::OnWindowResize(m_vec2RenderViewPortSize.x, m_vec2RenderViewPortSize.y);
-	RenderImage::OnRender();
-	m_fLastRenderTime = m_spTimer->ElapsedMillis();
 }

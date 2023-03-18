@@ -15,7 +15,6 @@
 
 #include "SandTable/Render/Render/Render.h"
 #include "SandTable/Render/Render/Render2D.h"
-#include "SandTable/Render/Render/RenderImage.h"
 
 #include "SandTable/Render/Buffer/VertexBuffer.h"
 #include "SandTable/Render/Buffer/IndexBuffer.h"
@@ -32,6 +31,8 @@
 #include "SandTable/Scene/Scene.h"
 #include "SandTable/Scene/Components.h"
 #include "SandTable/Scene/Entity.h"
+#include "SandTable/RayTracing/RayTracingCamera.h"
+#include "SandTable/RayTracing/RayTracingScene.h"
 
 #include "SandTable/Statics/DrawStatistics/QuadDrawStatics.h"
 #include "SandTable/Statics/Timer.h"

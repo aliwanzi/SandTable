@@ -28,4 +28,9 @@ float Input::GetMouseYPos()
 	return m_spInput->GetMouseYPosImpl();
 }
 
+void Input::SetCursorMode(CursorMode mode)
+{
+	m_spInput->SetCursorModeImpl(mode);
+}
+
 SAND_TABLE_NAMESPACE_END

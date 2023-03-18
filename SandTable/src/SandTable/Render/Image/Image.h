@@ -19,6 +19,8 @@ public:
 	uint32_t* GetImageData();
 
 	void Resize(uint32_t uiWidth, uint32_t uiHeight);
+
+	static uint32_t ConvertToRGBA(const glm::vec4& color);
 private:
 	Ref<Texture2D> m_spTexture;
 	Ref<DataBuffer> m_spDataBuffer;

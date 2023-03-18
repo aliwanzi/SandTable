@@ -53,4 +53,13 @@ float WindowsInput::GetMouseYPosImpl()
 	return vec2Pos.y;
 }
 
+void WindowsInput::SetCursorModeImpl(CursorMode mode)
+{
+	const auto& upWindow = Application::GetApplication()->GetWindow();
+	SAND_TABLE_ASSERT(upWindow, "WindowsInput get window failed");
+	auto glfwWindow = static_cast<GLFWwindow*>(upWindow->GetNativeWindow());
+	SAND_TABLE_ASSERT(glfwWindow, "WindowsInput get glfwWindow failed");
+	glfwSetInputMode(glfwWindow, GLFW_CURSOR, GLFW_CURSOR_NORMAL + (int)mode);
+}
+
 SAND_TABLE_NAMESPACE_END
