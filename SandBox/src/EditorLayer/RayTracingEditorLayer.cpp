@@ -6,8 +6,13 @@ RayTracingEditorLayer::RayTracingEditorLayer() :
 	m_spTimer(CreateRef<Timer>()),
 	m_fLastRenderTime(0.f),
 	m_spRayTracingScene(std::make_shared<RayTracingScene>()),
-	m_spRayTracingCamera(CreateRef<RayTracingCamera>(45.f, 0.1f, 100))
+	m_spRayTracingCamera(CreateRef<RayTracingCamera>(45.f, 0.1f, 100.f))
 {
+	m_spRayTracingScene->AddSpherePrimive(std::make_shared<SpherePrimitive>(glm::vec3(0.f), 0.5f,
+		CreateRef<RayTracingMaterial>(glm::vec3(1.f, 0.f, 1.f))));
+
+	m_spRayTracingScene->AddSpherePrimive(std::make_shared<SpherePrimitive>(glm::vec3(1.f, 0.f,-5.f), 1.5f,
+		CreateRef<RayTracingMaterial>(glm::vec3(0.2f, 0.3f, 1.f))));
 }
 
 void RayTracingEditorLayer::OnAttach()
@@ -105,6 +110,20 @@ void RayTracingEditorLayer::OnImGuiRender()
 	{
 		Render();
 	}
+	ImGui::End();
+
+	ImGui::Begin("Scene");
+	auto& vecSpherePrimitive = m_spRayTracingScene->GetSpherePrimives();
+	for (auto i = 0; i < vecSpherePrimitive.size(); i++)
+	{
+		ImGui::PushID(i);
+		ImGui::DragFloat3("Position", glm::value_ptr(vecSpherePrimitive[i]->GetPosition()), 0.1f);
+		ImGui::DragFloat("Radius", &vecSpherePrimitive[i]->GetRadius(), 0.1f);
+		ImGui::ColorEdit3("Albedo", glm::value_ptr(vecSpherePrimitive[i]->GetMaterial()->GetAlbedo()));
+		ImGui::Separator();
+		ImGui::PopID();
+	}
+
 	ImGui::End();
 
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.f, 0.f));

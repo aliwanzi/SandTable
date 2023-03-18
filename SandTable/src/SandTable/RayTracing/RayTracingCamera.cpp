@@ -25,7 +25,6 @@ bool RayTracingCamera::OnUpdate(float ts)
 		Input::SetCursorMode(CursorMode::Normal);
 		return false;
 	}
-
 	Input::SetCursorMode(CursorMode::Locked);
 
 	bool moved = false;
@@ -94,6 +93,7 @@ void RayTracingCamera::OnResize(uint32_t width, uint32_t height)
 	if (width == m_ViewportWidth && height == m_ViewportHeight)
 		return;
 
+	LOG_DEV_INFO("RayTracingCamera::OnResize");
 	m_ViewportWidth = width;
 	m_ViewportHeight = height;
 
