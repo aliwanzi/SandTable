@@ -11,7 +11,7 @@ public:
 	static uint64_t Uint64();
 	static glm::vec3 Vec3();
 private:
-	static std::mt19937 m_sRandomEngine;
+	static thread_local std::mt19937 m_sRandomEngine;
 	static std::uniform_int_distribution<std::mt19937::result_type> m_sDistribution;
 };
 

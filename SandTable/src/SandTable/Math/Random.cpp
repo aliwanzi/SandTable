@@ -4,7 +4,7 @@
 
 SAND_TABLE_NAMESPACE_BEGIN
 
-std::mt19937 Random::m_sRandomEngine;
+thread_local std::mt19937 Random::m_sRandomEngine;
 std::uniform_int_distribution<std::mt19937::result_type> Random::m_sDistribution;
 
 

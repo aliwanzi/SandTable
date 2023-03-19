@@ -17,6 +17,8 @@ public:
 		Ref<DataBuffer> spAccumulateBuffer;
 		glm::mat4 matView;
 		glm::mat4 matProjection;
+		std::vector<uint32_t> vecImageVerticalIter;
+		std::vector<uint32_t> vecImageHorizontalInter;
 	};
 
 	static void Init();
@@ -28,7 +30,7 @@ public:
 
 private:
 	static glm::vec4 PerPixel(const glm::vec3& rayOrigin, uint32_t uiX, uint32_t uiY, Ref<RayTracingScene>& spScene);
-	static Ref<HitPayLoad> TraceRay(const Ref<Ray>& spRay, const MapSphere& mapSpherePrimitive);
+	static void TraceRay(const Ray& ray, const MapSphere& mapSpherePrimitive, HitPayLoad& hitPayLoad);
 private:
 	static Ref<RenderStroge> m_spRenderStroge;
 };
