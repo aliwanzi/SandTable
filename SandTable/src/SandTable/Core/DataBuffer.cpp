@@ -14,6 +14,11 @@ DataBuffer::~DataBuffer()
 	m_uiDataBufferSize = 0;
 }
 
+void DataBuffer::Clear()
+{
+	memset(m_spDataBuffer.get(), 0, m_uiDataBufferSize * m_uiChannel);
+}
+
 void DataBuffer::Resize(uint64_t uiDataBufferSize)
 {
 	m_spDataBuffer = Ref<uint8_t>(new uint8_t[uiDataBufferSize * m_uiChannel], std::default_delete<uint8_t>());

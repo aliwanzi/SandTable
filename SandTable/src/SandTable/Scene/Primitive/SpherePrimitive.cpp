@@ -6,38 +6,48 @@ SpherePrimitive::SpherePrimitive(const glm::vec3& vec3Position, float fRadius, u
 	m_vec3Position(vec3Position),
 	m_fRadius(fRadius),
 	m_uiEntitID(uiEntitID),
-	m_spMaterial(nullptr)
+	m_uiMaterialID(-1),
+	m_bDirty(false)
 {
 }
 
 void SpherePrimitive::SetPosition(const glm::vec3& vec3Position)
 {
 	m_vec3Position = vec3Position;
+	m_bDirty = true;
 }
 
-glm::vec3& SpherePrimitive::GetPosition()
+const glm::vec3& SpherePrimitive::GetPosition() const
 {
 	return m_vec3Position;
 }
 
-void SpherePrimitive::SetRadius(float fRadius)
+void SpherePrimitive::SetRadius(float fRadius) 
 {
 	m_fRadius = fRadius;
+	m_bDirty = true;
 }
 
-float& SpherePrimitive::GetRadius()
+float SpherePrimitive::GetRadius() const
 {
 	return m_fRadius;
 }
 
-void SpherePrimitive::SetMaterial(const Ref<Material>& spMaterial)
+void SpherePrimitive::SetMaterialID(uint32_t uiMaterialID)
 {
-	m_spMaterial = spMaterial;
+	m_uiMaterialID = uiMaterialID;
+	m_bDirty = true;
 }
 
-Ref<Material>& SpherePrimitive::GetMaterial()
+uint32_t SpherePrimitive::GetMaterialID() const
 {
-	return m_spMaterial;
+	return m_uiMaterialID;
+}
+
+void SpherePrimitive::SetEntityID(uint32_t uiEntityID)
+{
+	m_uiEntitID = uiEntityID;
+	m_bDirty = true;
 }
 
 uint32_t SpherePrimitive::GetEntityID() const
@@ -45,9 +55,14 @@ uint32_t SpherePrimitive::GetEntityID() const
 	return m_uiEntitID;
 }
 
-void SpherePrimitive::SetEntityID(uint32_t uiEntityID)
+void SpherePrimitive::ResetDirty()
 {
-	m_uiEntitID = uiEntityID;
+	m_bDirty = false;
+}
+
+bool SpherePrimitive::GetDirty()
+{
+	return m_bDirty;
 }
 
 SAND_TABLE_NAMESPACE_END

@@ -106,16 +106,28 @@ float RayTracingCamera::GetRotationSpeed()
 	return 0.3f;
 }
 
+bool RayTracingCamera::GetDirty()
+{
+	return m_bDirty;
+}
+
+void RayTracingCamera::ResetDirty()
+{
+	m_bDirty = false;
+}
+
 void RayTracingCamera::RecalculateProjection()
 {
 	m_Projection = glm::perspectiveFov(glm::radians(m_VerticalFOV), (float)m_ViewportWidth, (float)m_ViewportHeight, m_NearClip, m_FarClip);
 	m_InverseProjection = glm::inverse(m_Projection);
+	m_bDirty = true;
 }
 
 void RayTracingCamera::RecalculateView()
 {
 	m_View = glm::lookAt(m_Position, m_Position + m_ForwardDirection, glm::vec3(0, 1, 0));
 	m_InverseView = glm::inverse(m_View);
+	m_bDirty = true;
 }
 
 void RayTracingCamera::RecalculateRayDirections()

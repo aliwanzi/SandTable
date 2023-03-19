@@ -10,6 +10,7 @@ public:
 	DataBuffer(const DataBuffer&) = default;
 	~DataBuffer();
 
+	void Clear();
 	void Resize(uint64_t uiDataBufferSize);
 	void SetDataBuffer(const void* pDataBuffer);
 

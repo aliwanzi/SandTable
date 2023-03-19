@@ -1,7 +1,6 @@
 #include "pch.h"
 #include "RayTracingRenderImage.h"
-#include <omp.h>
-
+#include "SandTable/Math/Random.h"
 SAND_TABLE_NAMESPACE_BEGIN
 
 Ref<RayTracingRenderImage::RenderStroge> RayTracingRenderImage::m_spRenderStroge = nullptr;
@@ -9,6 +8,7 @@ void RayTracingRenderImage::Init()
 {
 	m_spRenderStroge = CreateRef<RenderStroge>();
 	m_spRenderStroge->spImage = CreateRef<Image>();
+	m_spRenderStroge->spAccumulateBuffer = CreateRef<DataBuffer>(0, sizeof(glm::vec4) / sizeof(uint8_t));
 	m_spRenderStroge->spRay = CreateRef<Ray>();
 	m_spRenderStroge->matProjection = glm::mat4(1.f);
 	m_spRenderStroge->matView = glm::mat4(1.f);
@@ -21,6 +21,7 @@ void RayTracingRenderImage::OnResize(unsigned int uiWidth, unsigned int uiHeight
 	{
 		LOG_DEV_INFO("RayTracingRenderImage::OnResize");
 		m_spRenderStroge->spImage->Resize(uiWidth, uiHeight);
+		m_spRenderStroge->spAccumulateBuffer->Resize(uiWidth * uiHeight);
 	}
 }
 
@@ -36,31 +37,36 @@ void RayTracingRenderImage::EndScene()
 	m_spRenderStroge->spImage->UpdateImage();
 }
 
-void RayTracingRenderImage::RenderPrimitve(const MapSphere& vecSpherePrimitive)
+void RayTracingRenderImage::RenderPrimitve(Ref<RayTracingScene>& spRayTracingScene)
 {
-	if (vecSpherePrimitive.empty())
-	{
-		return;
-	}
+	auto& iFrameIndex = spRayTracingScene->GetFrameIndex();
+
 	auto width = m_spRenderStroge->spImage->GetWidth();
 	auto height = m_spRenderStroge->spImage->GetHeight();
+	if (iFrameIndex == 1)
+	{
+		m_spRenderStroge->spAccumulateBuffer->Clear();
+	}
 
 	auto pImageData = m_spRenderStroge->spImage->GetImageData();
-
+	auto pAccumulateBuffer = m_spRenderStroge->spAccumulateBuffer->As<glm::vec4>();
 	for (uint32_t y = 0; y < height; y++)
 	{
 		for (uint32_t x = 0; x < width; x++)
 		{
-			glm::vec2 vec2Coord = { static_cast<float>(x) / static_cast<float>(width),
-				static_cast<float>(y) / static_cast<float>(height) };
-			vec2Coord = vec2Coord * 2.f - 1.f; //(0~1)->(-1,1)
-			glm::vec4 target = m_spRenderStroge->matProjection * glm::vec4(vec2Coord.x, vec2Coord.y, 1, 1);
-			m_spRenderStroge->spRay->Direction = glm::vec3(m_spRenderStroge->matView
-				* glm::vec4(glm::normalize(glm::vec3(target) / target.w), 0));
+			auto color = PerPixel(m_spRenderStroge->spRay->Origin, x, y, spRayTracingScene);
 
-			pImageData[x + y * width] = Image::ConvertToRGBA(PerPixel(m_spRenderStroge->spRay, vecSpherePrimitive));
+			pAccumulateBuffer[x + y * width] += color;
+
+			color = pAccumulateBuffer[x + y * width];
+			color /= iFrameIndex;
+
+			pImageData[x + y * width] = Image::ConvertToRGBA(color);
 		}
 	}
+
+
+	spRayTracingScene->GetAccumulate() ? iFrameIndex++ : iFrameIndex = 1;
 }
 
 uint32_t RayTracingRenderImage::GetImage()
@@ -68,36 +74,47 @@ uint32_t RayTracingRenderImage::GetImage()
 	return m_spRenderStroge->spImage->GetImage();
 }
 
-glm::vec4 RayTracingRenderImage::PerPixel(Ref<Ray> ray, const MapSphere& mapSpherePrimitive)
+glm::vec4 RayTracingRenderImage::PerPixel(const glm::vec3& rayOrigin, uint32_t uiX, uint32_t uiY, Ref<RayTracingScene>& spScene)
 {
-	glm::vec3 vec3Color(0.f);
-	int fBounces(2);
-	float fMultiplier = 1.f;
+	auto& mapSpherePrimitive = spScene->GetSpherePrimives();
+	auto& mapMaterials = spScene->GetMaterials();
+	auto width = m_spRenderStroge->spImage->GetWidth();
+	auto height = m_spRenderStroge->spImage->GetHeight();
 
 	auto spRay = CreateRef<Ray>();
-	spRay->Origin = ray->Origin;
-	spRay->Direction = ray->Direction;
+	spRay->Origin = rayOrigin;
+	glm::vec2 vec2Coord = { static_cast<float>(uiX) / static_cast<float>(width),static_cast<float>(uiY) / static_cast<float>(height) };
+	vec2Coord = vec2Coord * 2.f - 1.f; //(0~1)->(-1,1)
+	glm::vec4 target = m_spRenderStroge->matProjection * glm::vec4(vec2Coord.x, vec2Coord.y, 1, 1);
+	spRay->Direction = glm::vec3(m_spRenderStroge->matView * glm::vec4(glm::normalize(glm::vec3(target) / target.w), 0));
 
+	glm::vec3 vec3Color(0.f);
+	glm::vec3 vec3SkyColor(0.6f, 0.7f, 0.9f);
+	int fBounces(5);
+	float fMultiplier = 1.f;
 	for (int i = 0; i < fBounces; i++)
 	{
 		auto spHitPayLoad = TraceRay(spRay, mapSpherePrimitive);
 		if (spHitPayLoad == nullptr)
 		{
+			vec3Color += vec3SkyColor * fMultiplier;
 			break;
 		}
 
 		glm::vec3 lightDir = glm::normalize(glm::vec3(-1.f));
 		float diffuse = glm::max(glm::dot(spHitPayLoad->WorldNormal, -lightDir), 0.f);
 
-		const auto& spSphere = mapSpherePrimitive.find(spHitPayLoad->EntityID)->second;
-		glm::vec3 vec3SphereColor(spSphere->GetMaterial()->GetAlbedo());
+		const auto& sphere = mapSpherePrimitive.find(spHitPayLoad->EntityID)->second;
+		const auto& material = mapMaterials.find(sphere->GetMaterialID())->second;
+		glm::vec3 vec3SphereColor(material->GetAlbedo());
 		vec3SphereColor *= diffuse;
 
 		vec3Color += vec3SphereColor * fMultiplier;
-		fMultiplier *= 0.7f;
+		fMultiplier *= 0.5f;
 
 		spRay->Origin = spHitPayLoad->WorldPosition + spHitPayLoad->WorldNormal * 0.0001f;
-		spRay->Direction = glm::reflect(spRay->Direction, spHitPayLoad->WorldNormal);
+		auto vec3Mircor = material->GetRoughness() * Random::Vec3();
+		spRay->Direction = glm::reflect(spRay->Direction, spHitPayLoad->WorldNormal + vec3Mircor);
 	}
 
 	return glm::vec4(vec3Color, 1.f);

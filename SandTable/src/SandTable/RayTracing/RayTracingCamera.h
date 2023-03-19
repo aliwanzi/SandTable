@@ -20,6 +20,10 @@ public:
 	const std::vector<glm::vec3>& GetRayDirections() const { return m_RayDirections; }
 
 	float GetRotationSpeed();
+
+	bool GetDirty();
+
+	void ResetDirty();
 private:
 	void RecalculateProjection();
 	void RecalculateView();
@@ -43,6 +47,8 @@ private:
 	glm::vec2 m_LastMousePosition{ 0.0f, 0.0f };
 
 	uint32_t m_ViewportWidth = 0, m_ViewportHeight = 0;
+
+	bool m_bDirty;
 };
 
 SAND_TABLE_NAMESPACE_END

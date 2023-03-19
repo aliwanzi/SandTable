@@ -8,25 +8,23 @@ RayTracingEditorLayer::RayTracingEditorLayer() :
 	m_spRayTracingScene(std::make_shared<RayTracingScene>()),
 	m_spRayTracingCamera(CreateRef<RayTracingCamera>(45.f, 0.1f, 100.f))
 {
-	{
-		auto spMaterial = CreateRef<Material>();
-		spMaterial->SetAlbedo(glm::vec3(1.f, 0.f, 1.f));
+	auto spMaterial0 = CreateRef<Material>(0);
+	spMaterial0->SetAlbedo(glm::vec3(1.f, 0.f, 1.f));
+	spMaterial0->SetRoughness(0.1);
+	m_spRayTracingScene->AddMaterial(spMaterial0);
 
-		auto spSpherePrimitive = CreateRef<SpherePrimitive>(glm::vec3(0.f), 1.0f, 0);
-		spSpherePrimitive->SetMaterial(spMaterial);
+	auto spMaterial1 = CreateRef<Material>(1);
+	spMaterial1->SetAlbedo(glm::vec3(0.2f, 0.3f, 1.f));
+	spMaterial1->SetRoughness(0.f);
+	m_spRayTracingScene->AddMaterial(spMaterial1);
 
-		m_spRayTracingScene->AddSpherePrimive(spSpherePrimitive);
-	}
+	auto spSpherePrimitive0 = CreateRef<SpherePrimitive>(glm::vec3(0.f), 1.0f, 0);
+	spSpherePrimitive0->SetMaterialID(0);
+	m_spRayTracingScene->AddSpherePrimive(spSpherePrimitive0);
 
-	{
-		auto spMaterial = CreateRef<Material>();
-		spMaterial->SetAlbedo(glm::vec3(0.2f, 0.3f, 1.f));
-
-		auto spSpherePrimitive = CreateRef<SpherePrimitive>(glm::vec3(1.f, -101.f, -5.f), 100.f, 1);
-		spSpherePrimitive->SetMaterial(spMaterial);
-
-		m_spRayTracingScene->AddSpherePrimive(spSpherePrimitive);
-	}
+	auto spSpherePrimitive1 = CreateRef<SpherePrimitive>(glm::vec3(1.f, -101.f, -5.f), 100.f, 1);
+	spSpherePrimitive1->SetMaterialID(1);
+	m_spRayTracingScene->AddSpherePrimive(spSpherePrimitive1);
 }
 
 void RayTracingEditorLayer::OnAttach()
@@ -40,10 +38,11 @@ void RayTracingEditorLayer::OnUpdate(const TimeStep& ts)
 	if (m_vec2RenderViewPortSize.x > 0 && m_vec2RenderViewPortSize.y > 0)
 	{
 		m_spRayTracingCamera->OnResize(m_vec2RenderViewPortSize.x, m_vec2RenderViewPortSize.y);
-		m_spRayTracingCamera->OnUpdate(ts);
 		m_spRayTracingScene->OnViewPortResize(m_vec2RenderViewPortSize.x, m_vec2RenderViewPortSize.y);
+		m_spRayTracingCamera->OnUpdate(ts);
 		m_spRayTracingScene->OnUpdate(ts, m_spRayTracingCamera);
 	}
+
 	m_fLastRenderTime = m_spTimer->ElapsedMillis();
 }
 
@@ -120,24 +119,57 @@ void RayTracingEditorLayer::OnImGuiRender()
 
 	ImGui::Begin("Settings");
 	ImGui::Text("Last render: %.3fms", m_fLastRenderTime);
-	if (ImGui::Button("Render"))
+	ImGui::Checkbox("Accumulate", &m_spRayTracingScene->GetAccumulate());
+	if (ImGui::Button("Reset"))
 	{
-		Render();
+		m_spRayTracingScene->ResetFrameIndex();
 	}
+	ImGui::Text("Frame Index: %d", m_spRayTracingScene->GetFrameIndex());
 	ImGui::End();
 
 	ImGui::Begin("Scene");
 	auto& mapSphere = m_spRayTracingScene->GetSpherePrimives();
-	for (auto& iter = mapSphere.begin(); iter != mapSphere.end(); iter++)
+	auto& mapMaterial = m_spRayTracingScene->GetMaterials();
+
+	glm::vec3 position(0.f);
+	float radius(0.f);
+
+	glm::vec3 albedo(0.f);
+	float roughness(0.f);
+	float metallic(0.f);
+	for (auto& sphere : mapSphere)
 	{
-		ImGui::PushID(iter->first);
-		ImGui::DragFloat3("Position", glm::value_ptr(iter->second->GetPosition()), 0.1f);
-		ImGui::DragFloat("Radius", &(iter->second->GetRadius()), 0.1f);
-		ImGui::ColorEdit3("Albedo", glm::value_ptr(iter->second->GetMaterial()->GetAlbedo()), 0.1f);
-		ImGui::DragFloat("Roughness",&(iter->second->GetMaterial()->GetRoughness()), 0.1f);
-		ImGui::DragFloat("Metallic",&(iter->second->GetMaterial()->GetMetallic()), 0.1f);
-		ImGui::PopID();
+		position = sphere.second->GetPosition();
+		radius = sphere.second->GetRadius();
+		ImGui::PushID(sphere.first);
+		if (ImGui::DragFloat3("Position", glm::value_ptr(position), 0.1f))
+		{
+			sphere.second->SetPosition(position);
+		}
+		if (ImGui::DragFloat("Radius", &radius, 0.1f))
+		{
+			sphere.second->SetRadius(radius);
+		}
+
+		auto material = mapMaterial.find(sphere.second->GetMaterialID())->second;
+		albedo = material->GetAlbedo();
+		roughness = material->GetRoughness();
+		metallic = material->GetMetallic();
+		if (ImGui::ColorEdit3("Albedo", glm::value_ptr(albedo)))
+		{
+			material->SetAlbedo(albedo);
+		}
+		if (ImGui::DragFloat("Roughness", &roughness, 0.01f, 0.0f, 1.f))
+		{
+			material->SetRoughness(roughness);
+		}
+		if (ImGui::DragFloat("Metallic", &metallic, 0.01f, 0.0f, 1.f))
+		{
+			material->SetMetallic(metallic);
+		}
+
 		ImGui::Separator();
+		ImGui::PopID();
 	}
 
 	ImGui::End();

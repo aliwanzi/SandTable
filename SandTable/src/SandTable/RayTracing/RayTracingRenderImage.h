@@ -2,6 +2,7 @@
 #include "SandTable/Render/Image/Image.h"
 #include "SandTable/RayTracing/Ray.h"
 #include "SandTable/RayTracing/RayTracingCamera.h"
+#include "SandTable/RayTracing/RayTracingScene.h"
 
 SAND_TABLE_NAMESPACE_BEGIN
 class SpherePrimitive;
@@ -13,6 +14,7 @@ public:
 	{
 		Ref<Ray> spRay;
 		Ref<Image> spImage;
+		Ref<DataBuffer> spAccumulateBuffer;
 		glm::mat4 matView;
 		glm::mat4 matProjection;
 	};
@@ -21,11 +23,11 @@ public:
 	static void OnResize(unsigned int uiWidth, unsigned int uiHeight);
 	static void BeginScene(const Ref<RayTracingCamera>& spCamera);
 	static void EndScene();
-	static void RenderPrimitve(const MapSphere& mapSpherePrimitive);
+	static void RenderPrimitve(Ref<RayTracingScene>& spRayTracingScene);
 	static uint32_t GetImage();
 
 private:
-	static glm::vec4 PerPixel(Ref<Ray> spRay, const MapSphere& mapSpherePrimitive);
+	static glm::vec4 PerPixel(const glm::vec3& rayOrigin, uint32_t uiX, uint32_t uiY, Ref<RayTracingScene>& spScene);
 	static Ref<HitPayLoad> TraceRay(const Ref<Ray>& spRay, const MapSphere& mapSpherePrimitive);
 private:
 	static Ref<RenderStroge> m_spRenderStroge;

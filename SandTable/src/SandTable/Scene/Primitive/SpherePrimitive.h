@@ -1,5 +1,4 @@
 #pragma once
-#include "SandTable/RayTracing/Material.h"
 
 SAND_TABLE_NAMESPACE_BEGIN
 class SpherePrimitive
@@ -9,22 +8,27 @@ public:
 	SpherePrimitive(const glm::vec3& vec3Position, float fRadius, uint32_t uiEntitID);
 
 	void SetPosition(const glm::vec3& vec3Position);
-	glm::vec3& GetPosition();
+	const glm::vec3& GetPosition() const;
 
 	void SetRadius(float fRadius);
-	float& GetRadius();
+	float GetRadius() const;
 
-	void SetMaterial(const Ref<Material>& spMaterial);
-	Ref<Material>& GetMaterial();
+	void SetMaterialID(uint32_t uiMaterialID);
+	uint32_t GetMaterialID() const;
 
-	uint32_t GetEntityID()const;
 	void SetEntityID(uint32_t uiEntityID);
+	uint32_t GetEntityID()const;
+
+	void ResetDirty();
+	bool GetDirty();
 
 private:
 	glm::vec3 m_vec3Position;
-	uint32_t m_uiEntitID;
 	float m_fRadius;
-	Ref<Material> m_spMaterial;
+	uint32_t m_uiEntitID;
+	uint32_t m_uiMaterialID;
+
+	bool m_bDirty;
 };
 
 using MapSphere = std::map<uint32_t, Ref<SpherePrimitive>>;

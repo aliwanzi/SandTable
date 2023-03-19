@@ -23,6 +23,11 @@ uint64_t Random::Uint64()
 	return static_cast<uint64_t>(m_sDistribution(m_sRandomEngine));
 }
 
+glm::vec3 Random::Vec3()
+{
+	return glm::vec3(Float(), Float(), Float());
+}
+
 
 
 SAND_TABLE_NAMESPACE_END
