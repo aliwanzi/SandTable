@@ -8,23 +8,39 @@ RayTracingEditorLayer::RayTracingEditorLayer() :
 	m_spRayTracingScene(std::make_shared<RayTracingScene>()),
 	m_spRayTracingCamera(CreateRef<RayTracingCamera>(45.f, 0.1f, 100.f))
 {
-	auto spMaterial0 = CreateRef<Material>(0);
-	spMaterial0->SetAlbedo(glm::vec3(1.f, 0.f, 1.f));
-	spMaterial0->SetRoughness(0.1);
+	auto spMaterial0 = CreateRef<Material>(MaterialType::Lambertian, 0);
+	spMaterial0->SetAlbedo(glm::vec3(0.8f, 0.8f, 0.f));
 	m_spRayTracingScene->AddMaterial(spMaterial0);
 
-	auto spMaterial1 = CreateRef<Material>(1);
-	spMaterial1->SetAlbedo(glm::vec3(0.2f, 0.3f, 1.f));
-	spMaterial1->SetRoughness(0.f);
+	auto spMaterial1 = CreateRef<Material>(MaterialType::Lambertian, 1);
+	spMaterial1->SetAlbedo(glm::vec3(0.7f, 0.3f, 0.3f));
 	m_spRayTracingScene->AddMaterial(spMaterial1);
 
-	auto spSpherePrimitive0 = CreateRef<SpherePrimitive>(glm::vec3(0.f), 1.0f, 0);
+	auto spMaterial2 = CreateRef<Material>(MaterialType::Metal, 2);
+	spMaterial2->SetAlbedo(glm::vec3(0.8f));
+	spMaterial2->SetRoughness(0.3f);
+	m_spRayTracingScene->AddMaterial(spMaterial2);
+
+	auto spMaterial3 = CreateRef<Material>(MaterialType::Metal, 3);
+	spMaterial3->SetAlbedo(glm::vec3(0.8f, 0.6f, 0.2f));
+	spMaterial3->SetRoughness(1.f);
+	m_spRayTracingScene->AddMaterial(spMaterial3);
+
+	auto spSpherePrimitive0 = CreateRef<SpherePrimitive>(glm::vec3(0.f, -100.5f, -1.f), 100.0f, 0);
 	spSpherePrimitive0->SetMaterialID(0);
 	m_spRayTracingScene->AddSpherePrimive(spSpherePrimitive0);
 
-	auto spSpherePrimitive1 = CreateRef<SpherePrimitive>(glm::vec3(1.f, -101.f, -5.f), 100.f, 1);
+	auto spSpherePrimitive1 = CreateRef<SpherePrimitive>(glm::vec3(0.f, 0.f, -1.f), 0.5f, 1);
 	spSpherePrimitive1->SetMaterialID(1);
 	m_spRayTracingScene->AddSpherePrimive(spSpherePrimitive1);
+
+	auto spSpherePrimitive2 = CreateRef<SpherePrimitive>(glm::vec3(-1.f, 0.f, -1.f), 0.5f, 2);
+	spSpherePrimitive2->SetMaterialID(2);
+	m_spRayTracingScene->AddSpherePrimive(spSpherePrimitive2);
+
+	auto spSpherePrimitive3 = CreateRef<SpherePrimitive>(glm::vec3(1.f, 0.f, -1.f), 0.5f, 3);
+	spSpherePrimitive3->SetMaterialID(3);
+	m_spRayTracingScene->AddSpherePrimive(spSpherePrimitive3);
 }
 
 void RayTracingEditorLayer::OnAttach()
@@ -107,9 +123,9 @@ void RayTracingEditorLayer::OnImGuiRender()
 	{
 		if (ImGui::BeginMenu("File"))
 		{
-			if (ImGui::MenuItem("Exit")) 
-			{ 
-				Application::GetApplication()->Close(); 
+			if (ImGui::MenuItem("Exit"))
+			{
+				Application::GetApplication()->Close();
 			}
 			ImGui::EndMenu();
 		}

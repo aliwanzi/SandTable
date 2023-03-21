@@ -1,4 +1,5 @@
 #pragma once
+#include "SandTable/RayTracing/Ray.h"
 
 SAND_TABLE_NAMESPACE_BEGIN
 class SpherePrimitive
@@ -21,6 +22,8 @@ public:
 
 	void ResetDirty();
 	bool GetDirty();
+
+	bool Hit(const Ray& ray, HitPayLoad& hitPayLoad);
 
 private:
 	glm::vec3 m_vec3Position;

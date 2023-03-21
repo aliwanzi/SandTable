@@ -2,7 +2,11 @@
 #include "SpherePrimitive.h"
 
 SAND_TABLE_NAMESPACE_BEGIN
-SpherePrimitive::SpherePrimitive(const glm::vec3& vec3Position, float fRadius, uint32_t uiEntitID):
+namespace
+{
+	const float fHitDistance = std::numeric_limits<float>::max();
+}
+SpherePrimitive::SpherePrimitive(const glm::vec3& vec3Position, float fRadius, uint32_t uiEntitID) :
 	m_vec3Position(vec3Position),
 	m_fRadius(fRadius),
 	m_uiEntitID(uiEntitID),
@@ -22,7 +26,7 @@ const glm::vec3& SpherePrimitive::GetPosition() const
 	return m_vec3Position;
 }
 
-void SpherePrimitive::SetRadius(float fRadius) 
+void SpherePrimitive::SetRadius(float fRadius)
 {
 	m_fRadius = fRadius;
 	m_bDirty = true;
@@ -63,6 +67,29 @@ void SpherePrimitive::ResetDirty()
 bool SpherePrimitive::GetDirty()
 {
 	return m_bDirty;
+}
+
+bool SpherePrimitive::Hit(const Ray& ray, HitPayLoad& hitPayLoad)
+{
+	auto& origin = ray.Origin - m_vec3Position;
+
+	float fA = glm::dot(ray.Direction, ray.Direction);
+	float fB = 2.f * glm::dot(origin, ray.Direction);
+	float fC = glm::dot(origin, origin) - m_fRadius * m_fRadius;
+
+	// Find the nearest root that lies in the acceptable range.
+	float discriminant = fB * fB - 4.0f * fA * fC;
+	if (discriminant < 0)
+	{
+		return false;
+	}
+
+	auto root = (-fB - sqrt(discriminant)) / (2.f * fA);
+	hitPayLoad.HitDistance = root;
+	hitPayLoad.WorldPosition = ray.Origin + ray.Direction * hitPayLoad.HitDistance;
+	hitPayLoad.EntityID = m_uiEntitID;
+	hitPayLoad.SetWorldNormal(ray, (hitPayLoad.WorldPosition - m_vec3Position) / m_fRadius);
+	return true;
 }
 
 SAND_TABLE_NAMESPACE_END

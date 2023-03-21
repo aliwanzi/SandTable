@@ -6,7 +6,6 @@
 #include "SandTable/Render/Render/Render2D.h"
 #include "SandTable/Statics/Instrumentor.h"
 #include "SandTable/Script/ScriptEngine.h"
-#include "SandTable/RayTracing/RayTracingRenderImage.h"
 
 SAND_TABLE_NAMESPACE_BEGIN
 
@@ -25,7 +24,6 @@ void Application::Init()
 	SAND_TABLE_PROFILE_FUNCTION();
 	Render::Init();
 	Render2D::Init();
-	RayTracingRenderImage::Init();
 	m_spLayerStack = CreateRef<LayerStack>();
 	m_spImGuiLayer = CreateRef<ImGuiLayer>();
 	PushOverlay(m_spImGuiLayer);
