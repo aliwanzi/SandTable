@@ -1,13 +1,14 @@
 #pragma once
 #include "RayTracingCamera.h"
 #include "SandTable/Core/TimeStep.h"
-#include "SandTable/Scene/Primitive/SpherePrimitive.h"
-#include "SandTable/RayTracing/Material.h"
 #include "SandTable/Render/Image/Image.h"
+
+#include "SandTable/RayTracing/Material/Material.h"
+#include "SandTable/RayTracing/Object/ObjectContainer.h"
 
 SAND_TABLE_NAMESPACE_BEGIN
 
-class RayTracingScene :public std::enable_shared_from_this<RayTracingScene>
+class RayTracingScene
 {
 public:
 	RayTracingScene();
@@ -15,8 +16,8 @@ public:
 	void OnUpdate(const TimeStep& timeStep, Ref<RayTracingCamera>& spCamera);
 	void OnViewPortResize(unsigned int uiWidth, unsigned int uiHeight);
 
-	void AddSpherePrimive(const Ref<SpherePrimitive>& spSpherePrimive);
-	MapSphere& GetSpherePrimives();
+	void SetObjectContainer(std::shared_ptr<ObjectContainer> spObjectContainer);
+	const std::shared_ptr<ObjectContainer>& GetObjectContainer()const;
 
 	void AddMaterial(const Ref<Material>& spMaterial);
 	MapMaterial& GetMaterials();
@@ -32,11 +33,11 @@ private:
 	void PostRender(Ref<RayTracingCamera>& spCamera);
 
 	glm::vec4 PerPixel(const glm::vec3& rayOrigin, uint32_t uiX, uint32_t uiY);
-	void TraceRay(const Ray& ray, HitPayLoad& hitPayLoad);
+	glm::vec3 TraceRay(const Ray& ray, const std::shared_ptr<Hittable>& spHittable, int depth);
 
 private:
 	MapMaterial m_mapMaterial;
-	MapSphere m_mapSpherePrimitve;
+	Ref<ObjectContainer> m_spObjectContainer;
 
 	bool m_bAccumulate;
 	int m_iFrameIndex;

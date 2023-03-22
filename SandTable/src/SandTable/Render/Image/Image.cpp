@@ -50,7 +50,8 @@ void Image::Resize(uint32_t uiWidth, uint32_t uiHeight)
 
 uint32_t Image::ConvertToRGBA(const glm::vec4& color)
 {
-	auto clampColor = glm::clamp(color, glm::vec4(0.f), glm::vec4(1.f));
+	auto clampColor = glm::sqrt(color); //GammaÐ£Õý
+	clampColor = glm::clamp(color, clampColor, glm::vec4(1.f));
 	uint8_t r = static_cast<uint8_t>(clampColor.r * 255.0f);
 	uint8_t g = static_cast<uint8_t>(clampColor.g * 255.0f);
 	uint8_t b = static_cast<uint8_t>(clampColor.b * 255.0f);

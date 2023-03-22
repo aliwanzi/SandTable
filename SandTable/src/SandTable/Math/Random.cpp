@@ -28,6 +28,17 @@ glm::vec3 Random::Vec3()
 	return glm::vec3(Float(), Float(), Float());
 }
 
+glm::vec3 Random::UnitSphere()
+{
+	while (true)
+	{
+		auto unit = glm::vec3(2 * Float() - 1, 2 * Float() - 1, 2 * Float() - 1);
+		if (glm::length(unit) >= 1.f || abs(glm::length(unit) < glm::epsilon<float>()))
+			continue;
+		return unit;
+	}
+}
+
 
 
 SAND_TABLE_NAMESPACE_END

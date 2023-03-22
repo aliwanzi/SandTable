@@ -8,7 +8,7 @@
 SAND_TABLE_NAMESPACE_BEGIN
 
 RayTracingCamera::RayTracingCamera(float verticalFOV, float nearClip, float farClip)
-	: m_VerticalFOV(verticalFOV), m_NearClip(nearClip), m_FarClip(farClip)
+	: m_VerticalFOV(verticalFOV), m_NearClip(nearClip), m_FarClip(farClip),m_bDirty(true)
 {
 	m_ForwardDirection = glm::vec3(0, 0, -1);
 	m_Position = glm::vec3(0, 0,2);
@@ -99,6 +99,18 @@ void RayTracingCamera::OnResize(uint32_t width, uint32_t height)
 
 	RecalculateProjection();
 	//RecalculateRayDirections();
+}
+
+void RayTracingCamera::SetPosition(const glm::vec3& position)
+{
+	m_Position = position;
+	RecalculateView();
+}
+
+void RayTracingCamera::SetForwardDirection(const glm::vec3& direction)
+{
+	m_ForwardDirection = direction;
+	RecalculateView();
 }
 
 float RayTracingCamera::GetRotationSpeed()

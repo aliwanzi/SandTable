@@ -5,42 +5,14 @@ RayTracingEditorLayer::RayTracingEditorLayer() :
 	m_vec2RenderViewPortSize(ImVec2(0.0f, 0.0f)),
 	m_spTimer(CreateRef<Timer>()),
 	m_fLastRenderTime(0.f),
-	m_spRayTracingScene(std::make_shared<RayTracingScene>()),
+	m_spObjectContainer(CreateRef<ObjectContainer>()),
+	m_spRayTracingScene(CreateRef<RayTracingScene>()),
 	m_spRayTracingCamera(CreateRef<RayTracingCamera>(45.f, 0.1f, 100.f))
 {
-	auto spMaterial0 = CreateRef<Material>(MaterialType::Lambertian, 0);
-	spMaterial0->SetAlbedo(glm::vec3(0.8f, 0.8f, 0.f));
-	m_spRayTracingScene->AddMaterial(spMaterial0);
-
-	auto spMaterial1 = CreateRef<Material>(MaterialType::Lambertian, 1);
-	spMaterial1->SetAlbedo(glm::vec3(0.7f, 0.3f, 0.3f));
-	m_spRayTracingScene->AddMaterial(spMaterial1);
-
-	auto spMaterial2 = CreateRef<Material>(MaterialType::Metal, 2);
-	spMaterial2->SetAlbedo(glm::vec3(0.8f));
-	spMaterial2->SetRoughness(0.3f);
-	m_spRayTracingScene->AddMaterial(spMaterial2);
-
-	auto spMaterial3 = CreateRef<Material>(MaterialType::Metal, 3);
-	spMaterial3->SetAlbedo(glm::vec3(0.8f, 0.6f, 0.2f));
-	spMaterial3->SetRoughness(1.f);
-	m_spRayTracingScene->AddMaterial(spMaterial3);
-
-	auto spSpherePrimitive0 = CreateRef<SpherePrimitive>(glm::vec3(0.f, -100.5f, -1.f), 100.0f, 0);
-	spSpherePrimitive0->SetMaterialID(0);
-	m_spRayTracingScene->AddSpherePrimive(spSpherePrimitive0);
-
-	auto spSpherePrimitive1 = CreateRef<SpherePrimitive>(glm::vec3(0.f, 0.f, -1.f), 0.5f, 1);
-	spSpherePrimitive1->SetMaterialID(1);
-	m_spRayTracingScene->AddSpherePrimive(spSpherePrimitive1);
-
-	auto spSpherePrimitive2 = CreateRef<SpherePrimitive>(glm::vec3(-1.f, 0.f, -1.f), 0.5f, 2);
-	spSpherePrimitive2->SetMaterialID(2);
-	m_spRayTracingScene->AddSpherePrimive(spSpherePrimitive2);
-
-	auto spSpherePrimitive3 = CreateRef<SpherePrimitive>(glm::vec3(1.f, 0.f, -1.f), 0.5f, 3);
-	spSpherePrimitive3->SetMaterialID(3);
-	m_spRayTracingScene->AddSpherePrimive(spSpherePrimitive3);
+	CreateMultiSphereScene();
+	//CreatFourSphereScene();
+	m_spRayTracingCamera->SetPosition(glm::vec3(-10, 6.5, 7));
+	m_spRayTracingCamera->SetForwardDirection(glm::vec3(0.7, -0.6, -0.5));
 }
 
 void RayTracingEditorLayer::OnAttach()
@@ -144,49 +116,64 @@ void RayTracingEditorLayer::OnImGuiRender()
 	ImGui::End();
 
 	ImGui::Begin("Scene");
-	auto& mapSphere = m_spRayTracingScene->GetSpherePrimives();
-	auto& mapMaterial = m_spRayTracingScene->GetMaterials();
-
-	glm::vec3 position(0.f);
-	float radius(0.f);
-
-	glm::vec3 albedo(0.f);
-	float roughness(0.f);
-	float metallic(0.f);
-	for (auto& sphere : mapSphere)
+	auto positon = m_spRayTracingCamera->GetPosition();
+	if (ImGui::DragFloat3("Positon", glm::value_ptr(positon)))
 	{
-		position = sphere.second->GetPosition();
-		radius = sphere.second->GetRadius();
-		ImGui::PushID(sphere.first);
-		if (ImGui::DragFloat3("Position", glm::value_ptr(position), 0.1f))
-		{
-			sphere.second->SetPosition(position);
-		}
-		if (ImGui::DragFloat("Radius", &radius, 0.1f))
-		{
-			sphere.second->SetRadius(radius);
-		}
-
-		auto material = mapMaterial.find(sphere.second->GetMaterialID())->second;
-		albedo = material->GetAlbedo();
-		roughness = material->GetRoughness();
-		metallic = material->GetMetallic();
-		if (ImGui::ColorEdit3("Albedo", glm::value_ptr(albedo)))
-		{
-			material->SetAlbedo(albedo);
-		}
-		if (ImGui::DragFloat("Roughness", &roughness, 0.01f, 0.0f, 1.f))
-		{
-			material->SetRoughness(roughness);
-		}
-		if (ImGui::DragFloat("Metallic", &metallic, 0.01f, 0.0f, 1.f))
-		{
-			material->SetMetallic(metallic);
-		}
-
-		ImGui::Separator();
-		ImGui::PopID();
+		m_spRayTracingCamera->SetPosition(positon);
 	}
+	auto direction = m_spRayTracingCamera->GetForwardDirection();
+	if (ImGui::DragFloat3("Forward Direction", glm::value_ptr(direction)))
+	{
+		m_spRayTracingCamera->SetForwardDirection(direction);
+	}
+
+	//auto& mapObjcet = m_spObjectContainer->GetAllObject();
+	//auto& mapMaterial = m_spRayTracingScene->GetMaterials();
+
+	//glm::vec3 position(0.f);
+	//float radius(0.f);
+
+	//glm::vec3 albedo(0.f);
+	//float roughness(0.f);
+	//float metallic(0.f);
+	//for (auto& object : mapObjcet)
+	//{
+		//auto spSphere = std::dynamic_pointer_cast<Sphere>(object.second);
+		//if (spSphere !=nullptr)
+		//{
+		//	position = spSphere->GetPosition();
+		//	radius = spSphere->GetRadius();
+		//	ImGui::PushID(object.first);
+		//	if (ImGui::DragFloat3("Position", glm::value_ptr(position), 0.1f))
+		//	{
+		//		spSphere->SetPosition(position);
+		//	}
+		//	if (ImGui::DragFloat("Radius", &radius, 0.1f))
+		//	{
+		//		spSphere->SetRadius(radius);
+		//	}
+		//}
+
+		//auto material = mapMaterial.find(object.second->GetMaterialID())->second;
+		//albedo = material->GetAlbedo();
+		//roughness = material->GetRoughness();
+		//metallic = material->GetMetallic();
+		//if (ImGui::ColorEdit3("Albedo", glm::value_ptr(albedo)))
+		//{
+		//	material->SetAlbedo(albedo);
+		//}
+		//if (ImGui::DragFloat("Roughness", &roughness, 0.01f, 0.0f, 1.f))
+		//{
+		//	material->SetRoughness(roughness);
+		//}
+		//if (ImGui::DragFloat("Metallic", &metallic, 0.01f, 0.0f, 1.f))
+		//{
+		//	material->SetMetallic(metallic);
+		//}
+
+	//	ImGui::Separator();
+	//ImGui::PopID();
+	//}
 
 	ImGui::End();
 
@@ -205,4 +192,141 @@ void RayTracingEditorLayer::OnImGuiRender()
 	ImGui::PopStyleVar();
 
 	ImGui::End();
+}
+
+void RayTracingEditorLayer::CreatFourSphereScene()
+{
+	auto spMaterial0 = CreateRef<Lambertian>(0);
+	spMaterial0->SetAlbedo(glm::vec3(0.8f, 0.8f, 0.f));
+	m_spRayTracingScene->AddMaterial(spMaterial0);
+
+	auto spMaterial1 = CreateRef<Lambertian>(1);
+	spMaterial1->SetAlbedo(glm::vec3(0.1, 0.2, 0.5));
+	m_spRayTracingScene->AddMaterial(spMaterial1);
+
+	auto spMaterial2 = CreateRef<Dielectric>(2);
+	spMaterial2->SetMetallic(1.5);
+	m_spRayTracingScene->AddMaterial(spMaterial2);
+
+	auto spMaterial3 = CreateRef<Metal>(3);
+	spMaterial3->SetAlbedo(glm::vec3(0.8f, 0.6f, 0.2f));
+	spMaterial3->SetRoughness(0.f);
+	m_spRayTracingScene->AddMaterial(spMaterial3);
+
+	auto spSpherePrimitive0 = CreateRef<Sphere>(0);
+	spSpherePrimitive0->SetPosition(glm::vec3(0.f, -100.5f, -1.f));
+	spSpherePrimitive0->SetRadius(100.0f);
+	spSpherePrimitive0->SetMaterialID(0);
+	m_spObjectContainer->AddObject(spSpherePrimitive0);
+
+	auto spSpherePrimitive1 = CreateRef<Sphere>(1);
+	spSpherePrimitive1->SetPosition(glm::vec3(0.f, 0.f, -1.f));
+	spSpherePrimitive1->SetRadius(0.5f);
+	spSpherePrimitive1->SetMaterialID(1);
+	m_spObjectContainer->AddObject(spSpherePrimitive1);
+
+	auto spSpherePrimitive2 = CreateRef<Sphere>(2);
+	spSpherePrimitive2->SetPosition(glm::vec3(-1.f, 0.f, -1.f));
+	spSpherePrimitive2->SetRadius(0.5f);
+	spSpherePrimitive2->SetMaterialID(2);
+	m_spObjectContainer->AddObject(spSpherePrimitive2);
+
+	auto spSpherePrimitive3 = CreateRef<Sphere>(3);
+	spSpherePrimitive3->SetPosition(glm::vec3(-1.f, 0.f, -1.f));
+	spSpherePrimitive3->SetRadius(-0.4f);
+	spSpherePrimitive3->SetMaterialID(2);
+	m_spObjectContainer->AddObject(spSpherePrimitive3);
+
+	auto spSpherePrimitive4 = CreateRef<Sphere>(4);
+	spSpherePrimitive4->SetPosition(glm::vec3(1.f, 0.f, -1.f));
+	spSpherePrimitive4->SetRadius(0.5f);
+	spSpherePrimitive4->SetMaterialID(3);
+	m_spObjectContainer->AddObject(spSpherePrimitive4);
+
+	m_spRayTracingScene->SetObjectContainer(m_spObjectContainer);
+}
+
+void RayTracingEditorLayer::CreateMultiSphereScene()
+{
+	int iMaterialNum(0);
+	int iObjectNum(0);
+	for (int a = -5; a <5; a++) 
+	{
+		for (int b = -5; b < 5; b++) 
+		{
+			float fChooseMat = Random::Float();
+			glm::vec3 center(a + 0.9 * Random::Float(), 0.2, b + 0.9 * Random::Float());
+
+			if (glm::length(center - glm::vec3(4, 0.2, 0)) > 0.9)
+			{
+				auto spSphere = CreateRef<Sphere>(iObjectNum++);
+				spSphere->SetPosition(center);
+				spSphere->SetRadius(0.2);
+				spSphere->SetMaterialID(iMaterialNum);
+				m_spObjectContainer->AddObject(spSphere);
+
+				if (fChooseMat < 0.8)
+				{
+					//diffuse
+					auto spLambertian = CreateRef<Lambertian>(iMaterialNum++);
+					spLambertian->SetAlbedo(Random::Vec3());
+					m_spRayTracingScene->AddMaterial(spLambertian);
+				}
+				else if (fChooseMat < 0.95)
+				{
+					//metal
+					auto spLambertian = CreateRef<Metal>(iMaterialNum++);
+					spLambertian->SetAlbedo(0.5f * Random::Vec3());
+					spLambertian->SetRoughness(Random::Float() * 0.5);
+					m_spRayTracingScene->AddMaterial(spLambertian);
+				}
+				else 
+				{
+					//glass
+					auto spDielectric = CreateRef<Dielectric>(iMaterialNum++);
+					spDielectric->SetMetallic(1.5);
+					m_spRayTracingScene->AddMaterial(spDielectric);
+				}
+			}
+		}
+	}
+
+	auto spGroundSphere = CreateRef<Sphere>(iObjectNum++);
+	spGroundSphere->SetPosition(glm::vec3(0, -1000, 0));
+	spGroundSphere->SetRadius(1000);
+	spGroundSphere->SetMaterialID(iMaterialNum);
+	m_spObjectContainer->AddObject(spGroundSphere);
+	auto spGroundMaterial = CreateRef<Lambertian>(iMaterialNum++);
+	spGroundMaterial->SetAlbedo(glm::vec3(0.5f));
+	m_spRayTracingScene->AddMaterial(spGroundMaterial);
+
+	auto spDielectricSphere = CreateRef<Sphere>(iObjectNum++);
+	spDielectricSphere->SetPosition(glm::vec3(-4, 1, 0));
+	spDielectricSphere->SetRadius(1);
+	spDielectricSphere->SetMaterialID(iMaterialNum);
+	m_spObjectContainer->AddObject(spDielectricSphere);
+	auto spDielectric = CreateRef<Dielectric>(iMaterialNum++);
+	spDielectric->SetMetallic(1.5);
+	m_spRayTracingScene->AddMaterial(spDielectric);
+
+	auto spLambertianSphere = CreateRef<Sphere>(iObjectNum++);
+	spLambertianSphere->SetPosition(glm::vec3(0, 1, 0));
+	spLambertianSphere->SetRadius(1);
+	spLambertianSphere->SetMaterialID(iMaterialNum);
+	m_spObjectContainer->AddObject(spLambertianSphere);
+	auto spLambertian = CreateRef<Lambertian>(iMaterialNum++);
+	spLambertian->SetAlbedo(glm::vec3(0.4, 0.2, 0.1));
+	m_spRayTracingScene->AddMaterial(spLambertian);
+
+	auto spMetalSphere = CreateRef<Sphere>(iObjectNum++);
+	spMetalSphere->SetPosition(glm::vec3(4, 1, 0));
+	spMetalSphere->SetRadius(1);
+	spMetalSphere->SetMaterialID(iMaterialNum);
+	m_spObjectContainer->AddObject(spMetalSphere);
+	auto spMetal = CreateRef<Metal>(iMaterialNum++);
+	spMetal->SetAlbedo(glm::vec3(0.7, 0.6, 0.5));
+	m_spRayTracingScene->AddMaterial(spMetal);
+
+
+	m_spRayTracingScene->SetObjectContainer(m_spObjectContainer);
 }

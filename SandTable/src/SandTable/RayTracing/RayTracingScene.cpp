@@ -4,14 +4,18 @@
 #include <execution>
 
 SAND_TABLE_NAMESPACE_BEGIN
-RayTracingScene::RayTracingScene() :
-	m_bAccumulate(false),
+namespace
+{
+	const float fHitDistance = std::numeric_limits<float>::max();
+}
+
+RayTracingScene::RayTracingScene():
+	m_bAccumulate(true),
 	m_iFrameIndex(1),
 	m_spRay(CreateRef<Ray>()),
 	m_spImage(CreateRef<Image>()),
 	m_spAccumulateBuffer(CreateRef<DataBuffer>(0, sizeof(glm::vec4) / sizeof(uint8_t)))
 {
-
 }
 
 void RayTracingScene::OnUpdate(const TimeStep& timeStep, Ref<RayTracingCamera>& spCamera)
@@ -43,14 +47,14 @@ void RayTracingScene::OnViewPortResize(unsigned int uiWidth, unsigned int uiHeig
 	}
 }
 
-void RayTracingScene::AddSpherePrimive(const Ref<SpherePrimitive>& spSpherePrimive)
+void RayTracingScene::SetObjectContainer(std::shared_ptr<ObjectContainer> spObjectContainer)
 {
-	m_mapSpherePrimitve[spSpherePrimive->GetEntityID()] = spSpherePrimive;
+	m_spObjectContainer = spObjectContainer;
 }
 
-MapSphere& RayTracingScene::GetSpherePrimives()
+const std::shared_ptr<ObjectContainer>& RayTracingScene::GetObjectContainer()const
 {
-	return m_mapSpherePrimitve;
+	return m_spObjectContainer;
 }
 
 void RayTracingScene::AddMaterial(const Ref<Material>& spMaterial)
@@ -88,7 +92,8 @@ void RayTracingScene::PreRender(Ref<RayTracingCamera>& spCamera)
 	bool bDirty(spCamera->GetDirty());
 	if (!bDirty)
 	{
-		for (auto& sphere : m_mapSpherePrimitve)
+		const auto& mapObject = m_spObjectContainer->GetAllObject();
+		for (auto& sphere : mapObject)
 		{
 			auto material = m_mapMaterial.find(sphere.second->GetMaterialID());
 			bDirty |= material->second->GetDirty();
@@ -122,11 +127,16 @@ void RayTracingScene::Render(Ref<RayTracingCamera>& spCamera)
 	auto pAccumulateBuffer = m_spAccumulateBuffer->As<glm::vec4>();
 
 	std::for_each(std::execution::par, m_vecImageVerticalIter.begin(), m_vecImageVerticalIter.end(),
-		[&](uint32_t y)
+		[this](uint32_t y)
 		{
 			std::for_each(m_vecImageHorizontalInter.begin(), m_vecImageHorizontalInter.end(),
-				[&](uint32_t x)
+				[this,y](uint32_t x)
 				{
+					auto width = m_spImage->GetWidth();
+					auto height = m_spImage->GetHeight();
+					auto pImageData = m_spImage->GetImageData();
+					auto pAccumulateBuffer = m_spAccumulateBuffer->As<glm::vec4>();
+
 					auto color = PerPixel(m_spRay->Origin, x, y);
 
 					pAccumulateBuffer[x + y * width] += color;
@@ -138,25 +148,18 @@ void RayTracingScene::Render(Ref<RayTracingCamera>& spCamera)
 				});
 		});
 
-	//auto width = m_spImage->GetWidth();
-	//auto height = m_spImage->GetHeight();
 	//for (uint32_t y = 0; y < height; y++)
 	//{
 	//	for (uint32_t x = 0; x < width; x++)
 	//	{
-	//		glm::vec2 vec2Coord = { static_cast<float>(x) / static_cast<float>(width),static_cast<float>(y) / static_cast<float>(height) };
-	//		vec2Coord = vec2Coord * 2.f - 1.f; //(0~1)->(-1,1)
-	//		glm::vec4 target = m_matProjection * glm::vec4(vec2Coord.x, vec2Coord.y, 1, 1);
-	//		m_spRay->Direction = glm::vec3(m_matView * glm::vec4(glm::normalize(glm::vec3(target) / target.w), 0));
+	//		auto color = PerPixel(m_spRay->Origin, x, y);
 
-	//		auto color = PerPixel(*m_spRay, 50);
+	//		pAccumulateBuffer[x + y * width] += color;
 
-	//		m_spAccumulateBuffer->As<glm::vec4>()[x + y * width] += color;
-
-	//		color = m_spAccumulateBuffer->As<glm::vec4>()[x + y * width];
+	//		color = pAccumulateBuffer[x + y * width];
 	//		color /= m_iFrameIndex;
 
-	//		m_spImage->GetImageData()[x + y * width] = Image::ConvertToRGBA(color);
+	//		pImageData[x + y * width] = Image::ConvertToRGBA(color);
 	//	}
 	//}
 
@@ -166,7 +169,8 @@ void RayTracingScene::Render(Ref<RayTracingCamera>& spCamera)
 void RayTracingScene::PostRender(Ref<RayTracingCamera>& spCamera)
 {
 	spCamera->ResetDirty();
-	for (auto& sphere : m_mapSpherePrimitve)
+	const auto& mapObject = m_spObjectContainer->GetAllObject();
+	for (auto& sphere : mapObject)
 	{
 		auto material = m_mapMaterial.find(sphere.second->GetMaterialID());
 		material->second->ResetDirty();
@@ -179,7 +183,7 @@ void RayTracingScene::PostRender(Ref<RayTracingCamera>& spCamera)
 glm::vec4 RayTracingScene::PerPixel(const glm::vec3& rayOrigin, uint32_t uiX, uint32_t uiY)
 {
 	auto width = m_spImage->GetWidth();
-	auto height =m_spImage->GetHeight();
+	auto height = m_spImage->GetHeight();
 
 	Ray ray;
 	ray.Origin = rayOrigin;
@@ -188,78 +192,30 @@ glm::vec4 RayTracingScene::PerPixel(const glm::vec3& rayOrigin, uint32_t uiX, ui
 	glm::vec4 target = m_matProjection * glm::vec4(vec2Coord.x, vec2Coord.y, 1, 1);
 	ray.Direction = glm::vec3(m_matView * glm::vec4(glm::normalize(glm::vec3(target) / target.w), 0));
 
-	glm::vec3 vec3Color(0.f);
-	glm::vec3 vec3SkyColor(0.6f, 0.7f, 0.9f);
-	int fBounces(50);
-	float fMultiplier = 1.f;
-
-	HitPayLoad hitPayLoad;
-	for (int i = 0; i < fBounces; i++)
-	{
-		TraceRay(ray, hitPayLoad);
-		if (hitPayLoad.HitDistance < 0)
-		{
-			vec3Color += vec3SkyColor * fMultiplier;
-			break;
-		}
-
-		glm::vec3 lightDir = glm::normalize(glm::vec3(-1.f));
-		float diffuse = glm::max(glm::dot(hitPayLoad.WorldNormal, -lightDir), 0.f);
-
-		const auto& sphere = m_mapSpherePrimitve.find(hitPayLoad.EntityID)->second;
-		const auto& material = m_mapMaterial.find(sphere->GetMaterialID())->second;
-		glm::vec3 vec3SphereColor;
-		material->Scatter(hitPayLoad, ray, vec3SphereColor);
-		vec3SphereColor *= diffuse;
-
-		vec3Color += vec3SphereColor * fMultiplier;
-		fMultiplier *= 0.5f;
-	}
-
-	return glm::vec4(vec3Color, 1.f);
+	auto color = TraceRay(ray, m_spObjectContainer, 50);
+	return glm::vec4(color, 1.f);
 }
 
-void RayTracingScene::TraceRay(const Ray& ray,HitPayLoad& hitPayLoad)
+glm::vec3 RayTracingScene::TraceRay(const Ray& ray, const std::shared_ptr<Hittable>& spHittable, int depth)
 {
-	float fHitDistance = std::numeric_limits<float>::max();
-	uint32_t uiSphereID(-1);
-	for (const auto& iter : m_mapSpherePrimitve)
+	if (depth <= 0)
 	{
-		const auto& sphere = iter.second;
-		auto& origin = ray.Origin - sphere->GetPosition();
-
-		float fA = glm::dot(ray.Direction, ray.Direction);
-		float fB = 2.f * glm::dot(origin, ray.Direction);
-		float fC = glm::dot(origin, origin) - sphere->GetRadius() * sphere->GetRadius();
-
-		float discriminant = fB * fB - 4.0f * fA * fC;
-		if (discriminant < 0.f)
-		{
-			continue;
-		}
-		float fCloset = (-fB - glm::sqrt(discriminant)) / (2.f * fA);
-		if (fCloset > 0.f && fCloset < fHitDistance)
-		{
-			fHitDistance = fCloset;
-			uiSphereID = sphere->GetEntityID();
-		}
+		return glm::vec3(0.f);
 	}
 
-	auto iter = m_mapSpherePrimitve.find(uiSphereID);
-	if (iter != m_mapSpherePrimitve.end())
+	HitRecord rec;
+	if (spHittable->Hit(ray, 0.001, fHitDistance, rec))
 	{
-		auto& position = iter->second->GetPosition();
-		glm::vec3 origin = ray.Origin - position;
+		Ray scattered;
+		glm::vec3 attenuation;
+		auto material = m_mapMaterial.find(rec.MaterialID)->second;
+		if (material != nullptr && material->Scatter(ray, rec, attenuation, scattered))
+			return attenuation * TraceRay(scattered, spHittable, depth - 1);
+		return glm::vec3(0.f);
+	}
 
-		hitPayLoad.HitDistance = fHitDistance;
-		hitPayLoad.WorldPosition = ray.Origin + ray.Direction * fHitDistance;
-		hitPayLoad.SetWorldNormal(ray, hitPayLoad.WorldPosition - position);
-		hitPayLoad.EntityID = uiSphereID;
-	}
-	else
-	{
-		hitPayLoad.HitDistance = -1;
-	}
+	float t = 0.5 * (glm::normalize(ray.Direction).y + 1.0);
+	return glm::vec3(1.f) * (1.f - t) + glm::vec3(0.5f, 0.7f, 1.f) * t;
 }
 
 SAND_TABLE_NAMESPACE_END
