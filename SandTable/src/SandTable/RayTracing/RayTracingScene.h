@@ -32,7 +32,6 @@ private:
 	void Render(Ref<RayTracingCamera>& spCamera);
 	void PostRender(Ref<RayTracingCamera>& spCamera);
 
-	glm::vec4 PerPixel(const glm::vec3& rayOrigin, uint32_t uiX, uint32_t uiY);
 	glm::vec3 TraceRay(const Ray& ray, const std::shared_ptr<Hittable>& spHittable, int depth);
 
 private:
@@ -42,10 +41,6 @@ private:
 	bool m_bAccumulate;
 	int m_iFrameIndex;
 
-	glm::mat4 m_matView;
-	glm::mat4 m_matProjection;
-
-	Ref<Ray> m_spRay;
 	Ref<Image> m_spImage;
 	Ref<DataBuffer> m_spAccumulateBuffer;
 	std::vector<uint32_t> m_vecImageVerticalIter;

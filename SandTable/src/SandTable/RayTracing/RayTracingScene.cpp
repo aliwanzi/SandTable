@@ -9,10 +9,9 @@ namespace
 	const float fHitDistance = std::numeric_limits<float>::max();
 }
 
-RayTracingScene::RayTracingScene():
+RayTracingScene::RayTracingScene() :
 	m_bAccumulate(true),
 	m_iFrameIndex(1),
-	m_spRay(CreateRef<Ray>()),
 	m_spImage(CreateRef<Image>()),
 	m_spAccumulateBuffer(CreateRef<DataBuffer>(0, sizeof(glm::vec4) / sizeof(uint8_t)))
 {
@@ -109,10 +108,6 @@ void RayTracingScene::PreRender(Ref<RayTracingCamera>& spCamera)
 	{
 		ResetFrameIndex();
 	}
-
-	m_spRay->Origin = spCamera->GetPosition();
-	m_matView = spCamera->GetInverseView();
-	m_matProjection = spCamera->GetInverseProjection();
 }
 
 void RayTracingScene::Render(Ref<RayTracingCamera>& spCamera)
@@ -127,17 +122,13 @@ void RayTracingScene::Render(Ref<RayTracingCamera>& spCamera)
 	auto pAccumulateBuffer = m_spAccumulateBuffer->As<glm::vec4>();
 
 	std::for_each(std::execution::par, m_vecImageVerticalIter.begin(), m_vecImageVerticalIter.end(),
-		[this](uint32_t y)
+		[&](uint32_t y)
 		{
 			std::for_each(m_vecImageHorizontalInter.begin(), m_vecImageHorizontalInter.end(),
-				[this,y](uint32_t x)
+				[&](uint32_t x)
 				{
-					auto width = m_spImage->GetWidth();
-					auto height = m_spImage->GetHeight();
-					auto pImageData = m_spImage->GetImageData();
-					auto pAccumulateBuffer = m_spAccumulateBuffer->As<glm::vec4>();
-
-					auto color = PerPixel(m_spRay->Origin, x, y);
+					Ray ray = spCamera->GenRay(x, y);
+					auto color = glm::vec4(TraceRay(ray, m_spObjectContainer, 50), 1.f);
 
 					pAccumulateBuffer[x + y * width] += color;
 
@@ -180,21 +171,6 @@ void RayTracingScene::PostRender(Ref<RayTracingCamera>& spCamera)
 	m_spImage->UpdateImage();
 }
 
-glm::vec4 RayTracingScene::PerPixel(const glm::vec3& rayOrigin, uint32_t uiX, uint32_t uiY)
-{
-	auto width = m_spImage->GetWidth();
-	auto height = m_spImage->GetHeight();
-
-	Ray ray;
-	ray.Origin = rayOrigin;
-	glm::vec2 vec2Coord = { static_cast<float>(uiX) / static_cast<float>(width),static_cast<float>(uiY) / static_cast<float>(height) };
-	vec2Coord = vec2Coord * 2.f - 1.f; //(0~1)->(-1,1)
-	glm::vec4 target = m_matProjection * glm::vec4(vec2Coord.x, vec2Coord.y, 1, 1);
-	ray.Direction = glm::vec3(m_matView * glm::vec4(glm::normalize(glm::vec3(target) / target.w), 0));
-
-	auto color = TraceRay(ray, m_spObjectContainer, 50);
-	return glm::vec4(color, 1.f);
-}
 
 glm::vec3 RayTracingScene::TraceRay(const Ray& ray, const std::shared_ptr<Hittable>& spHittable, int depth)
 {

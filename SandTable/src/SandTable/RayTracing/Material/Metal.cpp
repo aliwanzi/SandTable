@@ -14,10 +14,10 @@ Metal::Metal(uint32_t uiMaterialID) :
 bool Metal::Scatter(const Ray& rayIn, const HitRecord& hitRecord, glm::vec3& attenuation, Ray& rayOut) const
 {
 	attenuation = m_vec3Albedo;
+	rayOut.Step = rayIn.Step;
 	rayOut.Origin = glm::dot(rayOut.Direction, hitRecord.WorldNormal) < 0 ? hitRecord.WorldPosition - hitRecord.WorldNormal * 0.00001f :
 		hitRecord.WorldPosition + hitRecord.WorldNormal * 0.00001f;
-	auto vec3Mircor = m_fRoughness * Random::UnitSphere();
-	rayOut.Direction = glm::reflect(glm::normalize(rayIn.Direction), hitRecord.WorldNormal);
+	rayOut.Direction = glm::reflect(rayIn.Direction, hitRecord.WorldNormal + m_fRoughness * Random::UnitSphere()) ;
 
 	return glm::dot(rayOut.Direction, hitRecord.WorldNormal) > 0;
 }

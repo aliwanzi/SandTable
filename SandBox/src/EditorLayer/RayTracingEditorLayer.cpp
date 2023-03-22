@@ -7,7 +7,7 @@ RayTracingEditorLayer::RayTracingEditorLayer() :
 	m_fLastRenderTime(0.f),
 	m_spObjectContainer(CreateRef<ObjectContainer>()),
 	m_spRayTracingScene(CreateRef<RayTracingScene>()),
-	m_spRayTracingCamera(CreateRef<RayTracingCamera>(45.f, 0.1f, 100.f))
+	m_spRayTracingCamera(CreateRef<RayTracingCamera>(45.f, 0.1f, 100.f, 0, 1))
 {
 	CreateMultiSphereScene();
 	//CreatFourSphereScene();
@@ -250,38 +250,55 @@ void RayTracingEditorLayer::CreateMultiSphereScene()
 {
 	int iMaterialNum(0);
 	int iObjectNum(0);
-	for (int a = -5; a <5; a++) 
+	for (int a = -5; a < 5; a++)
 	{
-		for (int b = -5; b < 5; b++) 
+		for (int b = -5; b < 5; b++)
 		{
 			float fChooseMat = Random::Float();
 			glm::vec3 center(a + 0.9 * Random::Float(), 0.2, b + 0.9 * Random::Float());
 
 			if (glm::length(center - glm::vec3(4, 0.2, 0)) > 0.9)
 			{
-				auto spSphere = CreateRef<Sphere>(iObjectNum++);
-				spSphere->SetPosition(center);
-				spSphere->SetRadius(0.2);
-				spSphere->SetMaterialID(iMaterialNum);
-				m_spObjectContainer->AddObject(spSphere);
 
 				if (fChooseMat < 0.8)
 				{
 					//diffuse
+					auto moveCenter = center + glm::vec3(0.f, 0.5f * Random::Float(), 0.f);
+					auto spSphere = CreateRef<MovingSphere>(iObjectNum++);
+					spSphere->SetPosition(center);
+					spSphere->SetMovePosition(moveCenter);
+					spSphere->SetStepBegin(0.f);
+					spSphere->SetStepEnd(1.f);
+					spSphere->SetRadius(0.2);
+					spSphere->SetMaterialID(iMaterialNum);
+					m_spObjectContainer->AddObject(spSphere);
+
 					auto spLambertian = CreateRef<Lambertian>(iMaterialNum++);
 					spLambertian->SetAlbedo(Random::Vec3());
 					m_spRayTracingScene->AddMaterial(spLambertian);
 				}
 				else if (fChooseMat < 0.95)
 				{
+					auto spSphere = CreateRef<Sphere>(iObjectNum++);
+					spSphere->SetPosition(center);
+					spSphere->SetRadius(0.2);
+					spSphere->SetMaterialID(iMaterialNum);
+					m_spObjectContainer->AddObject(spSphere);
+
 					//metal
 					auto spLambertian = CreateRef<Metal>(iMaterialNum++);
 					spLambertian->SetAlbedo(0.5f * Random::Vec3());
 					spLambertian->SetRoughness(Random::Float() * 0.5);
 					m_spRayTracingScene->AddMaterial(spLambertian);
 				}
-				else 
+				else
 				{
+					auto spSphere = CreateRef<Sphere>(iObjectNum++);
+					spSphere->SetPosition(center);
+					spSphere->SetRadius(0.2);
+					spSphere->SetMaterialID(iMaterialNum);
+					m_spObjectContainer->AddObject(spSphere);
+
 					//glass
 					auto spDielectric = CreateRef<Dielectric>(iMaterialNum++);
 					spDielectric->SetMetallic(1.5);

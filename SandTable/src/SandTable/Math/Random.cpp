@@ -33,6 +33,17 @@ glm::vec3 Random::UnitSphere()
 	while (true)
 	{
 		auto unit = glm::vec3(2 * Float() - 1, 2 * Float() - 1, 2 * Float() - 1);
+		if (glm::length(unit) >= 1.f)
+			continue;
+		return unit;
+	}
+}
+
+glm::vec3 Random::UnitDisk()
+{
+	while (true)
+	{
+		auto unit = glm::vec3(2 * Float() - 1, 2 * Float() - 1, 0);
 		if (glm::length(unit) >= 1.f || abs(glm::length(unit) < glm::epsilon<float>()))
 			continue;
 		return unit;

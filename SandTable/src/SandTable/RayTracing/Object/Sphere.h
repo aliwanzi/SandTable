@@ -2,7 +2,7 @@
 #include "Object.h"
 
 SAND_TABLE_NAMESPACE_BEGIN
-class Sphere:public Object
+class Sphere :public Object
 {
 public:
 	Sphere(uint32_t uiEntitID);
@@ -16,7 +16,7 @@ public:
 	// Í¨¹ý Hittable ¼Ì³Ð
 	virtual bool Hit(const Ray& ray, float fMin, float fMax, HitRecord& hitRecord) const override;
 
-private:
+protected:
 	glm::vec3 m_vec3Position;
 	float m_fRadius;
 };

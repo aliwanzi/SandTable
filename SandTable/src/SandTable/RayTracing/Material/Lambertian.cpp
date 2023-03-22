@@ -14,6 +14,7 @@ Lambertian::Lambertian(uint32_t uiMaterialID) :
 bool Lambertian::Scatter(const Ray& rayIn, const HitRecord& hitRecord, glm::vec3& attenuation, Ray& rayOut) const
 {
 	attenuation = m_vec3Albedo;
+	rayOut.Step = rayIn.Step;
 	rayOut.Origin = glm::dot(rayOut.Direction, hitRecord.WorldNormal) < 0 ? hitRecord.WorldPosition - hitRecord.WorldNormal * 0.00001f :
 		hitRecord.WorldPosition + hitRecord.WorldNormal * 0.00001f;
 	rayOut.Direction = hitRecord.WorldNormal + Random::UnitSphere();

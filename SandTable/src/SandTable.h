@@ -36,6 +36,7 @@
 #include "SandTable/RayTracing/RayTracingScene.h"
 #include "SandTable/RayTracing/Object/ObjectContainer.h"
 #include "SandTable/RayTracing/Object/Sphere.h"
+#include "SandTable/RayTracing/Object/MovingSphere.h"
 #include "SandTable/RayTracing/Material/Dielectric.h"
 #include "SandTable/RayTracing/Material/Lambertian.h"
 #include "SandTable/RayTracing/Material/Metal.h"

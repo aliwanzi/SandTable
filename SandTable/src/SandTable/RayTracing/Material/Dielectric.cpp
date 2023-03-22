@@ -4,7 +4,7 @@
 
 SAND_TABLE_NAMESPACE_BEGIN
 
-Dielectric::Dielectric(uint32_t uiMaterialID):
+Dielectric::Dielectric(uint32_t uiMaterialID) :
 	Material(uiMaterialID),
 	m_fMetallic(0.f)
 {
@@ -13,13 +13,14 @@ Dielectric::Dielectric(uint32_t uiMaterialID):
 bool Dielectric::Scatter(const Ray& rayIn, const HitRecord& hitRecord, glm::vec3& attenuation, Ray& rayOut) const
 {
 	attenuation = glm::vec3(1.f);
+	rayOut.Step = rayIn.Step;
 	float fRatio = hitRecord.FrontFace ? (1.0 / m_fMetallic) : m_fMetallic;
 	auto unitDir = glm::normalize(rayIn.Direction);
 	auto fCosTheta = glm::min(glm::dot(-unitDir, hitRecord.WorldNormal), 1.f);
 	auto fSinTheta = sqrt(1.0 - fCosTheta * fCosTheta);
 	if (fSinTheta * fRatio > 1.0 || Reflectance(fCosTheta, fRatio) > Random::Float())
 	{
-		rayOut.Direction = glm::reflect(unitDir, hitRecord.WorldNormal) + Random::UnitSphere();
+		rayOut.Direction = glm::reflect(unitDir, hitRecord.WorldNormal);
 	}
 	else
 	{
