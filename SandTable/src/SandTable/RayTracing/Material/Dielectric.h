@@ -8,7 +8,7 @@ class Dielectric :public Material
 public:
 	Dielectric(uint32_t uiMaterialID);
 	// Í¨¹ý Material ¼Ì³Ð
-	virtual bool Scatter(const Ray& rayIn, const HitRecord& hitRecord, glm::vec3& attenuation, Ray& rayOut) const override;
+	virtual bool Scatter(const Ray& rayIn, const HitRecord& hitRecord, glm::dvec3& attenuation, Ray& rayOut) const override;
 	void SetMetallic(float fMetallic);
 	float GetMetallic() const;
 

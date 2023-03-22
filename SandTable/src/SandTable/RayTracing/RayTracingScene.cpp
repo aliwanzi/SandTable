@@ -94,9 +94,9 @@ void RayTracingScene::PreRender(Ref<RayTracingCamera>& spCamera)
 		const auto& mapObject = m_spObjectContainer->GetAllObject();
 		for (auto& sphere : mapObject)
 		{
-			auto material = m_mapMaterial.find(sphere.second->GetMaterialID());
+			auto material = m_mapMaterial.find(sphere->GetMaterialID());
 			bDirty |= material->second->GetDirty();
-			bDirty |= sphere.second->GetDirty();
+			bDirty |= sphere->GetDirty();
 			if (bDirty)
 			{
 				break;
@@ -163,35 +163,35 @@ void RayTracingScene::PostRender(Ref<RayTracingCamera>& spCamera)
 	const auto& mapObject = m_spObjectContainer->GetAllObject();
 	for (auto& sphere : mapObject)
 	{
-		auto material = m_mapMaterial.find(sphere.second->GetMaterialID());
+		auto material = m_mapMaterial.find(sphere->GetMaterialID());
 		material->second->ResetDirty();
-		sphere.second->ResetDirty();
+		sphere->ResetDirty();
 	}
 
 	m_spImage->UpdateImage();
 }
 
 
-glm::vec3 RayTracingScene::TraceRay(const Ray& ray, const std::shared_ptr<Hittable>& spHittable, int depth)
+glm::dvec3 RayTracingScene::TraceRay(const Ray& ray, const std::shared_ptr<Hittable>& spHittable, int depth)
 {
 	if (depth <= 0)
 	{
-		return glm::vec3(0.f);
+		return glm::dvec3(0.f);
 	}
 
 	HitRecord rec;
 	if (spHittable->Hit(ray, 0.001, fHitDistance, rec))
 	{
 		Ray scattered;
-		glm::vec3 attenuation;
+		glm::dvec3 attenuation;
 		auto material = m_mapMaterial.find(rec.MaterialID)->second;
 		if (material != nullptr && material->Scatter(ray, rec, attenuation, scattered))
 			return attenuation * TraceRay(scattered, spHittable, depth - 1);
-		return glm::vec3(0.f);
+		return glm::dvec3(0.f);
 	}
 
-	float t = 0.5 * (glm::normalize(ray.Direction).y + 1.0);
-	return glm::vec3(1.f) * (1.f - t) + glm::vec3(0.5f, 0.7f, 1.f) * t;
+	double t = 0.5 * (glm::normalize(ray.Direction).y + 1.0);
+	return glm::dvec3(1.f) * (1 - t) + glm::dvec3(0.5f, 0.7f, 1.f) * t;
 }
 
 SAND_TABLE_NAMESPACE_END

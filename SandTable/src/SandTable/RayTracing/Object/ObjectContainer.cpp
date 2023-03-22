@@ -8,9 +8,9 @@ bool ObjectContainer::Hit(const Ray& ray, float fMin, float fMax, HitRecord& hit
 	HitRecord hitRecordTemp;
 	float fCloset = fMax;
 	bool bHitAnything(false);
-	for (auto& iter : m_mapObject)
+	for (auto& iter : m_vecObject)
 	{
-		if (iter.second->Hit(ray, fMin, fCloset, hitRecordTemp) && hitRecordTemp.HitDistance < fCloset)
+		if (iter->Hit(ray, fMin, fCloset, hitRecordTemp) && hitRecordTemp.HitDistance < fCloset)
 		{
 			bHitAnything = true;
 			fCloset = hitRecordTemp.HitDistance;
@@ -21,19 +21,19 @@ bool ObjectContainer::Hit(const Ray& ray, float fMin, float fMax, HitRecord& hit
 	return bHitAnything;
 }
 
-const std::map<uint32_t, std::shared_ptr<Object>>& ObjectContainer::GetAllObject() const
+std::vector<Ref<Object>>& ObjectContainer::GetAllObject()
 {
-	return m_mapObject;
+	return m_vecObject;
 }
 
 void ObjectContainer::AddObject(std::shared_ptr<Object> spObject)
 {
-	m_mapObject.insert(std::make_pair(spObject->GetEntityID(), spObject));
+	m_vecObject.emplace_back(spObject);
 }
 
 void ObjectContainer::Clear()
 {
-	m_mapObject.clear();
+	m_vecObject.clear();
 }
 
 SAND_TABLE_NAMESPACE_END

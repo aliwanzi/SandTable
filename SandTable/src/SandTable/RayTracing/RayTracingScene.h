@@ -32,7 +32,7 @@ private:
 	void Render(Ref<RayTracingCamera>& spCamera);
 	void PostRender(Ref<RayTracingCamera>& spCamera);
 
-	glm::vec3 TraceRay(const Ray& ray, const std::shared_ptr<Hittable>& spHittable, int depth);
+	glm::dvec3 TraceRay(const Ray& ray, const std::shared_ptr<Hittable>& spHittable, int depth);
 
 private:
 	MapMaterial m_mapMaterial;

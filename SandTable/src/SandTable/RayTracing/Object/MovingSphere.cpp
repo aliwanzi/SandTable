@@ -6,24 +6,24 @@ MovingSphere::MovingSphere(uint32_t uiEntitID) :Sphere(uiEntitID)
 {
 }
 
-void MovingSphere::SetStepBegin(float fStepBegin)
+void MovingSphere::SetStepBegin(double fStepBegin)
 {
 	m_bDirty = true;
 	m_fStepBegin = fStepBegin;
 }
 
-void MovingSphere::SetStepEnd(float fStepEnd)
+void MovingSphere::SetStepEnd(double fStepEnd)
 {
 	m_bDirty = true;
 	m_fStepEnd = fStepEnd;
 }
 
-void MovingSphere::SetMovePosition(const glm::vec3& vec3MovePosition)
+void MovingSphere::SetMovePosition(const glm::dvec3& vec3MovePosition)
 {
 	m_vec3MovePosition = vec3MovePosition;
 }
 
-const glm::vec3& MovingSphere::GetMovePosition() const
+const glm::dvec3& MovingSphere::GetMovePosition() const
 {
 	return m_vec3MovePosition;
 }
@@ -59,7 +59,7 @@ bool MovingSphere::Hit(const Ray& ray, float fMin, float fMax, HitRecord& hitRec
 	return true;
 }
 
-glm::vec3 MovingSphere::Center(float fStep) const
+glm::dvec3 MovingSphere::Center(float fStep) const
 {
 	return m_vec3Position + (fStep - m_fStepBegin) / (m_fStepEnd - m_fStepBegin) * (m_vec3MovePosition - m_vec3Position);
 }

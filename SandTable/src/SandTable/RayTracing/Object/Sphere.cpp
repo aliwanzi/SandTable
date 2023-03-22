@@ -8,23 +8,23 @@ namespace
 }
 Sphere::Sphere(uint32_t uiEntitID):
 	Object(uiEntitID),
-	m_vec3Position(glm::vec3(0.f)),
+	m_vec3Position(glm::dvec3(0.f)),
 	m_fRadius(0)
 {
 }
 
-void Sphere::SetPosition(const glm::vec3& vec3Position)
+void Sphere::SetPosition(const glm::dvec3& vec3Position)
 {
 	m_vec3Position = vec3Position;
 	m_bDirty = true;
 }
 
-const glm::vec3& Sphere::GetPosition() const
+const glm::dvec3& Sphere::GetPosition() const
 {
 	return m_vec3Position;
 }
 
-void Sphere::SetRadius(float fRadius)
+void Sphere::SetRadius(double fRadius)
 {
 	m_fRadius = fRadius;
 	m_bDirty = true;

@@ -8,17 +8,17 @@ public:
 	Metal(uint32_t uiMaterialID);
 
 	// Í¨¹ý Material ¼Ì³Ð
-	virtual bool Scatter(const Ray& rayIn, const HitRecord& hitRecord, glm::vec3& attenuation, Ray& rayOut) const override;
+	virtual bool Scatter(const Ray& rayIn, const HitRecord& hitRecord, glm::dvec3& attenuation, Ray& rayOut) const override;
 
-	void SetAlbedo(const glm::vec3& vec3Albedo);
-	const glm::vec3& GetAlbedo() const;
+	void SetAlbedo(const glm::dvec3& vec3Albedo);
+	const glm::dvec3& GetAlbedo() const;
 
-	void SetRoughness(float fRoughness);
+	void SetRoughness(double fRoughness);
 	float GetRoughness() const;
 
 private:
-	float m_fRoughness;
-	glm::vec3 m_vec3Albedo;
+	double m_fRoughness;
+	glm::dvec3 m_vec3Albedo;
 };
 SAND_TABLE_NAMESPACE_END
 

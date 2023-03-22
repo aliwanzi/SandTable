@@ -8,7 +8,7 @@ class Material
 {
 public:
 	Material(uint32_t uiMaterialID);
-	virtual bool Scatter(const Ray& rayIn, const HitRecord& hitRecord, glm::vec3& attenuation, Ray& rayOut) const = 0;
+	virtual bool Scatter(const Ray& rayIn, const HitRecord& hitRecord, glm::dvec3& attenuation, Ray& rayOut) const = 0;
 
 	uint32_t GetMaterialID() const;
 

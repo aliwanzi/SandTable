@@ -6,20 +6,20 @@ class MovingSphere :public Sphere
 public:
 	MovingSphere(uint32_t uiEntitID);
 
-	void SetStepBegin(float fStepBegin);
-	void SetStepEnd(float fStepEnd);
+	void SetStepBegin(double fStepBegin);
+	void SetStepEnd(double fStepEnd);
 
-	void SetMovePosition(const glm::vec3& vec3MovePosition);
-	const glm::vec3& GetMovePosition()const;
+	void SetMovePosition(const glm::dvec3& vec3MovePosition);
+	const glm::dvec3& GetMovePosition()const;
 
 	// Í¨¹ý Hittable ¼Ì³Ð
 	virtual bool Hit(const Ray& ray, float fMin, float fMax, HitRecord& hitRecord) const override;
 private:
-	glm::vec3 Center(float fStep) const;
+	glm::dvec3 Center(float fStep) const;
 private:
-	glm::vec3 m_vec3MovePosition;
-	float m_fStepBegin;
-	float m_fStepEnd;
+	glm::dvec3 m_vec3MovePosition;
+	double m_fStepBegin;
+	double m_fStepEnd;
 };
 
 SAND_TABLE_NAMESPACE_END

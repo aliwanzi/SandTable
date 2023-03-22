@@ -8,12 +8,12 @@ public:
 	// Í¨¹ý Hittable ¼Ì³Ð
 	virtual bool Hit(const Ray& ray, float fMin, float fMax, HitRecord& hitRecord) const override;
 	
-	const std::map<uint32_t, std::shared_ptr<Object>>& GetAllObject()const;
+	std::vector<Ref<Object>>& GetAllObject();
 
 	void AddObject(std::shared_ptr<Object> spObject);
 	void Clear();
 private:
-	std::map<uint32_t, std::shared_ptr<Object>> m_mapObject;
+	std::vector<Ref<Object>> m_vecObject;
 };
 
 SAND_TABLE_NAMESPACE_END

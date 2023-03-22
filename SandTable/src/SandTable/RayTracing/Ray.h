@@ -3,8 +3,8 @@ SAND_TABLE_NAMESPACE_BEGIN
 
 struct Ray
 {
-    glm::vec3 Origin;
-    glm::vec3 Direction;
+    glm::dvec3 Origin;
+    glm::dvec3 Direction;
     float Step;
 };
 
