@@ -9,8 +9,9 @@ RayTracingEditorLayer::RayTracingEditorLayer() :
 	m_spRayTracingScene(CreateRef<RayTracingScene>()),
 	m_spRayTracingCamera(CreateRef<RayTracingCamera>(45.f, 0.1f, 100.f, 0, 1))
 {
-	m_spRayTracingCamera->SetPosition(glm::dvec3(-10, 6.5, 7));
-	m_spRayTracingCamera->SetForwardDirection(glm::dvec3(0.7, -0.6, -0.5));
+	m_spRayTracingCamera->SetPosition(glm::dvec3(2.5, 1.5, 7));
+	m_spRayTracingCamera->SetForwardDirection(glm::dvec3(-0.38, -0.1, -1.0));
+	CreatTwoSphereScene();
 }
 
 void RayTracingEditorLayer::OnAttach()
@@ -169,6 +170,8 @@ void RayTracingEditorLayer::CreatTwoSphereScene()
 	auto spMaterial0 = CreateRef<Lambertian>(0);
 	spMaterial0->SetAlbedo(glm::dvec3(0.8f, 0.8f, 0.f));
 	auto spNoiseTexture = CreateRef<NoiseColorTexture>();
+	spNoiseTexture->SetNoiseScale(4.0);
+	spNoiseTexture->SetTurbDepth(7);
 	spMaterial0->SetColorTexture(spNoiseTexture);
 	m_spRayTracingScene->AddMaterial(spMaterial0);
 

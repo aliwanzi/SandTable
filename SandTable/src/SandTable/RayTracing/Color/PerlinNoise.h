@@ -6,8 +6,11 @@ class PerlinNoise
 public:
 	PerlinNoise(uint32_t uiPointCount = 256);
 	double GetNoise(const glm::dvec3& SamplePoint)const;
+	double Turb(const glm::dvec3& SamplePoint, int iDepth = 7)const;
+
 private:
 	double TrilinearInterp(const glm::dvec3 noise[2][2][2], const glm::dvec3& uvw) const;
+	double TrilinearInterp(const double noise[2][2][2], const glm::dvec3& uvw) const;
 private:
 	uint32_t m_uiPointCount;
 	Ref<DataBuffer> m_spPermBuffer;

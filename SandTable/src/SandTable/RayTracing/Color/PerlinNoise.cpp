@@ -55,11 +55,24 @@ double PerlinNoise::GetNoise(const glm::dvec3& SamplePoint) const
 	return TrilinearInterp(noise, uvw);
 }
 
+double PerlinNoise::Turb(const glm::dvec3& SamplePoint, int iDepth) const
+{
+	double value(0.0), weight(1.0);
+	glm::dvec3 tempPoint(SamplePoint);
+	for (int i = 0; i < iDepth; i++)
+	{
+		value += weight * GetNoise(tempPoint);
+		weight *= 0.5;
+		tempPoint *= 2;
+	}
+	return value;
+}
+
 double PerlinNoise::TrilinearInterp(const glm::dvec3 noise[2][2][2], const glm::dvec3& uvw) const
 {
-	auto base = uvw * uvw * (glm::dvec3(3.0) - 2.0 * uvw);
+	glm::dvec3 base = uvw * uvw * (glm::dvec3(3.0) - 2.0 * uvw);
 
-	auto value = 0.0;
+	double value = 0.0;
 
 	for (int i = 0; i < 2; i++)
 	{
@@ -70,6 +83,27 @@ double PerlinNoise::TrilinearInterp(const glm::dvec3 noise[2][2][2], const glm::
 				glm::dvec3 weight(uvw - glm::dvec3(i, j, k));
 				glm::dvec3 accum = glm::dvec3(i, j, k) * base + (glm::dvec3(1) - glm::dvec3(i, j, k)) * (glm::dvec3(1) - base);
 				value += accum.x * accum.y * accum.z * glm::dot(noise[i][j][k], weight);
+			}
+		}
+	}
+
+
+	return value;
+}
+
+double PerlinNoise::TrilinearInterp(const double noise[2][2][2], const glm::dvec3& uvw) const
+{
+	glm::dvec3 base = uvw * uvw * (glm::dvec3(3.0) - 2.0 * uvw);
+	double value = 0.0;
+
+	for (int i = 0; i < 2; i++)
+	{
+		for (int j = 0; j < 2; j++)
+		{
+			for (int k = 0; k < 2; k++)
+			{
+				glm::dvec3 accum = glm::dvec3(i, j, k) * base + (glm::dvec3(1) - glm::dvec3(i, j, k)) * (glm::dvec3(1) - base);
+				value += accum.x * accum.y * accum.z * noise[i][j][k];
 			}
 		}
 	}
