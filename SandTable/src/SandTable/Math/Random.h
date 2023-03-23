@@ -8,12 +8,9 @@ class Random
 public:
 	static float Float();
 
-	static uint8_t Uint8(int min, int max);
+	static int Uint(int min, int max);
 	static uint32_t Uint32();
 	static uint64_t Uint64();
-
-	static double Double();
-	static double Double(double min, double max);
 
 	static glm::dvec3 Vec3();
 

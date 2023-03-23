@@ -9,6 +9,8 @@ BoundingVolumeHierarchy::BoundingVolumeHierarchy(
 	double dStepEnd):
 	BoundingVolumeHierarchy(
 		spObjectContainer->GetAllObject(), 
+		0,
+		spObjectContainer->GetAllObject().size(),
 		dStepBegin, 
 		dStepEnd)
 {
@@ -75,7 +77,7 @@ BoundingVolumeHierarchy::BoundingVolumeHierarchy(
 	success &= m_spRight->CreateBoundingBox(dStepBegin, dStepEnd);
 	SAND_TABLE_ASSERT(success,"Creat Bounding Box Failed");
 
-	m_spBoundingBox = CreateRef<BoundingBox>(dStepBegin, dStepEnd);
+	//m_spBoundingBox = CreateRef<BoundingBox>(dStepBegin, dStepEnd);
 	m_spBoundingBox->SurrondingBox(m_spLeft->GetBoundingBox(), m_spRight->GetBoundingBox());
 }
 
@@ -90,7 +92,7 @@ bool BoundingVolumeHierarchy::Hit(const Ray& ray,
 
 bool BoundingVolumeHierarchy::CreateBoundingBox(double dStepBegin, double dStepEnd)
 {
-	m_spBoundingBox = CreateRef<BoundingBox>();
+	//m_spBoundingBox = CreateRef<BoundingBox>();
 	return true;
 }
 

@@ -2,10 +2,11 @@
 #include "SandTable/RayTracing/Hittable.h"
 SAND_TABLE_NAMESPACE_BEGIN
 
-class Object:public Hittable
+class Object :public Hittable
 {
 public:
 	Object(uint32_t uiEntitID);
+	virtual ~Object() = default;
 	uint32_t GetEntityID()const;
 
 	void ResetDirty();

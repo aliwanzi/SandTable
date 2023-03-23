@@ -34,12 +34,19 @@
 
 #include "SandTable/RayTracing/RayTracingCamera.h"
 #include "SandTable/RayTracing/RayTracingScene.h"
+
 #include "SandTable/RayTracing/Object/ObjectContainer.h"
 #include "SandTable/RayTracing/Object/Sphere.h"
 #include "SandTable/RayTracing/Object/MovingSphere.h"
+
 #include "SandTable/RayTracing/Material/Dielectric.h"
 #include "SandTable/RayTracing/Material/Lambertian.h"
 #include "SandTable/RayTracing/Material/Metal.h"
+
+#include "SandTable/RayTracing/Color/CheckerColorTexture.h"
+#include "SandTable/RayTracing/Color/ImageColorTexture.h"
+#include "SandTable/RayTracing/Color/NoiseColorTexture.h"
+#include "SandTable/RayTracing/Color/SolidColorTexture.h"
 
 #include "SandTable/Statics/DrawStatistics/QuadDrawStatics.h"
 #include "SandTable/Statics/Timer.h"

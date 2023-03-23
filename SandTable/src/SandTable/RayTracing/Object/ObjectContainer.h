@@ -7,6 +7,8 @@ class ObjectContainer :public Hittable
 public:
 	// Í¨¹ý Hittable ¼Ì³Ð
 	virtual bool Hit(const Ray& ray, float fMin, float fMax, HitRecord& hitRecord) const override;
+	virtual bool CreateBoundingBox(double dStepBegin, double dStepEnd) { return true; };
+	virtual const Ref<BoundingBox>& GetBoundingBox()const override { return nullptr; };
 	
 	std::vector<Ref<Object>>& GetAllObject();
 

@@ -9,8 +9,6 @@ RayTracingEditorLayer::RayTracingEditorLayer() :
 	m_spRayTracingScene(CreateRef<RayTracingScene>()),
 	m_spRayTracingCamera(CreateRef<RayTracingCamera>(45.f, 0.1f, 100.f, 0, 1))
 {
-	CreateMultiSphereScene();
-	//CreatFourSphereScene();
 	m_spRayTracingCamera->SetPosition(glm::dvec3(-10, 6.5, 7));
 	m_spRayTracingCamera->SetForwardDirection(glm::dvec3(0.7, -0.6, -0.5));
 }
@@ -126,54 +124,24 @@ void RayTracingEditorLayer::OnImGuiRender()
 	{
 		m_spRayTracingCamera->SetForwardDirection(direction);
 	}
+	ImGui::End();
 
-	//auto& mapObjcet = m_spObjectContainer->GetAllObject();
-	//auto& mapMaterial = m_spRayTracingScene->GetMaterials();
+	ImGui::Begin("SceneCase");
 
-	//glm::dvec3 position(0.f);
-	//float radius(0.f);
+	if (ImGui::Button("TwoSphere"))
+	{
+		CreatTwoSphereScene();
+	}
 
-	//glm::dvec3 albedo(0.f);
-	//float roughness(0.f);
-	//float metallic(0.f);
-	//for (auto& object : mapObjcet)
-	//{
-		//auto spSphere = std::dynamic_pointer_cast<Sphere>(object.second);
-		//if (spSphere !=nullptr)
-		//{
-		//	position = spSphere->GetPosition();
-		//	radius = spSphere->GetRadius();
-		//	ImGui::PushID(object.first);
-		//	if (ImGui::DragFloat3("Position", glm::value_ptr(position), 0.1f))
-		//	{
-		//		spSphere->SetPosition(position);
-		//	}
-		//	if (ImGui::DragFloat("Radius", &radius, 0.1f))
-		//	{
-		//		spSphere->SetRadius(radius);
-		//	}
-		//}
+	if (ImGui::Button("FourSphere"))
+	{
+		CreatFourSphereScene();
+	}
 
-		//auto material = mapMaterial.find(object.second->GetMaterialID())->second;
-		//albedo = material->GetAlbedo();
-		//roughness = material->GetRoughness();
-		//metallic = material->GetMetallic();
-		//if (ImGui::ColorEdit3("Albedo", glm::value_ptr(albedo)))
-		//{
-		//	material->SetAlbedo(albedo);
-		//}
-		//if (ImGui::DragFloat("Roughness", &roughness, 0.01f, 0.0f, 1.f))
-		//{
-		//	material->SetRoughness(roughness);
-		//}
-		//if (ImGui::DragFloat("Metallic", &metallic, 0.01f, 0.0f, 1.f))
-		//{
-		//	material->SetMetallic(metallic);
-		//}
-
-	//	ImGui::Separator();
-	//ImGui::PopID();
-	//}
+	if (ImGui::Button("MultiSpere"))
+	{
+		CreateMultiSphereScene();
+	}
 
 	ImGui::End();
 
@@ -194,8 +162,36 @@ void RayTracingEditorLayer::OnImGuiRender()
 	ImGui::End();
 }
 
+void RayTracingEditorLayer::CreatTwoSphereScene()
+{
+	m_spRayTracingScene->ResetFrameIndex();
+
+	auto spMaterial0 = CreateRef<Lambertian>(0);
+	spMaterial0->SetAlbedo(glm::dvec3(0.8f, 0.8f, 0.f));
+	auto spNoiseTexture = CreateRef<NoiseColorTexture>();
+	spMaterial0->SetColorTexture(spNoiseTexture);
+	m_spRayTracingScene->AddMaterial(spMaterial0);
+
+	auto spSpherePrimitive0 = CreateRef<Sphere>(0);
+	spSpherePrimitive0->SetPosition(glm::dvec3(0.f, -1000, 0));
+	spSpherePrimitive0->SetRadius(1000.0f);
+	spSpherePrimitive0->SetMaterialID(0);
+	m_spObjectContainer->AddObject(spSpherePrimitive0);
+
+	auto spSpherePrimitive1 = CreateRef<Sphere>(1);
+	spSpherePrimitive1->SetPosition(glm::dvec3(0.f, 2.f, 0.f));
+	spSpherePrimitive1->SetRadius(2);
+	spSpherePrimitive1->SetMaterialID(0);
+	m_spObjectContainer->AddObject(spSpherePrimitive1);
+
+	m_spRayTracingScene->SetObjectContainer(m_spObjectContainer);
+}
+
+
 void RayTracingEditorLayer::CreatFourSphereScene()
 {
+	m_spRayTracingScene->ResetFrameIndex();
+
 	auto spMaterial0 = CreateRef<Lambertian>(0);
 	spMaterial0->SetAlbedo(glm::dvec3(0.8f, 0.8f, 0.f));
 	m_spRayTracingScene->AddMaterial(spMaterial0);
@@ -248,6 +244,8 @@ void RayTracingEditorLayer::CreatFourSphereScene()
 
 void RayTracingEditorLayer::CreateMultiSphereScene()
 {
+	m_spRayTracingScene->ResetFrameIndex();
+
 	int iMaterialNum(0);
 	int iObjectNum(0);
 	for (int a = -5; a < 5; a++)
@@ -315,6 +313,10 @@ void RayTracingEditorLayer::CreateMultiSphereScene()
 	m_spObjectContainer->AddObject(spGroundSphere);
 	auto spGroundMaterial = CreateRef<Lambertian>(iMaterialNum++);
 	spGroundMaterial->SetAlbedo(glm::dvec3(0.5f));
+	auto spEven = CreateRef<SolidColorTexture>(glm::dvec3(0.2, 0.3, 0.1));
+	auto spOdd = CreateRef<SolidColorTexture>(glm::dvec3(0.9));
+	auto spCheckerColor = CreateRef<CheckerColorTexture>(spEven, spOdd);
+	spGroundMaterial->SetColorTexture(spCheckerColor);
 	m_spRayTracingScene->AddMaterial(spGroundMaterial);
 
 	auto spDielectricSphere = CreateRef<Sphere>(iObjectNum++);
@@ -347,3 +349,6 @@ void RayTracingEditorLayer::CreateMultiSphereScene()
 
 	m_spRayTracingScene->SetObjectContainer(m_spObjectContainer);
 }
+
+
+

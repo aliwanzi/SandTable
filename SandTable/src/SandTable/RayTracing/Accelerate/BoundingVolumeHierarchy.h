@@ -1,10 +1,10 @@
 #pragma once
-#include "SandTable/RayTracing/Hittable.h"
 #include "SandTable/RayTracing/Object/ObjectContainer.h"
+#include "SandTable/RayTracing/Accelerate/Accelerate.h"
 
 SAND_TABLE_NAMESPACE_BEGIN
 
-class BoundingVolumeHierarchy:public Hittable
+class BoundingVolumeHierarchy:public Accelerate
 {
 public:
 	BoundingVolumeHierarchy(std::shared_ptr<ObjectContainer> spObjectContainer, double dStepBegin, double dStepEnd);
@@ -15,7 +15,6 @@ public:
 
 private:
 	virtual bool CreateBoundingBox(double dStepBegin, double dStepEnd) override;
-	bool Comparator(const Ref<Hittable>& left, const Ref<Hittable>& right);
 private:
 	Ref<Hittable> m_spLeft;
 	Ref<Hittable> m_spRight;

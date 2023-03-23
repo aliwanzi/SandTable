@@ -4,7 +4,6 @@
 SAND_TABLE_NAMESPACE_BEGIN
 Object::Object(uint32_t uiEntitID):
 	m_uiEntitID(uiEntitID),
-	m_spBoundingBox(CreateRef<BoundingBox>()),
 	m_uiMaterialID(0),
 	m_bDirty(false)
 {

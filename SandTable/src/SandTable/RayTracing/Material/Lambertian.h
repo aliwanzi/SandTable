@@ -2,6 +2,7 @@
 #include "Material.h"
 SAND_TABLE_NAMESPACE_BEGIN
 
+class ColorTexture;
 class Lambertian :public Material
 {
 public:
@@ -12,7 +13,10 @@ public:
 
 	void SetAlbedo(const glm::dvec3& vec3Albedo);
 	const glm::dvec3& GetAlbedo() const;
+
+	void SetColorTexture(Ref<ColorTexture> spColorTexture);
 private:
+	Ref<ColorTexture> m_spColorTexture;
 	glm::dvec3 m_vec3Albedo;
 };
 

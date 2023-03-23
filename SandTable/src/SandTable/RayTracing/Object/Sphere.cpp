@@ -63,7 +63,15 @@ bool Sphere::Hit(const Ray& ray, float fMin, float fMax, HitRecord& hitRecord) c
 	hitRecord.EntityID = m_uiEntitID;
 	hitRecord.MaterialID = m_uiMaterialID;
 	hitRecord.SetWorldNormal(ray, (hitRecord.WorldPosition - m_vec3Position) / m_fRadius);
+	CalculateSampleUV(hitRecord.WorldNormal, hitRecord.UV);
 	return true;
+}
+
+void Sphere::CalculateSampleUV(const glm::vec3& SamplePoint, glm::dvec2& UV) const
+{
+	UV = glm::dvec2(glm::atan(SamplePoint.z, SamplePoint.x), glm::asin(SamplePoint.y));
+	UV *= (1 / (2 * glm::pi<double>()), 1 / glm::pi<double>());
+	UV += glm::dvec2(0.5);
 }
 
 SAND_TABLE_NAMESPACE_END

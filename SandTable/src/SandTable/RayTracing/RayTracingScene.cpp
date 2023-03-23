@@ -13,12 +13,18 @@ RayTracingScene::RayTracingScene() :
 	m_bAccumulate(true),
 	m_iFrameIndex(1),
 	m_spImage(CreateRef<Image>()),
-	m_spAccumulateBuffer(CreateRef<DataBuffer>(0, sizeof(glm::vec4) / sizeof(uint8_t)))
+	m_spAccumulateBuffer(CreateRef<DataBuffer>(0, sizeof(glm::vec4) / sizeof(uint8_t))),
+	m_spObjectContainer(nullptr)
 {
 }
 
 void RayTracingScene::OnUpdate(const TimeStep& timeStep, Ref<RayTracingCamera>& spCamera)
 {
+	if (m_spObjectContainer == nullptr || m_mapMaterial.empty())
+	{
+		return;
+	}
+
 	PreRender(spCamera);
 	Render(spCamera);
 	PostRender(spCamera);
@@ -59,6 +65,11 @@ const std::shared_ptr<ObjectContainer>& RayTracingScene::GetObjectContainer()con
 void RayTracingScene::AddMaterial(const Ref<Material>& spMaterial)
 {
 	m_mapMaterial[spMaterial->GetMaterialID()] = spMaterial;
+}
+
+void RayTracingScene::ClearMaterial()
+{
+	m_mapMaterial.clear();
 }
 
 MapMaterial& RayTracingScene::GetMaterials()
@@ -121,11 +132,13 @@ void RayTracingScene::Render(Ref<RayTracingCamera>& spCamera)
 	auto pImageData = m_spImage->GetImageData();
 	auto pAccumulateBuffer = m_spAccumulateBuffer->As<glm::vec4>();
 
+#define MultiThread
+#ifdef MultiThread
 	std::for_each(std::execution::par, m_vecImageVerticalIter.begin(), m_vecImageVerticalIter.end(),
 		[&](uint32_t y)
 		{
 			std::for_each(m_vecImageHorizontalInter.begin(), m_vecImageHorizontalInter.end(),
-				[&](uint32_t x)
+			[&](uint32_t x)
 				{
 					Ray ray = spCamera->GenRay(x, y);
 					auto color = glm::vec4(TraceRay(ray, m_spObjectContainer, 50), 1.f);
@@ -138,21 +151,23 @@ void RayTracingScene::Render(Ref<RayTracingCamera>& spCamera)
 					pImageData[x + y * width] = Image::ConvertToRGBA(color);
 				});
 		});
+#else
+	for (uint32_t y = 0; y < height; y++)
+	{
+		for (uint32_t x = 0; x < width; x++)
+		{
+			Ray ray = spCamera->GenRay(x, y);
+			auto color = glm::vec4(TraceRay(ray, m_spObjectContainer, 50), 1.f);
 
-	//for (uint32_t y = 0; y < height; y++)
-	//{
-	//	for (uint32_t x = 0; x < width; x++)
-	//	{
-	//		auto color = PerPixel(m_spRay->Origin, x, y);
+			pAccumulateBuffer[x + y * width] += color;
 
-	//		pAccumulateBuffer[x + y * width] += color;
+			color = pAccumulateBuffer[x + y * width];
+			color /= m_iFrameIndex;
 
-	//		color = pAccumulateBuffer[x + y * width];
-	//		color /= m_iFrameIndex;
-
-	//		pImageData[x + y * width] = Image::ConvertToRGBA(color);
-	//	}
-	//}
+			pImageData[x + y * width] = Image::ConvertToRGBA(color);
+		}
+	}
+#endif // MultiThread
 
 	m_bAccumulate ? m_iFrameIndex++ : m_iFrameIndex = 1;
 }

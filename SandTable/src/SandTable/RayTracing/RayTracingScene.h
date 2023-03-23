@@ -20,6 +20,7 @@ public:
 	const std::shared_ptr<ObjectContainer>& GetObjectContainer()const;
 
 	void AddMaterial(const Ref<Material>& spMaterial);
+	void ClearMaterial();
 	MapMaterial& GetMaterials();
 
 	uint32_t GetRenderImage()const;

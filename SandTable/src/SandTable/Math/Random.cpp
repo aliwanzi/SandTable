@@ -13,9 +13,9 @@ float Random::Float()
 	return static_cast<float>(m_sDistribution(m_sRandomEngine)) / static_cast<float>(std::numeric_limits<uint32_t>::max());
 }
 
-uint8_t Random::Uint8(int min, int max)
+int Random::Uint(int min, int max)
 {
-	return static_cast<uint8_t>(min + Float() * (max + 1));
+	return static_cast<int>(min + Float() * (max + 1));
 }
 
 uint32_t Random::Uint32()
