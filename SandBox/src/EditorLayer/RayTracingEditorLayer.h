@@ -11,6 +11,7 @@ public:
 	virtual void OnUpdate(const TimeStep&) override;
 	virtual void OnImGuiRender() override;
 private:
+	void CreatEarthSphereScene();
 	void CreatTwoSphereScene();
 	void CreatFourSphereScene();
 	void CreateMultiSphereScene();

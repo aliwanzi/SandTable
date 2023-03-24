@@ -7,7 +7,7 @@ SolidColorTexture::SolidColorTexture(const glm::dvec3& color):
 {
 }
 
-glm::dvec3 SolidColorTexture::GetColor(const glm::dvec3& SamplePoint, glm::dvec2 UV) const
+glm::dvec3 SolidColorTexture::GetColor(const glm::dvec3& SamplePoint, const glm::dvec2& UV) const
 {
     return m_vec3Color;
 }

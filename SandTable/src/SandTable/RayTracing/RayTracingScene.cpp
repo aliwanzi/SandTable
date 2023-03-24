@@ -132,7 +132,7 @@ void RayTracingScene::Render(Ref<RayTracingCamera>& spCamera)
 	auto pImageData = m_spImage->GetImageData();
 	auto pAccumulateBuffer = m_spAccumulateBuffer->As<glm::vec4>();
 
-#define MultiThread
+//#define MultiThread
 #ifdef MultiThread
 	std::for_each(std::execution::par, m_vecImageVerticalIter.begin(), m_vecImageVerticalIter.end(),
 		[&](uint32_t y)

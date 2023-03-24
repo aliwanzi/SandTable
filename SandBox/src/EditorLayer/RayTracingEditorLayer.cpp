@@ -11,7 +11,7 @@ RayTracingEditorLayer::RayTracingEditorLayer() :
 {
 	m_spRayTracingCamera->SetPosition(glm::dvec3(2.5, 1.5, 7));
 	m_spRayTracingCamera->SetForwardDirection(glm::dvec3(-0.38, -0.1, -1.0));
-	CreatTwoSphereScene();
+	CreatEarthSphereScene();
 }
 
 void RayTracingEditorLayer::OnAttach()
@@ -186,6 +186,25 @@ void RayTracingEditorLayer::CreatTwoSphereScene()
 	spSpherePrimitive1->SetRadius(2);
 	spSpherePrimitive1->SetMaterialID(0);
 	m_spObjectContainer->AddObject(spSpherePrimitive1);
+
+	m_spRayTracingScene->SetObjectContainer(m_spObjectContainer);
+}
+
+void RayTracingEditorLayer::CreatEarthSphereScene()
+{
+	m_spRayTracingScene->ResetFrameIndex();
+
+	auto spMaterial0 = CreateRef<Lambertian>(0);
+	spMaterial0->SetAlbedo(glm::dvec3(0.8f, 0.8f, 0.f));
+	auto spImageColorTexture = CreateRef<ImageColorTexture>("resources/texture/earthmap.jpg");
+	spMaterial0->SetColorTexture(spImageColorTexture);
+	m_spRayTracingScene->AddMaterial(spMaterial0);
+
+	auto spSpherePrimitive0 = CreateRef<Sphere>(0);
+	spSpherePrimitive0->SetPosition(glm::dvec3(0.f, 0, 0));
+	spSpherePrimitive0->SetRadius(2.0f);
+	spSpherePrimitive0->SetMaterialID(0);
+	m_spObjectContainer->AddObject(spSpherePrimitive0);
 
 	m_spRayTracingScene->SetObjectContainer(m_spObjectContainer);
 }

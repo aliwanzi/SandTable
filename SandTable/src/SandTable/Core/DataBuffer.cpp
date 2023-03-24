@@ -27,7 +27,7 @@ void DataBuffer::Resize(uint64_t uiDataBufferSize)
 
 void DataBuffer::SetDataBuffer(const void* pDataBuffer)
 {
-	memcpy(m_spDataBuffer.get(), pDataBuffer, m_uiDataBufferSize);
+	memcpy(m_spDataBuffer.get(), pDataBuffer, m_uiDataBufferSize * m_uiChannel);
 }
 
 uint64_t DataBuffer::GetDataBufferSize() const
