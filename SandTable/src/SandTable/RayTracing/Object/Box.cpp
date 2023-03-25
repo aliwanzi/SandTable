@@ -29,7 +29,7 @@ Box::Box(const glm::dvec3& PointMin, const glm::dvec3& PointMax, uint32_t uiEnti
 	spYZRectangle0->SetXPos(PointMin.x);
 	auto spYZRectangle1 = CreateRef<YZRectangle>(uiEntityID);
 	spYZRectangle1->SetYZPoints(glm::dvec2(PointMin.y, PointMin.z), glm::dvec2(PointMax.y, PointMax.z));
-	spYZRectangle1->SetXPos(PointMin.x);
+	spYZRectangle1->SetXPos(PointMax.x);
 
 	m_spObjectContainer->AddObject(spXYRectangle0);
 	m_spObjectContainer->AddObject(spXYRectangle1);
@@ -51,6 +51,7 @@ bool Box::CreateBoundingBox(double dStepBegin, double dStepEnd)
 	for (auto& object : objects)
 	{
 		object->SetTranslate(m_spTransform->GetTranslate());
+		object->SetRotateY(m_spTransform->GetRotateY());
 	}
 
 	if (!m_spObjectContainer->CreateBoundingBox(dStepBegin, dStepEnd))

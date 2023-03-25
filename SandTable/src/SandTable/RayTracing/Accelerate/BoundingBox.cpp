@@ -11,10 +11,10 @@ BoundingBox::BoundingBox():
 
 }
 
-BoundingBox::BoundingBox(const glm::dvec3 min, const glm::dvec3 max):
-	m_vec3Max(max),
-	m_vec3Min(min)
+BoundingBox::BoundingBox(const glm::dvec3 min, const glm::dvec3 max)
 {
+	m_vec3Max = glm::max(min, max);
+	m_vec3Min = glm::min(min, max);
 }
 
 void BoundingBox::SetMin(const glm::dvec3& vec3Min)
@@ -41,6 +41,29 @@ void BoundingBox::MakeTranslate(const glm::dvec3& vec3Offset)
 {
 	m_vec3Min += vec3Offset;
 	m_vec3Max += vec3Offset;
+}
+
+void BoundingBox::MakeRotation(const glm::highp_dmat4& mat4Rotate)
+{
+	std::vector<glm::dvec4> vecPoint
+	{
+		glm::dvec4(m_vec3Min.x,m_vec3Min.y,m_vec3Min.z,1.0),
+		glm::dvec4(m_vec3Max.x,m_vec3Min.y,m_vec3Min.z,1.0),
+		glm::dvec4(m_vec3Max.x,m_vec3Max.y,m_vec3Min.z,1.0),
+		glm::dvec4(m_vec3Min.x,m_vec3Max.y,m_vec3Min.z,1.0),
+		glm::dvec4(m_vec3Min.x,m_vec3Min.y,m_vec3Max.z,1.0),
+		glm::dvec4(m_vec3Max.x,m_vec3Min.y,m_vec3Max.z,1.0),
+		glm::dvec4(m_vec3Max.x,m_vec3Max.y,m_vec3Max.z,1.0),
+		glm::dvec4(m_vec3Min.x,m_vec3Max.y,m_vec3Max.z,1.0),
+	};
+
+	m_vec3Min = glm::dvec3(std::numeric_limits<float>::max());
+	m_vec3Max = glm::dvec3(-std::numeric_limits<float>::max());
+	for (int i = 0; i < 8; i++)
+	{
+		m_vec3Min = glm::min(m_vec3Min, glm::dvec3(mat4Rotate * vecPoint[i]));
+		m_vec3Max = glm::max(m_vec3Max, glm::dvec3(mat4Rotate * vecPoint[i]));
+	}
 }
 
 bool BoundingBox::Intersect(const Ray& ray, double& stepMin, double& stepMax) const

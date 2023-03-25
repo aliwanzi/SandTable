@@ -22,20 +22,21 @@ void YZRectangle::SetXPos(double dXPos)
 
 bool YZRectangle::Hit(const Ray& ray, double fMin, double fMax, HitRecord& hitRecord)
 {
-    auto root = (m_dXPos - (ray.Origin - m_spTransform->GetTranslate()).x) / ray.Direction.x;
+    auto center = m_spBoundingBox->GetCentroid();
+    auto root = (center.x - ray.Origin.x) / ray.Direction.x;
     if (root < fMin || root > fMax)
         return false;
-
     auto point = (ray.Origin + root * ray.Direction);
     if (!m_spBoundingBox->Contains(point))
-    {
         return false;
-    }
 
-    hitRecord.UV = (glm::dvec2(point.y, point.z) - m_vec2PointMin) / (m_vec2PointMax - m_vec2PointMin);
+    auto min = m_spBoundingBox->GetMin();
+    auto uvw = (center - min) / m_spBoundingBox->GetDimension();
+
+    hitRecord.UV = glm::dvec2(uvw.y, uvw.z);
     hitRecord.HitDistance = root;
     hitRecord.SetWorldNormal(ray, glm::dvec3(1, 0, 0));
-    hitRecord.WorldPosition = ray.Origin+m_spTransform->GetTranslate() + ray.Direction * hitRecord.HitDistance;
+    hitRecord.WorldPosition = point;
     hitRecord.MaterialID = m_uiMaterialID;
     hitRecord.EntityID = m_uiEntitID;
 
@@ -46,6 +47,7 @@ bool YZRectangle::CreateBoundingBox(double dStepBegin, double dStepEnd)
 {
     m_spBoundingBox = CreateRef<BoundingBox>(glm::dvec3(m_dXPos - 0.0001, m_vec2PointMin), glm::dvec3(m_dXPos + 0.00001, m_vec2PointMax));
     m_spBoundingBox->MakeTranslate(m_spTransform->GetTranslate());
+    m_spBoundingBox->MakeRotation(m_spTransform->GetRotation());
     return true;
 }
 

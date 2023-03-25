@@ -28,7 +28,7 @@ void Object::SetTranslate(const glm::dvec3& vec3Translate)
 
 void Object::SetRotateY(double angle)
 {
-	m_spTransform->SetRotateY(glm::radians(angle));
+	m_spTransform->SetRotateY(angle);
 }
 
 const Ref<BoundingBox>& Object::GetBoundingBox() const

@@ -14,6 +14,7 @@ public:
     const glm::dvec3& GetMax()const;
 
     void MakeTranslate(const glm::dvec3& vec3Offset);
+    void MakeRotation(const glm::highp_dmat4& mat4Rotate);
 
     bool Intersect(const Ray& ray, double& stepMin, double& stepMax) const;
     bool Contains(const glm::dvec3& point) const;
