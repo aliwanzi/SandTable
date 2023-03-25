@@ -38,10 +38,15 @@
 #include "SandTable/RayTracing/Object/ObjectContainer.h"
 #include "SandTable/RayTracing/Object/Sphere.h"
 #include "SandTable/RayTracing/Object/MovingSphere.h"
+#include "SandTable/RayTracing/Object/Rectangle/XYRectangle.h"
+#include "SandTable/RayTracing/Object/Rectangle/XZRectangle.h"
+#include "SandTable/RayTracing/Object/Rectangle/YZRectangle.h"
+#include "SandTable/RayTracing/Object/Box.h"
 
 #include "SandTable/RayTracing/Material/Dielectric.h"
 #include "SandTable/RayTracing/Material/Lambertian.h"
 #include "SandTable/RayTracing/Material/Metal.h"
+#include "SandTable/RayTracing/Material/Light/DiffuseLight.h"
 
 #include "SandTable/RayTracing/Color/CheckerColorTexture.h"
 #include "SandTable/RayTracing/Color/ImageColorTexture.h"

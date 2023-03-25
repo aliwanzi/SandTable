@@ -11,7 +11,7 @@ public:
 	BoundingVolumeHierarchy(std::vector<Ref<Object>>& vecObject, size_t start, size_t end, double dStepBegin, double dStepEnd);
 
 	// Í¨¹ý Hittable ¼Ì³Ð
-	virtual bool Hit(const Ray& ray, float fMin, float fMax, HitRecord& hitRecord) const override;
+	virtual bool Hit(const Ray& ray, double fMin, double fMax, HitRecord& hitRecord) override;
 
 private:
 	virtual bool CreateBoundingBox(double dStepBegin, double dStepEnd) override;

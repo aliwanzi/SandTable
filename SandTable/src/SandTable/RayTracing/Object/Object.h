@@ -1,5 +1,6 @@
 #pragma once
 #include "SandTable/RayTracing/Hittable.h"
+#include "SandTable/RayTracing/Transform.h"
 SAND_TABLE_NAMESPACE_BEGIN
 
 class Object :public Hittable
@@ -12,12 +13,19 @@ public:
 	void ResetDirty();
 	bool GetDirty();
 
-	void SetMaterialID(uint32_t uiMaterialID);
+	virtual void SetMaterialID(uint32_t uiMaterialID);
 	uint32_t GetMaterialID() const;
+
+	void SetTranslate(const glm::dvec3& vec3Translate);
+	void SetRotateY(double angle);
+
+	virtual const Ref<BoundingBox>& GetBoundingBox()const override;
 protected:
 	bool m_bDirty;
 	uint32_t m_uiEntitID;
 	uint32_t m_uiMaterialID;
+	Ref<BoundingBox> m_spBoundingBox;
+	Ref<Transform> m_spTransform;
 };
 SAND_TABLE_NAMESPACE_END
 

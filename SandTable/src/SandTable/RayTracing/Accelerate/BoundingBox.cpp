@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "BoundingBox.h"
+#include "SandTable/Math/MathUtils.h"
 
 SAND_TABLE_NAMESPACE_BEGIN
 
@@ -36,13 +37,20 @@ const glm::dvec3& BoundingBox::GetMax() const
 	return m_vec3Max;
 }
 
-bool BoundingBox::Intersect(const Ray& ray, double& step) const
+void BoundingBox::MakeTranslate(const glm::dvec3& vec3Offset)
+{
+	m_vec3Min += vec3Offset;
+	m_vec3Max += vec3Offset;
+}
+
+bool BoundingBox::Intersect(const Ray& ray, double& stepMin, double& stepMax) const
 {
 	glm::dvec3 min{ (m_vec3Min - ray.Origin) * (1.0 / ray.Direction) };
 	glm::dvec3 max{ (m_vec3Max - ray.Origin) * (1.0 / ray.Direction) };
 
-	step = std::max(glm::compMax(glm::min(min, max)), 0.0);
-	return glm::compMin(glm::max(min, max)) >= step;
+	stepMin = std::max(glm::compMax(glm::min(min, max)), 0.0);
+	stepMax = std::min(glm::compMin(glm::max(min, max)), std::numeric_limits<double>::max());
+	return stepMax >= stepMin;
 }
 
 bool BoundingBox::Contains(const glm::dvec3& point) const

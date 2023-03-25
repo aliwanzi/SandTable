@@ -11,6 +11,11 @@ Material::Material(uint32_t uiMaterialID) :
 }
 
 
+glm::dvec3 Material::Emitted(const glm::dvec3& SamplePoint, const glm::dvec2& UV) const
+{
+	return glm::dvec3(0.0);
+}
+
 uint32_t Material::GetMaterialID() const
 {
 	return m_uiMaterialID;

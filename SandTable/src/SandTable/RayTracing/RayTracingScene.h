@@ -23,6 +23,9 @@ public:
 	void ClearMaterial();
 	MapMaterial& GetMaterials();
 
+	void SetBackGroundColor(const glm::dvec3& background);
+	const glm::dvec3& GetBackGroundColor()const;
+
 	uint32_t GetRenderImage()const;
 
 	bool& GetAccumulate();
@@ -46,6 +49,8 @@ private:
 	Ref<DataBuffer> m_spAccumulateBuffer;
 	std::vector<uint32_t> m_vecImageVerticalIter;
 	std::vector<uint32_t> m_vecImageHorizontalInter;
+
+	glm::dvec3 m_vec3BackGroundColor;
 };
 
 SAND_TABLE_NAMESPACE_END

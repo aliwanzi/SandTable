@@ -83,9 +83,9 @@ BoundingVolumeHierarchy::BoundingVolumeHierarchy(
 
 
 bool BoundingVolumeHierarchy::Hit(const Ray& ray, 
-	float fMin,
-	float fMax, 
-	HitRecord& hitRecord) const
+	double fMin,
+	double fMax,
+	HitRecord& hitRecord)
 {
 	return false;
 }

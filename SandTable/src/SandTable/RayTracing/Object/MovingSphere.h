@@ -14,11 +14,10 @@ public:
 	const glm::dvec3& GetMovePosition()const;
 
 	// Í¨¹ý Hittable ¼Ì³Ð
-	virtual bool Hit(const Ray& ray, float fMin, float fMax, HitRecord& hitRecord) const override;
-	virtual bool CreateBoundingBox(double dStepBegin, double dStepEnd) override { return true; };
-	virtual const Ref<BoundingBox>& GetBoundingBox()const override { return nullptr; };
+	virtual bool Hit(const Ray& ray, double fMin, double fMax, HitRecord& hitRecord) override;
+	virtual bool CreateBoundingBox(double dStepBegin, double dStepEnd) override;
 private:
-	glm::dvec3 Center(float fStep) const;
+	glm::dvec3 Center(double fStep) const;
 private:
 	glm::dvec3 m_vec3MovePosition;
 	double m_fStepBegin;

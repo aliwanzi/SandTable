@@ -2,10 +2,7 @@
 #include "Sphere.h"
 
 SAND_TABLE_NAMESPACE_BEGIN
-namespace
-{
-	const float fHitDistance = std::numeric_limits<float>::max();
-}
+
 Sphere::Sphere(uint32_t uiEntitID):
 	Object(uiEntitID),
 	m_vec3Position(glm::dvec3(0.f)),
@@ -35,8 +32,11 @@ float Sphere::GetRadius() const
 	return m_fRadius;
 }
 
-bool Sphere::Hit(const Ray& ray, float fMin, float fMax, HitRecord& hitRecord) const
+bool Sphere::Hit(const Ray& ray, double fMin, double fMax, HitRecord& hitRecord)
 {
+	//glm::dvec3 points(ray.Origin);
+	//m_spTranslate->MakeTranslate(points);
+
 	auto& origin = ray.Origin - m_vec3Position;
 
 	float fA = glm::dot(ray.Direction, ray.Direction);
@@ -44,16 +44,16 @@ bool Sphere::Hit(const Ray& ray, float fMin, float fMax, HitRecord& hitRecord) c
 	float fC = glm::dot(origin, origin) - m_fRadius * m_fRadius;
 
 	// Find the nearest root that lies in the acceptable range.
-	float discriminant = fB * fB - 4.0f * fA * fC;
+	float discriminant = fB * fB - 4.0 * fA * fC;
 	if (discriminant < 0)
 	{
 		return false;
 	}
 
-	auto root = (-fB - sqrt(discriminant)) / (2.f * fA);
+	auto root = (-fB - sqrt(discriminant)) / (2. * fA);
 	if (root < fMin || fMax < root) 
 	{
-		root = (-fB + sqrt(discriminant)) / (2.f * fA);
+		root = (-fB + sqrt(discriminant)) / (2. * fA);
 		if (root < fMin || fMax < root)
 			return false;
 	}
@@ -64,6 +64,15 @@ bool Sphere::Hit(const Ray& ray, float fMin, float fMax, HitRecord& hitRecord) c
 	hitRecord.MaterialID = m_uiMaterialID;
 	hitRecord.SetWorldNormal(ray, (hitRecord.WorldPosition - m_vec3Position) / m_fRadius);
 	CalculateSampleUV(hitRecord.WorldNormal, hitRecord.UV);
+	return true;
+}
+
+bool Sphere::CreateBoundingBox(double dStepBegin, double dStepEnd)
+{
+	m_spBoundingBox = CreateRef<BoundingBox>();
+	m_spBoundingBox->SetMin(m_vec3Position - glm::dvec3(m_fRadius));
+	m_spBoundingBox->SetMax(m_vec3Position + glm::dvec3(m_fRadius));
+	m_spBoundingBox->MakeTranslate(m_spTransform->GetTranslate());
 	return true;
 }
 

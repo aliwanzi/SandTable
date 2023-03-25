@@ -13,7 +13,9 @@ public:
     void SetMax(const glm::dvec3& vec3Max);
     const glm::dvec3& GetMax()const;
 
-    bool Intersect(const Ray& ray, double& step) const;
+    void MakeTranslate(const glm::dvec3& vec3Offset);
+
+    bool Intersect(const Ray& ray, double& stepMin, double& stepMax) const;
     bool Contains(const glm::dvec3& point) const;
     glm::dvec3 GetDimension() const;
     glm::dvec3 GetCentroid() const;

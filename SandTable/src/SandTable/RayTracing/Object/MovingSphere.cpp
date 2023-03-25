@@ -28,7 +28,7 @@ const glm::dvec3& MovingSphere::GetMovePosition() const
 	return m_vec3MovePosition;
 }
 
-bool MovingSphere::Hit(const Ray& ray, float fMin, float fMax, HitRecord& hitRecord) const
+bool MovingSphere::Hit(const Ray& ray, double fMin, double fMax, HitRecord& hitRecord)
 {
 	auto& origin = ray.Origin - Center(ray.Step);
 
@@ -37,16 +37,16 @@ bool MovingSphere::Hit(const Ray& ray, float fMin, float fMax, HitRecord& hitRec
 	float fC = glm::dot(origin, origin) - m_fRadius * m_fRadius;
 
 	// Find the nearest root that lies in the acceptable range.
-	float discriminant = fB * fB - 4.0f * fA * fC;
+	float discriminant = fB * fB - 4.0 * fA * fC;
 	if (discriminant < 0)
 	{
 		return false;
 	}
 
-	auto root = (-fB - sqrt(discriminant)) / (2.f * fA);
+	auto root = (-fB - sqrt(discriminant)) / (2. * fA);
 	if (root < fMin || fMax < root)
 	{
-		root = (-fB + sqrt(discriminant)) / (2.f * fA);
+		root = (-fB + sqrt(discriminant)) / (2. * fA);
 		if (root < fMin || fMax < root)
 			return false;
 	}
@@ -59,7 +59,12 @@ bool MovingSphere::Hit(const Ray& ray, float fMin, float fMax, HitRecord& hitRec
 	return true;
 }
 
-glm::dvec3 MovingSphere::Center(float fStep) const
+bool MovingSphere::CreateBoundingBox(double dStepBegin, double dStepEnd)
+{
+	return true;
+}
+
+glm::dvec3 MovingSphere::Center(double fStep) const
 {
 	return m_vec3Position + (fStep - m_fStepBegin) / (m_fStepEnd - m_fStepBegin) * (m_vec3MovePosition - m_vec3Position);
 }

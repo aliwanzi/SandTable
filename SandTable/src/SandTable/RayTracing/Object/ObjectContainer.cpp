@@ -3,8 +3,25 @@
 
 SAND_TABLE_NAMESPACE_BEGIN
 
-bool ObjectContainer::Hit(const Ray& ray, float fMin, float fMax, HitRecord& hitRecord) const
+ObjectContainer::ObjectContainer():
+	m_spBoundingBox(CreateRef<BoundingBox>()),
+	m_bInitilize(false)
+	
 {
+}
+
+bool ObjectContainer::Hit(const Ray& ray, double fMin, double fMax, HitRecord& hitRecord)
+{
+	if (!m_bInitilize)
+	{
+		if (!CreateBoundingBox(fMin, fMax))
+		{
+			LOG_DEV_ERROR("Create BoundingBox Failed");
+			return false;
+		}
+	}
+
+
 	HitRecord hitRecordTemp;
 	float fCloset = fMax;
 	bool bHitAnything(false);
@@ -19,6 +36,25 @@ bool ObjectContainer::Hit(const Ray& ray, float fMin, float fMax, HitRecord& hit
 		}
 	}
 	return bHitAnything;
+}
+
+bool ObjectContainer::CreateBoundingBox(double dStepBegin, double dStepEnd)
+{
+	for (auto& iter : m_vecObject)
+	{
+		if (!iter->CreateBoundingBox(dStepBegin,dStepEnd))
+		{
+			return false;
+		}
+		m_spBoundingBox->Merge(iter->GetBoundingBox());
+	}
+	m_bInitilize = true;
+	return true;
+}
+
+const Ref<BoundingBox>& ObjectContainer::GetBoundingBox() const
+{
+	return m_spBoundingBox;
 }
 
 std::vector<Ref<Object>>& ObjectContainer::GetAllObject()

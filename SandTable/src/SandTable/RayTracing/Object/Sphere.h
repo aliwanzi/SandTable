@@ -15,10 +15,9 @@ public:
 	float GetRadius() const;
 
 	// Í¨¹ý Hittable ¼Ì³Ð
-	virtual bool Hit(const Ray& ray, float fMin, float fMax, HitRecord& hitRecord) const override;
+	virtual bool Hit(const Ray& ray, double fMin, double fMax, HitRecord& hitRecord) override;
 
-	virtual bool CreateBoundingBox(double dStepBegin, double dStepEnd) { return true; };
-	virtual const Ref<BoundingBox>& GetBoundingBox()const override { return nullptr; };
+	virtual bool CreateBoundingBox(double dStepBegin, double dStepEnd);
 private:
 	void CalculateSampleUV(const glm::vec3& SamplePoint, glm::dvec2& UV) const;
 

@@ -11,7 +11,7 @@ RayTracingEditorLayer::RayTracingEditorLayer() :
 {
 	m_spRayTracingCamera->SetPosition(glm::dvec3(2.5, 1.5, 7));
 	m_spRayTracingCamera->SetForwardDirection(glm::dvec3(-0.38, -0.1, -1.0));
-	CreatEarthSphereScene();
+	CreateCornellBoxScene();
 }
 
 void RayTracingEditorLayer::OnAttach()
@@ -127,25 +127,6 @@ void RayTracingEditorLayer::OnImGuiRender()
 	}
 	ImGui::End();
 
-	ImGui::Begin("SceneCase");
-
-	if (ImGui::Button("TwoSphere"))
-	{
-		CreatTwoSphereScene();
-	}
-
-	if (ImGui::Button("FourSphere"))
-	{
-		CreatFourSphereScene();
-	}
-
-	if (ImGui::Button("MultiSpere"))
-	{
-		CreateMultiSphereScene();
-	}
-
-	ImGui::End();
-
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.f, 0.f));
 	ImGui::Begin("ViewPort");
 
@@ -166,6 +147,7 @@ void RayTracingEditorLayer::OnImGuiRender()
 void RayTracingEditorLayer::CreatTwoSphereScene()
 {
 	m_spRayTracingScene->ResetFrameIndex();
+	m_spRayTracingScene->SetBackGroundColor(glm::dvec3(0.7, 0.8, 1.0));
 
 	auto spMaterial0 = CreateRef<Lambertian>(0);
 	spMaterial0->SetAlbedo(glm::dvec3(0.8f, 0.8f, 0.f));
@@ -193,6 +175,7 @@ void RayTracingEditorLayer::CreatTwoSphereScene()
 void RayTracingEditorLayer::CreatEarthSphereScene()
 {
 	m_spRayTracingScene->ResetFrameIndex();
+	m_spRayTracingScene->SetBackGroundColor(glm::dvec3(0.7, 0.8, 1.0));
 
 	auto spMaterial0 = CreateRef<Lambertian>(0);
 	spMaterial0->SetAlbedo(glm::dvec3(0.8f, 0.8f, 0.f));
@@ -213,6 +196,7 @@ void RayTracingEditorLayer::CreatEarthSphereScene()
 void RayTracingEditorLayer::CreatFourSphereScene()
 {
 	m_spRayTracingScene->ResetFrameIndex();
+	m_spRayTracingScene->SetBackGroundColor(glm::dvec3(0.7, 0.8, 1.0));
 
 	auto spMaterial0 = CreateRef<Lambertian>(0);
 	spMaterial0->SetAlbedo(glm::dvec3(0.8f, 0.8f, 0.f));
@@ -267,6 +251,7 @@ void RayTracingEditorLayer::CreatFourSphereScene()
 void RayTracingEditorLayer::CreateMultiSphereScene()
 {
 	m_spRayTracingScene->ResetFrameIndex();
+	m_spRayTracingScene->SetBackGroundColor(glm::dvec3(0.7, 0.8, 1.0));
 
 	int iMaterialNum(0);
 	int iObjectNum(0);
@@ -368,6 +353,124 @@ void RayTracingEditorLayer::CreateMultiSphereScene()
 	spMetal->SetAlbedo(glm::dvec3(0.7, 0.6, 0.5));
 	m_spRayTracingScene->AddMaterial(spMetal);
 
+
+	m_spRayTracingScene->SetObjectContainer(m_spObjectContainer);
+}
+
+void RayTracingEditorLayer::CreateSampleLightScene()
+{
+	m_spRayTracingScene->ResetFrameIndex();
+	m_spRayTracingScene->SetBackGroundColor(glm::dvec3(0.7, 0.8, 1.0));
+
+	auto spMaterial0 = CreateRef<Lambertian>(0);
+	auto spNoiseTexture = CreateRef<NoiseColorTexture>();
+	spNoiseTexture->SetNoiseScale(4.0);
+	spNoiseTexture->SetTurbDepth(7);
+	spMaterial0->SetColorTexture(spNoiseTexture);
+	m_spRayTracingScene->AddMaterial(spMaterial0);
+
+	auto spSpherePrimitive0 = CreateRef<Sphere>(0);
+	spSpherePrimitive0->SetPosition(glm::dvec3(0.f, -1000, 0));
+	spSpherePrimitive0->SetRadius(1000.0f);
+	spSpherePrimitive0->SetMaterialID(0);
+	m_spObjectContainer->AddObject(spSpherePrimitive0);
+
+	auto spSpherePrimitive1 = CreateRef<Sphere>(1);
+	spSpherePrimitive1->SetPosition(glm::dvec3(0.f, 2.f, 0.f));
+	spSpherePrimitive1->SetRadius(2);
+	spSpherePrimitive1->SetMaterialID(0);
+	m_spObjectContainer->AddObject(spSpherePrimitive1);
+
+	auto spColorTexture = CreateRef<SolidColorTexture>(glm::dvec3(4));
+	auto spDiffuseLight = CreateRef<DiffuseLight>(spColorTexture, 1);
+	m_spRayTracingScene->AddMaterial(spDiffuseLight);
+
+	auto spXYRectangle = CreateRef<XYRectangle>(2);
+	spXYRectangle->SetXYPoints(glm::dvec2(3, 1), glm::dvec2(5, 3));
+	spXYRectangle->SetZPos(-2);
+	spXYRectangle->SetMaterialID(1);
+	m_spObjectContainer->AddObject(spXYRectangle);
+
+	auto spSpherePrimitive2 = CreateRef<Sphere>(3);
+	spSpherePrimitive2->SetPosition(glm::dvec3(0.f, 7.f, 0.f));
+	spSpherePrimitive2->SetRadius(2);
+	spSpherePrimitive2->SetMaterialID(1);
+	m_spObjectContainer->AddObject(spSpherePrimitive2);
+
+	m_spRayTracingScene->SetObjectContainer(m_spObjectContainer);
+}
+
+void RayTracingEditorLayer::CreateCornellBoxScene()
+{
+	m_spRayTracingScene->ResetFrameIndex();
+	m_spRayTracingScene->SetBackGroundColor(glm::dvec3(0.0));
+
+	m_spRayTracingCamera->SetPosition(glm::vec3(278, 278, -600));
+	m_spRayTracingCamera->SetForwardDirection(glm::vec3(278, 278, 0) - glm::vec3(278, 278, -800));
+
+	auto spRed = CreateRef<Lambertian>(0);
+	spRed->SetAlbedo(glm::dvec3(0.65,0.05,0.05));
+	m_spRayTracingScene->AddMaterial(spRed);
+
+	auto spWhite = CreateRef<Lambertian>(1);
+	spWhite->SetAlbedo(glm::dvec3(0.73));
+	m_spRayTracingScene->AddMaterial(spWhite);
+
+	auto spGreen = CreateRef<Lambertian>(2);
+	spGreen->SetAlbedo(glm::dvec3(0.12, 0.45, 0.15));
+	m_spRayTracingScene->AddMaterial(spGreen);
+
+	auto spColorTexture = CreateRef<SolidColorTexture>(glm::dvec3(15));
+	auto spDiffuseLight = CreateRef<DiffuseLight>(spColorTexture, 3);
+	m_spRayTracingScene->AddMaterial(spDiffuseLight);
+
+	auto spYZRectangle0 = CreateRef<YZRectangle>(0);
+	spYZRectangle0->SetYZPoints(glm::dvec2(0), glm::dvec2(555));
+	spYZRectangle0->SetXPos(555);
+	spYZRectangle0->SetMaterialID(2);
+	m_spObjectContainer->AddObject(spYZRectangle0);
+
+	auto spYZRectangle1 = CreateRef<YZRectangle>(1);
+	spYZRectangle1->SetYZPoints(glm::dvec2(0), glm::dvec2(555));
+	spYZRectangle1->SetXPos(0);
+	spYZRectangle1->SetMaterialID(0);
+	m_spObjectContainer->AddObject(spYZRectangle1);
+
+	auto spXZRectangle0 = CreateRef<XZRectangle>(2);
+	spXZRectangle0->SetXZPoints(glm::dvec2(213, 227), glm::dvec2(343, 332));
+	spXZRectangle0->SetYPos(554);
+	spXZRectangle0->SetMaterialID(3);
+	m_spObjectContainer->AddObject(spXZRectangle0);
+
+	auto spXZRectangle1 = CreateRef<XZRectangle>(3);
+	spXZRectangle1->SetXZPoints(glm::dvec2(0), glm::dvec2(555));
+	spXZRectangle1->SetYPos(0);
+	spXZRectangle1->SetMaterialID(1);
+	m_spObjectContainer->AddObject(spXZRectangle1);
+
+	auto spXZRectangle2 = CreateRef<XZRectangle>(4);
+	spXZRectangle2->SetXZPoints(glm::dvec2(0), glm::dvec2(555));
+	spXZRectangle2->SetYPos(555);
+	spXZRectangle2->SetMaterialID(1);
+	m_spObjectContainer->AddObject(spXZRectangle2);
+
+	auto spXYRectangle = CreateRef<XYRectangle>(5);
+	spXYRectangle->SetXYPoints(glm::dvec2(0), glm::dvec2(555));
+	spXYRectangle->SetZPos(555);
+	spXYRectangle->SetMaterialID(1);
+	m_spObjectContainer->AddObject(spXYRectangle);
+
+	auto spBox0 = CreateRef<Box>(glm::dvec3(0), glm::dvec3(165, 330, 165), 6);
+	spBox0->SetMaterialID(1);
+	spBox0->SetTranslate(glm::dvec3(265, 0, 295));
+	spBox0->SetRotateY(15);
+	m_spObjectContainer->AddObject(spBox0);
+
+	auto spBox1 = CreateRef<Box>(glm::dvec3(0), glm::dvec3(165), 7);
+	spBox1->SetMaterialID(1);
+	spBox1->SetTranslate(glm::dvec3(130, 0, 65));
+	spBox1->SetRotateY(-18);
+	m_spObjectContainer->AddObject(spBox1);
 
 	m_spRayTracingScene->SetObjectContainer(m_spObjectContainer);
 }

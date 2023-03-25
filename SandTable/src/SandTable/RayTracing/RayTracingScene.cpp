@@ -1,20 +1,17 @@
 #include "pch.h"
 #include "RayTracingScene.h"
-#include "SandTable/Math/Random.h"
+#include "SandTable/Math/MathUtils.h"
 #include <execution>
 
 SAND_TABLE_NAMESPACE_BEGIN
-namespace
-{
-	const float fHitDistance = std::numeric_limits<float>::max();
-}
 
 RayTracingScene::RayTracingScene() :
 	m_bAccumulate(true),
 	m_iFrameIndex(1),
 	m_spImage(CreateRef<Image>()),
 	m_spAccumulateBuffer(CreateRef<DataBuffer>(0, sizeof(glm::vec4) / sizeof(uint8_t))),
-	m_spObjectContainer(nullptr)
+	m_spObjectContainer(nullptr),
+	m_vec3BackGroundColor(glm::dvec3(0.0))
 {
 }
 
@@ -77,6 +74,16 @@ MapMaterial& RayTracingScene::GetMaterials()
 	return m_mapMaterial;
 }
 
+void RayTracingScene::SetBackGroundColor(const glm::dvec3& background)
+{
+	m_vec3BackGroundColor = background;
+}
+
+const glm::dvec3& RayTracingScene::GetBackGroundColor() const
+{
+	return m_vec3BackGroundColor;
+}
+
 uint32_t RayTracingScene::GetRenderImage() const
 {
 	return m_spImage->GetImage();
@@ -132,7 +139,7 @@ void RayTracingScene::Render(Ref<RayTracingCamera>& spCamera)
 	auto pImageData = m_spImage->GetImageData();
 	auto pAccumulateBuffer = m_spAccumulateBuffer->As<glm::vec4>();
 
-//#define MultiThread
+#define MultiThread
 #ifdef MultiThread
 	std::for_each(std::execution::par, m_vecImageVerticalIter.begin(), m_vecImageVerticalIter.end(),
 		[&](uint32_t y)
@@ -191,22 +198,32 @@ glm::dvec3 RayTracingScene::TraceRay(const Ray& ray, const std::shared_ptr<Hitta
 {
 	if (depth <= 0)
 	{
-		return glm::dvec3(0.f);
+		return glm::dvec3(0.0);
 	}
-
+	
 	HitRecord rec;
-	if (spHittable->Hit(ray, 0.001, fHitDistance, rec))
+	if (!spHittable->Hit(ray, 0.001, std::numeric_limits<float>::max(), rec))
 	{
-		Ray scattered;
-		glm::dvec3 attenuation;
-		auto material = m_mapMaterial.find(rec.MaterialID)->second;
-		if (material != nullptr && material->Scatter(ray, rec, attenuation, scattered))
-			return attenuation * TraceRay(scattered, spHittable, depth - 1);
-		return glm::dvec3(0.f);
+		return m_vec3BackGroundColor;
 	}
 
-	double t = 0.5 * (glm::normalize(ray.Direction).y + 1.0);
-	return glm::dvec3(1.f) * (1 - t) + glm::dvec3(0.5f, 0.7f, 1.f) * t;
+	auto material = m_mapMaterial.find(rec.MaterialID);
+	if (material == m_mapMaterial.end())
+	{
+		LOG_DEV_ERROR("Can't find material in TraceRay");
+		return glm::dvec3(0.0);
+	}
+
+	auto emmitted = material->second->Emitted(rec.WorldPosition, rec.UV);
+
+	Ray scattered;
+	glm::dvec3 attenuation;
+	if (!material->second->Scatter(ray, rec, attenuation, scattered))
+	{
+		return emmitted;
+	}
+
+	return emmitted + attenuation * TraceRay(scattered, spHittable, depth - 1);
 }
 
 SAND_TABLE_NAMESPACE_END

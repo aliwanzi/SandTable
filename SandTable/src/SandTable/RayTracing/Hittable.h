@@ -22,7 +22,7 @@ struct HitRecord
 class Hittable
 {
 public:
-	virtual bool Hit(const Ray& ray, float fMin, float fMax, HitRecord& hitRecord) const = 0;
+	virtual bool Hit(const Ray& ray, double fMin, double fMax, HitRecord& hitRecord) = 0;
 	virtual bool CreateBoundingBox(double dStepBegin, double dStepEnd) = 0;
 	virtual const Ref<BoundingBox>& GetBoundingBox()const = 0;
 };
