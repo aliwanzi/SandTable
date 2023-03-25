@@ -15,8 +15,7 @@ bool Metal::Scatter(const Ray& rayIn, const HitRecord& hitRecord, glm::dvec3& at
 {
 	attenuation = m_vec3Albedo;
 	rayOut.Step = rayIn.Step;
-	rayOut.Origin = glm::dot(rayOut.Direction, hitRecord.WorldNormal) < 0 ? hitRecord.WorldPosition - hitRecord.WorldNormal * 0.00001 :
-		hitRecord.WorldPosition + hitRecord.WorldNormal * 0.00001;
+	rayOut.Origin = hitRecord.WorldPosition;
 	rayOut.Direction = glm::reflect(rayIn.Direction, hitRecord.WorldNormal + m_fRoughness * Random::UnitSphere()) ;
 
 	return glm::dot(rayOut.Direction, hitRecord.WorldNormal) > 0;

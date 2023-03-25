@@ -25,23 +25,29 @@ void XYRectangle::SetZPos(double dZPos)
 
 bool XYRectangle::Hit(const Ray& ray, double fMin, double fMax, HitRecord& hitRecord)
 {
+    Ray transRay;
+    transRay.Origin =m_spTransform->GetRotationInverse()* m_spTransform->GetTranslationInverse()
+        * glm::dvec4(ray.Origin, 1.0);
+    transRay.Direction = m_spTransform->GetRotationInverse() * glm::dvec4(ray.Direction, 1.0);
+
     auto center = m_spBoundingBox->GetCentroid();
-    auto root = (center.z - ray.Origin.z) / ray.Direction.z;
+    auto root = (center.z - transRay.Origin.z) / transRay.Direction.z;
     if (root < fMin || root > fMax)
         return false;
-    auto point = (ray.Origin + root * ray.Direction);
+    auto point = (transRay.Origin + root * transRay.Direction);
     if (!m_spBoundingBox->Contains(point))
     {
         return false;
     }
 
     auto min = m_spBoundingBox->GetMin();
-    auto uvw = (center - min) / m_spBoundingBox->GetDimension();
+    auto uvw = (point - min) / m_spBoundingBox->GetDimension();
+    auto normal = m_spTransform->GetRotation() * glm::dvec4(0, 0, 1, 1);
 
     hitRecord.UV = glm::dvec2(uvw.x, uvw.y);
     hitRecord.HitDistance = root;
-    hitRecord.SetWorldNormal(ray, glm::dvec3(0, 0, 1));
-    hitRecord.WorldPosition = point;
+    hitRecord.SetWorldNormal(ray, normal);
+    hitRecord.WorldPosition = ray.Origin + root * ray.Direction;
     hitRecord.MaterialID = m_uiMaterialID;
     hitRecord.EntityID = m_uiEntitID;
 
@@ -50,9 +56,8 @@ bool XYRectangle::Hit(const Ray& ray, double fMin, double fMax, HitRecord& hitRe
 
 bool XYRectangle::CreateBoundingBox(double dStepBegin, double dStepEnd)
 {
-    m_spBoundingBox = CreateRef<BoundingBox>(glm::dvec3(m_vec2PointMin, m_dZPos - 0.0001), glm::dvec3(m_vec2PointMax, m_dZPos + 0.00001));
-    m_spBoundingBox->MakeTranslate(m_spTransform->GetTranslate());
-    m_spBoundingBox->MakeRotation(m_spTransform->GetRotation());
+    m_spBoundingBox = CreateRef<BoundingBox>(glm::dvec3(m_vec2PointMin, m_dZPos - 0.0001), 
+        glm::dvec3(m_vec2PointMax, m_dZPos + 0.00001));
     return true;
 }
 

@@ -140,7 +140,7 @@ void RayTracingScene::Render(Ref<RayTracingCamera>& spCamera)
 	auto pAccumulateBuffer = m_spAccumulateBuffer->As<glm::vec4>();
 
 //#define MultiThread
-#ifdef MultiThread
+//#ifdef MultiThread
 	std::for_each(std::execution::par, m_vecImageVerticalIter.begin(), m_vecImageVerticalIter.end(),
 		[&](uint32_t y)
 		{
@@ -158,23 +158,23 @@ void RayTracingScene::Render(Ref<RayTracingCamera>& spCamera)
 					pImageData[x + y * width] = Image::ConvertToRGBA(color);
 				});
 		});
-#else
-	for (uint32_t y = 0; y < height; y++)
-	{
-		for (uint32_t x = 0; x < width; x++)
-		{
-			Ray ray = spCamera->GenRay(x, y);
-			auto color = glm::vec4(TraceRay(ray, m_spObjectContainer, 50), 1.f);
-
-			pAccumulateBuffer[x + y * width] += color;
-
-			color = pAccumulateBuffer[x + y * width];
-			color /= m_iFrameIndex;
-
-			pImageData[x + y * width] = Image::ConvertToRGBA(color);
-		}
-	}
-#endif // MultiThread
+//#else
+//	for (uint32_t y = 0; y < height; y++)
+//	{
+//		for (uint32_t x = 0; x < width; x++)
+//		{
+//			Ray ray = spCamera->GenRay(x, y);
+//			auto color = glm::vec4(TraceRay(ray, m_spObjectContainer, 50), 1.f);
+//
+//			pAccumulateBuffer[x + y * width] += color;
+//
+//			color = pAccumulateBuffer[x + y * width];
+//			color /= m_iFrameIndex;
+//
+//			pImageData[x + y * width] = Image::ConvertToRGBA(color);
+//		}
+//	}
+//#endif // MultiThread
 
 	m_bAccumulate ? m_iFrameIndex++ : m_iFrameIndex = 1;
 }

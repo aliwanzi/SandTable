@@ -403,7 +403,7 @@ void RayTracingEditorLayer::CreateSampleLightScene()
 void RayTracingEditorLayer::CreateCornellBoxScene()
 {
 	m_spRayTracingScene->ResetFrameIndex();
-	m_spRayTracingScene->SetBackGroundColor(glm::dvec3(0.7, 0.8, 1.0));
+	//m_spRayTracingScene->SetBackGroundColor(glm::dvec3(0.7, 0.8, 1.0));
 
 	m_spRayTracingCamera->SetPosition(glm::vec3(278, 278, -600));
 	m_spRayTracingCamera->SetForwardDirection(glm::vec3(278, 278, 0) - glm::vec3(278, 278, -800));
@@ -424,54 +424,53 @@ void RayTracingEditorLayer::CreateCornellBoxScene()
 	auto spDiffuseLight = CreateRef<DiffuseLight>(spColorTexture, 3);
 	m_spRayTracingScene->AddMaterial(spDiffuseLight);
 
-	//auto spYZRectangle0 = CreateRef<YZRectangle>(0);
-	//spYZRectangle0->SetYZPoints(glm::dvec2(0), glm::dvec2(555));
-	//spYZRectangle0->SetXPos(555);
-	//spYZRectangle0->SetMaterialID(2);
-	//m_spObjectContainer->AddObject(spYZRectangle0);
+	auto spYZRectangle0 = CreateRef<YZRectangle>(0);
+	spYZRectangle0->SetYZPoints(glm::dvec2(0), glm::dvec2(555));
+	spYZRectangle0->SetXPos(555);
+	spYZRectangle0->SetMaterialID(2);
+	m_spObjectContainer->AddObject(spYZRectangle0);
 
-	//auto spYZRectangle1 = CreateRef<YZRectangle>(1);
-	//spYZRectangle1->SetYZPoints(glm::dvec2(0), glm::dvec2(555));
-	//spYZRectangle1->SetXPos(0);
-	//spYZRectangle1->SetMaterialID(0);
-	//m_spObjectContainer->AddObject(spYZRectangle1);
+	auto spYZRectangle1 = CreateRef<YZRectangle>(1);
+	spYZRectangle1->SetYZPoints(glm::dvec2(0), glm::dvec2(555));
+	spYZRectangle1->SetXPos(0);
+	spYZRectangle1->SetMaterialID(0);
+	m_spObjectContainer->AddObject(spYZRectangle1);
 
-	//auto spXZRectangle0 = CreateRef<XZRectangle>(2);
-	//spXZRectangle0->SetXZPoints(glm::dvec2(213, 227), glm::dvec2(343, 332));
-	//spXZRectangle0->SetYPos(554);
-	//spXZRectangle0->SetMaterialID(3);
-	//m_spObjectContainer->AddObject(spXZRectangle0);
+	auto spXZRectangle0 = CreateRef<XZRectangle>(2);
+	spXZRectangle0->SetXZPoints(glm::dvec2(213, 227), glm::dvec2(343, 332));
+	spXZRectangle0->SetYPos(554);
+	spXZRectangle0->SetMaterialID(3);
+	m_spObjectContainer->AddObject(spXZRectangle0);
 
 	auto spXZRectangle1 = CreateRef<XZRectangle>(3);
 	spXZRectangle1->SetXZPoints(glm::dvec2(0), glm::dvec2(555));
 	spXZRectangle1->SetYPos(0);
-	spXZRectangle1->SetRotateY(45);
 	spXZRectangle1->SetMaterialID(1);
 	m_spObjectContainer->AddObject(spXZRectangle1);
 
-	//auto spXZRectangle2 = CreateRef<XZRectangle>(4);
-	//spXZRectangle2->SetXZPoints(glm::dvec2(0), glm::dvec2(555));
-	//spXZRectangle2->SetYPos(555);
-	//spXZRectangle2->SetMaterialID(1);
-	//m_spObjectContainer->AddObject(spXZRectangle2);
+	auto spXZRectangle2 = CreateRef<XZRectangle>(4);
+	spXZRectangle2->SetXZPoints(glm::dvec2(0), glm::dvec2(555));
+	spXZRectangle2->SetYPos(555);
+	spXZRectangle2->SetMaterialID(1);
+	m_spObjectContainer->AddObject(spXZRectangle2);
 
-	//auto spXYRectangle = CreateRef<XYRectangle>(5);
-	//spXYRectangle->SetXYPoints(glm::dvec2(0), glm::dvec2(555));
-	//spXYRectangle->SetZPos(555);
-	//spXYRectangle->SetMaterialID(1);
-	//m_spObjectContainer->AddObject(spXYRectangle);
+	auto spXYRectangle = CreateRef<XYRectangle>(5);
+	spXYRectangle->SetXYPoints(glm::dvec2(0), glm::dvec2(555));
+	spXYRectangle->SetZPos(555);
+	spXYRectangle->SetMaterialID(1);
+	m_spObjectContainer->AddObject(spXYRectangle);
 
-	//auto spBox0 = CreateRef<Box>(glm::dvec3(0), glm::dvec3(165, 330, 165), 6);
-	//spBox0->SetMaterialID(1);
-	//spBox0->SetTranslate(glm::dvec3(265, 0, 295));
-	//spBox0->SetRotateY(15);
-	//m_spObjectContainer->AddObject(spBox0);
+	auto spBox0 = CreateRef<Box>(glm::dvec3(0), glm::dvec3(165, 330, 165), 6);
+	spBox0->SetMaterialID(1);
+	spBox0->SetTranslate(glm::dvec3(265, 0, 295));
+	spBox0->SetRotateY(15);
+	m_spObjectContainer->AddObject(spBox0);
 
-	//auto spBox1 = CreateRef<Box>(glm::dvec3(0), glm::dvec3(165), 7);
-	//spBox1->SetMaterialID(1);
-	////spBox1->SetTranslate(glm::dvec3(130, 0, 65));
-	//spBox1->SetRotateY(45);
-	//m_spObjectContainer->AddObject(spBox1);
+	auto spBox1 = CreateRef<Box>(glm::dvec3(0), glm::dvec3(165, 330, 165), 7);
+	spBox1->SetMaterialID(1);
+	spBox1->SetTranslate(glm::dvec3(130, 0, 130));
+	spBox1->SetRotateY(-18);
+	m_spObjectContainer->AddObject(spBox1);
 
 	m_spRayTracingScene->SetObjectContainer(m_spObjectContainer);
 }

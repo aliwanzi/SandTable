@@ -25,8 +25,7 @@ bool Lambertian::Scatter(const Ray& rayIn, const HitRecord& hitRecord, glm::dvec
 	}
 
 	rayOut.Step = rayIn.Step;
-	rayOut.Origin = glm::dot(rayOut.Direction, hitRecord.WorldNormal) < 0 ? hitRecord.WorldPosition - hitRecord.WorldNormal * 0.00001 :
-		hitRecord.WorldPosition + hitRecord.WorldNormal * 0.00001;
+	rayOut.Origin = hitRecord.WorldPosition;
 	rayOut.Direction = hitRecord.WorldNormal + Random::UnitSphere();
 	return true;
 }

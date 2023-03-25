@@ -27,8 +27,7 @@ bool Dielectric::Scatter(const Ray& rayIn, const HitRecord& hitRecord, glm::dvec
 		rayOut.Direction = glm::refract(unitDir, hitRecord.WorldNormal, fRatio);
 	}
 
-	rayOut.Origin = glm::dot(rayOut.Direction, hitRecord.WorldNormal) < 0 ? hitRecord.WorldPosition - hitRecord.WorldNormal * 0.00001 :
-		hitRecord.WorldPosition + hitRecord.WorldNormal * 0.00001;
+	rayOut.Origin = hitRecord.WorldPosition;
 	return true;
 }
 
