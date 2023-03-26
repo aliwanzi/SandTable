@@ -11,7 +11,7 @@ RayTracingEditorLayer::RayTracingEditorLayer() :
 {
 	m_spRayTracingCamera->SetPosition(glm::dvec3(2.5, 1.5, 7));
 	m_spRayTracingCamera->SetForwardDirection(glm::dvec3(-0.38, -0.1, -1.0));
-	CreateCornellBoxScene();
+	CreatFourSphereScene();
 }
 
 void RayTracingEditorLayer::OnAttach()
@@ -110,6 +110,11 @@ void RayTracingEditorLayer::OnImGuiRender()
 	if (ImGui::Button("Reset"))
 	{
 		m_spRayTracingScene->ResetFrameIndex();
+	}
+
+	if (ImGui::Button("Save Image"))
+	{
+		m_spRayTracingScene->SaveImage();
 	}
 	ImGui::Text("Frame Index: %d", m_spRayTracingScene->GetFrameIndex());
 	ImGui::End();
@@ -252,12 +257,14 @@ void RayTracingEditorLayer::CreateMultiSphereScene()
 {
 	m_spRayTracingScene->ResetFrameIndex();
 	m_spRayTracingScene->SetBackGroundColor(glm::dvec3(0.7, 0.8, 1.0));
+	m_spRayTracingCamera->SetPosition(glm::dvec3(4.698,0.643,-5.733));
+	m_spRayTracingCamera->SetForwardDirection(glm::dvec3(-0.521, -0.172, 0.923));
 
 	int iMaterialNum(0);
 	int iObjectNum(0);
-	for (int a = -5; a < 5; a++)
+	for (int a = -10; a < 10; a++)
 	{
-		for (int b = -5; b < 5; b++)
+		for (int b = -10; b < 10; b++)
 		{
 			float fChooseMat = Random::Float();
 			glm::dvec3 center(a + 0.9 * Random::Float(), 0.2, b + 0.9 * Random::Float());
@@ -265,15 +272,20 @@ void RayTracingEditorLayer::CreateMultiSphereScene()
 			if (glm::length(center - glm::dvec3(4, 0.2, 0)) > 0.9)
 			{
 
-				if (fChooseMat < 0.8)
+				if (fChooseMat < 0.6)
 				{
 					//diffuse
-					auto moveCenter = center + glm::dvec3(0.f, 0.5f * Random::Float(), 0.f);
-					auto spSphere = CreateRef<MovingSphere>(iObjectNum++);
+					//auto moveCenter = center + glm::dvec3(0.f, 0.5f * Random::Float(), 0.f);
+					//auto spSphere = CreateRef<MovingSphere>(iObjectNum++);
+					//spSphere->SetPosition(center);
+					//spSphere->SetMovePosition(moveCenter);
+					//spSphere->SetStepBegin(0.f);
+					//spSphere->SetStepEnd(1.f);
+					//spSphere->SetRadius(0.2);
+					//spSphere->SetMaterialID(iMaterialNum);
+					//m_spObjectContainer->AddObject(spSphere);
+					auto spSphere = CreateRef<Sphere>(iObjectNum++);
 					spSphere->SetPosition(center);
-					spSphere->SetMovePosition(moveCenter);
-					spSphere->SetStepBegin(0.f);
-					spSphere->SetStepEnd(1.f);
 					spSphere->SetRadius(0.2);
 					spSphere->SetMaterialID(iMaterialNum);
 					m_spObjectContainer->AddObject(spSphere);
@@ -327,21 +339,31 @@ void RayTracingEditorLayer::CreateMultiSphereScene()
 	m_spRayTracingScene->AddMaterial(spGroundMaterial);
 
 	auto spDielectricSphere = CreateRef<Sphere>(iObjectNum++);
-	spDielectricSphere->SetPosition(glm::dvec3(-4, 1, 0));
+	spDielectricSphere->SetPosition(glm::dvec3(0, 1, 0));
 	spDielectricSphere->SetRadius(1);
 	spDielectricSphere->SetMaterialID(iMaterialNum);
 	m_spObjectContainer->AddObject(spDielectricSphere);
+
+	auto spSpherePrimitive3 = CreateRef<Sphere>(iObjectNum++);
+	spSpherePrimitive3->SetPosition(glm::dvec3(0, 1, 0));
+	spSpherePrimitive3->SetRadius(-0.5f);
+	spSpherePrimitive3->SetMaterialID(iMaterialNum);
+	m_spObjectContainer->AddObject(spSpherePrimitive3);
+
 	auto spDielectric = CreateRef<Dielectric>(iMaterialNum++);
 	spDielectric->SetMetallic(1.5);
 	m_spRayTracingScene->AddMaterial(spDielectric);
 
 	auto spLambertianSphere = CreateRef<Sphere>(iObjectNum++);
-	spLambertianSphere->SetPosition(glm::dvec3(0, 1, 0));
+	spLambertianSphere->SetPosition(glm::dvec3(-4, 1, 0));
 	spLambertianSphere->SetRadius(1);
 	spLambertianSphere->SetMaterialID(iMaterialNum);
 	m_spObjectContainer->AddObject(spLambertianSphere);
 	auto spLambertian = CreateRef<Lambertian>(iMaterialNum++);
-	spLambertian->SetAlbedo(glm::dvec3(0.4, 0.2, 0.1));
+	auto spNoiseTexture0 = CreateRef<NoiseColorTexture>();
+	spNoiseTexture0->SetNoiseScale(4.0);
+	spNoiseTexture0->SetTurbDepth(7);
+	spLambertian->SetColorTexture(spNoiseTexture0);
 	m_spRayTracingScene->AddMaterial(spLambertian);
 
 	auto spMetalSphere = CreateRef<Sphere>(iObjectNum++);

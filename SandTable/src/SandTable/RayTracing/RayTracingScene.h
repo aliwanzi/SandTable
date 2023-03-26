@@ -31,6 +31,7 @@ public:
 	bool& GetAccumulate();
 	int& GetFrameIndex();
 	void ResetFrameIndex();
+	void SaveImage();
 private:
 	void PreRender(Ref<RayTracingCamera>& spCamera);
 	void Render(Ref<RayTracingCamera>& spCamera);
@@ -43,6 +44,7 @@ private:
 	Ref<ObjectContainer> m_spObjectContainer;
 
 	bool m_bAccumulate;
+	bool m_bSaveImage;
 	int m_iFrameIndex;
 
 	Ref<Image> m_spImage;

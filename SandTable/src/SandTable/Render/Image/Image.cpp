@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "Image.h"
 #include "SandTable/Math/Random.h"
+#include <stb_image_write.h>
 
 SAND_TABLE_NAMESPACE_BEGIN
 Image::Image(InternalFormat eInternalFormat, DataFormat eDataFormat):
@@ -58,6 +59,12 @@ uint32_t Image::ConvertToRGBA(const glm::vec4& color)
 	uint8_t a = static_cast<uint8_t>(clampColor.a * 255.0f);
 	uint32_t result = a << 24 | b << 16 | g << 8 | r;
 	return result;
+}
+
+void Image::SaveImagePNG(const std::string& sPath, void* data, uint32_t width, uint32_t height, uint32_t channel)
+{
+	stbi_flip_vertically_on_write(1);
+	stbi_write_png(sPath.c_str(), width, height, channel, data, 0);
 }
 
 SAND_TABLE_NAMESPACE_END

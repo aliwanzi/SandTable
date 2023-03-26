@@ -21,6 +21,8 @@ public:
 	void Resize(uint32_t uiWidth, uint32_t uiHeight);
 
 	static uint32_t ConvertToRGBA(const glm::vec4& color);
+
+	static void SaveImagePNG(const std::string& sPath, void* data, uint32_t width, uint32_t height, uint32_t channel);
 private:
 	Ref<Texture2D> m_spTexture;
 	Ref<DataBuffer> m_spDataBuffer;
