@@ -11,7 +11,7 @@ RayTracingEditorLayer::RayTracingEditorLayer() :
 {
 	m_spRayTracingCamera->SetPosition(glm::dvec3(2.5, 1.5, 7));
 	m_spRayTracingCamera->SetForwardDirection(glm::dvec3(-0.38, -0.1, -1.0));
-	CreatFourSphereScene();
+	CreateMultiSphereScene();
 }
 
 void RayTracingEditorLayer::OnAttach()
@@ -217,7 +217,7 @@ void RayTracingEditorLayer::CreatFourSphereScene()
 
 	auto spMaterial3 = CreateRef<Metal>(3);
 	spMaterial3->SetAlbedo(glm::dvec3(0.8f, 0.6f, 0.2f));
-	spMaterial3->SetRoughness(0.f);
+	spMaterial3->SetRoughness(0.0f);
 	m_spRayTracingScene->AddMaterial(spMaterial3);
 
 	auto spSpherePrimitive0 = CreateRef<Sphere>(0);
