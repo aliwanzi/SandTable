@@ -1,6 +1,5 @@
 #include "pch.h"
 #include "BoundingVolumeHierarchy.h"
-#include "SandTable/Math/Random.h"
 SAND_TABLE_NAMESPACE_BEGIN
 
 BoundingVolumeHierarchy::BoundingVolumeHierarchy(

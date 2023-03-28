@@ -13,6 +13,11 @@ float Random::Float()
 	return static_cast<float>(m_sDistribution(m_sRandomEngine)) / static_cast<float>(std::numeric_limits<uint32_t>::max());
 }
 
+double Random::DoubleMax()
+{
+	return static_cast<float>(std::numeric_limits<uint64_t>::max());
+}
+
 int Random::Uint(int min, int max)
 {
 	return static_cast<int>(min + Float() * (max + 1));

@@ -7,6 +7,7 @@ class SolidColorTexture:public ColorTexture
 {
 public:
 	SolidColorTexture(const glm::dvec3& color);
+	virtual ~SolidColorTexture() = default;
 	// Í¨¹ý Color ¼Ì³Ð
 	virtual glm::dvec3 GetColor(const glm::dvec3& SamplePoint, const glm::dvec2& UV) const override;
 private:

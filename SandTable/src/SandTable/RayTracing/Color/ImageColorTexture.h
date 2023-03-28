@@ -7,6 +7,7 @@ class ImageColorTexture :public ColorTexture
 {
 public:
 	ImageColorTexture(const std::string& sPath);
+	virtual ~ImageColorTexture() = default;
 	// Í¨¹ý ColorTexture ¼Ì³Ð
 	virtual glm::dvec3 GetColor(const glm::dvec3& SamplePoint, const glm::dvec2& UV) const override;
 private:

@@ -1,6 +1,5 @@
 #include "pch.h"
 #include "Image.h"
-#include "SandTable/Math/Random.h"
 #include <stb_image_write.h>
 
 SAND_TABLE_NAMESPACE_BEGIN

@@ -2,6 +2,14 @@
 #include "Object.h"
 
 SAND_TABLE_NAMESPACE_BEGIN
+Object::Object():
+	m_uiEntitID(0),
+	m_uiMaterialID(0),
+	m_bDirty(false),
+	m_spTransform(CreateRef<Transform>())
+{
+}
+
 Object::Object(uint32_t uiEntitID):
 	m_uiEntitID(uiEntitID),
 	m_uiMaterialID(0),
@@ -31,7 +39,7 @@ void Object::SetRotateY(double angle)
 	m_spTransform->SetRotateY(angle);
 }
 
-const Ref<BoundingBox>& Object::GetBoundingBox() const
+const Ref<BoundingBox>& Object::GetBoundingBox()
 {
 	SAND_TABLE_ASSERT(m_spBoundingBox != nullptr, "Bounding Box is null");
 	return m_spBoundingBox;

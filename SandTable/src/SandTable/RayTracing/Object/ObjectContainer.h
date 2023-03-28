@@ -2,7 +2,7 @@
 #include "SandTable/RayTracing/Object/Object.h"
 
 SAND_TABLE_NAMESPACE_BEGIN
-class ObjectContainer :public Hittable
+class ObjectContainer :public Object
 {
 public:
 	ObjectContainer();
@@ -10,7 +10,6 @@ public:
 	// Í¨¹ý Hittable ¼Ì³Ð
 	virtual bool Hit(const Ray& ray, double fMin, double fMax, HitRecord& hitRecord) override;
 	virtual bool CreateBoundingBox(double dStepBegin, double dStepEnd) override;
-	virtual const Ref<BoundingBox>& GetBoundingBox()const override;
 	
 	std::vector<Ref<Object>>& GetAllObject();
 
@@ -18,7 +17,6 @@ public:
 	void Clear();
 private:
 	std::vector<Ref<Object>> m_vecObject;
-	Ref<BoundingBox> m_spBoundingBox;
 	bool m_bInitilize;
 };
 

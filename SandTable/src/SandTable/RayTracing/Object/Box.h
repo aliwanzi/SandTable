@@ -7,6 +7,7 @@ class Box :public Object
 {
 public:
 	Box(const glm::dvec3& PointMin, const glm::dvec3& PointMax, uint32_t uiEntityID);
+	virtual ~Box() = default;
 
 	// Í¨¹ý Object ¼Ì³Ð
 	virtual bool Hit(const Ray& ray, double fMin, double fMax, HitRecord& hitRecord) override;

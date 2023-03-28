@@ -8,6 +8,8 @@ class Random
 public:
 	static float Float();
 
+	static double DoubleMax();
+
 	static int Uint(int min, int max);
 	static uint32_t Uint32();
 	static uint64_t Uint64();

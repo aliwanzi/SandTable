@@ -24,6 +24,8 @@
 
 #include "SandTable/Statics/Instrumentor.h"
 
+#include "SandTable/Math/Random.h"
+
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>

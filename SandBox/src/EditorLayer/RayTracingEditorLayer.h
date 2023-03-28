@@ -17,6 +17,8 @@ private:
 	void CreateMultiSphereScene();
 	void CreateSampleLightScene();
 	void CreateCornellBoxScene();
+	void CreateCornellBoxSmokeScene();
+	void CreateFinalScene();
 private:
 
 	ImVec2 m_vec2RenderViewPortSize;

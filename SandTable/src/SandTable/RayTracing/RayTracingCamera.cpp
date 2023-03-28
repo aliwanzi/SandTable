@@ -5,7 +5,6 @@
 #include "SandTable/Core/KeyCode.h"
 #include "SandTable/Core/MouseCode.h"
 #include "SandTable/RayTracing/Ray.h"
-#include "SandTable/Math/Random.h"
 
 SAND_TABLE_NAMESPACE_BEGIN
 namespace

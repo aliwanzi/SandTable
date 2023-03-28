@@ -1,6 +1,5 @@
 #include "pch.h"
 #include "PerlinNoise.h"
-#include "SandTable/Math/Random.h"
 
 SAND_TABLE_NAMESPACE_BEGIN
 PerlinNoise::PerlinNoise(uint32_t uiPointCount):

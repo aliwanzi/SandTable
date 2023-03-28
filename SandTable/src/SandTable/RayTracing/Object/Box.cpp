@@ -58,8 +58,6 @@ bool Box::CreateBoundingBox(double dStepBegin, double dStepEnd)
 	{
 		return false;
 	}
-	m_spBoundingBox = m_spObjectContainer->GetBoundingBox();
-
 	return true;
 }
 

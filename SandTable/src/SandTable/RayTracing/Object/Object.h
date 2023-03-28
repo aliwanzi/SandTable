@@ -1,11 +1,14 @@
 #pragma once
 #include "SandTable/RayTracing/Hittable.h"
 #include "SandTable/RayTracing/Transform.h"
+#include "SandTable/RayTracing/Object/Accelerate/BoundingBox.h"
+
 SAND_TABLE_NAMESPACE_BEGIN
 
 class Object :public Hittable
 {
 public:
+	Object();
 	Object(uint32_t uiEntitID);
 	virtual ~Object() = default;
 	uint32_t GetEntityID()const;
@@ -19,7 +22,8 @@ public:
 	void SetTranslate(const glm::dvec3& vec3Translate);
 	void SetRotateY(double angle);
 
-	virtual const Ref<BoundingBox>& GetBoundingBox()const override;
+	virtual bool CreateBoundingBox(double dStepBegin, double dStepEnd) = 0;
+	const Ref<BoundingBox>& GetBoundingBox();
 protected:
 	bool m_bDirty;
 	uint32_t m_uiEntitID;

@@ -214,7 +214,7 @@ glm::dvec3 RayTracingScene::TraceRay(const Ray& ray, const std::shared_ptr<Hitta
 	}
 	
 	HitRecord rec;
-	if (!spHittable->Hit(ray, 0.001, std::numeric_limits<float>::max(), rec))
+	if (!spHittable->Hit(ray, 0.001, Random::DoubleMax(), rec))
 	{
 		return m_vec3BackGroundColor;
 	}

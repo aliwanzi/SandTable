@@ -7,6 +7,7 @@ class NoiseColorTexture :public ColorTexture
 {
 public:
 	NoiseColorTexture();
+	virtual ~NoiseColorTexture() = default;
 	void SetTurbDepth(int iTurbDepth);
 	void SetNoiseScale(double dScale);
 	// Í¨¹ý Color ¼Ì³Ð

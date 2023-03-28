@@ -4,9 +4,7 @@
 SAND_TABLE_NAMESPACE_BEGIN
 
 ObjectContainer::ObjectContainer():
-	m_spBoundingBox(CreateRef<BoundingBox>()),
 	m_bInitilize(false)
-	
 {
 }
 
@@ -46,15 +44,9 @@ bool ObjectContainer::CreateBoundingBox(double dStepBegin, double dStepEnd)
 		{
 			return false;
 		}
-		m_spBoundingBox->Merge(iter->GetBoundingBox());
 	}
 	m_bInitilize = true;
 	return true;
-}
-
-const Ref<BoundingBox>& ObjectContainer::GetBoundingBox() const
-{
-	return m_spBoundingBox;
 }
 
 std::vector<Ref<Object>>& ObjectContainer::GetAllObject()

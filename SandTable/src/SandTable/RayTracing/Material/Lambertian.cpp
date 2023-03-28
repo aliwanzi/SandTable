@@ -1,7 +1,6 @@
 #include "pch.h"
 #include "Lambertian.h"
 #include "SandTable/RayTracing/Hittable.h"
-#include "SandTable/Math/Random.h"
 #include "SandTable/RayTracing/Color/ColorTexture.h"
 
 SAND_TABLE_NAMESPACE_BEGIN

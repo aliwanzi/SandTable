@@ -34,9 +34,6 @@ float Sphere::GetRadius() const
 
 bool Sphere::Hit(const Ray& ray, double fMin, double fMax, HitRecord& hitRecord)
 {
-	//glm::dvec3 points(ray.Origin);
-	//m_spTranslate->MakeTranslate(points);
-
 	auto& origin = ray.Origin - m_vec3Position;
 
 	float fA = glm::dot(ray.Direction, ray.Direction);
@@ -72,7 +69,6 @@ bool Sphere::CreateBoundingBox(double dStepBegin, double dStepEnd)
 	m_spBoundingBox = CreateRef<BoundingBox>();
 	m_spBoundingBox->SetMin(m_vec3Position - glm::dvec3(m_fRadius));
 	m_spBoundingBox->SetMax(m_vec3Position + glm::dvec3(m_fRadius));
-	m_spBoundingBox->MakeTranslate(m_spTransform->GetTranslate());
 	return true;
 }
 

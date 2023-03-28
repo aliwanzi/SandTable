@@ -1,12 +1,11 @@
 #include "pch.h"
 #include "BoundingBox.h"
-#include "SandTable/Math/MathUtils.h"
 
 SAND_TABLE_NAMESPACE_BEGIN
 
 BoundingBox::BoundingBox():
-	m_vec3Max(glm::dvec3(std::numeric_limits<double>::lowest())),
-	m_vec3Min(glm::dvec3(std::numeric_limits<double>::max()))
+	m_vec3Max(-Random::DoubleMax()),
+	m_vec3Min(Random::DoubleMax())
 {
 
 }
@@ -37,42 +36,13 @@ const glm::dvec3& BoundingBox::GetMax() const
 	return m_vec3Max;
 }
 
-void BoundingBox::MakeTranslate(const glm::dvec3& vec3Offset)
-{
-	m_vec3Min += vec3Offset;
-	m_vec3Max += vec3Offset;
-}
-
-void BoundingBox::MakeRotation(const glm::highp_dmat4& mat4Rotate)
-{
-	std::vector<glm::dvec4> vecPoint
-	{
-		glm::dvec4(m_vec3Min.x,m_vec3Min.y,m_vec3Min.z,1.0),
-		glm::dvec4(m_vec3Max.x,m_vec3Min.y,m_vec3Min.z,1.0),
-		glm::dvec4(m_vec3Max.x,m_vec3Max.y,m_vec3Min.z,1.0),
-		glm::dvec4(m_vec3Min.x,m_vec3Max.y,m_vec3Min.z,1.0),
-		glm::dvec4(m_vec3Min.x,m_vec3Min.y,m_vec3Max.z,1.0),
-		glm::dvec4(m_vec3Max.x,m_vec3Min.y,m_vec3Max.z,1.0),
-		glm::dvec4(m_vec3Max.x,m_vec3Max.y,m_vec3Max.z,1.0),
-		glm::dvec4(m_vec3Min.x,m_vec3Max.y,m_vec3Max.z,1.0),
-	};
-
-	m_vec3Min = glm::dvec3(std::numeric_limits<float>::max());
-	m_vec3Max = glm::dvec3(-std::numeric_limits<float>::max());
-	for (int i = 0; i < 8; i++)
-	{
-		m_vec3Min = glm::min(m_vec3Min, glm::dvec3(mat4Rotate * vecPoint[i]));
-		m_vec3Max = glm::max(m_vec3Max, glm::dvec3(mat4Rotate * vecPoint[i]));
-	}
-}
-
 bool BoundingBox::Intersect(const Ray& ray, double& stepMin, double& stepMax) const
 {
 	glm::dvec3 min{ (m_vec3Min - ray.Origin) * (1.0 / ray.Direction) };
 	glm::dvec3 max{ (m_vec3Max - ray.Origin) * (1.0 / ray.Direction) };
 
 	stepMin = std::max(glm::compMax(glm::min(min, max)), 0.0);
-	stepMax = std::min(glm::compMin(glm::max(min, max)), std::numeric_limits<double>::max());
+	stepMax = std::min(glm::compMin(glm::max(min, max)), Random::DoubleMax());
 	return stepMax >= stepMin;
 }
 

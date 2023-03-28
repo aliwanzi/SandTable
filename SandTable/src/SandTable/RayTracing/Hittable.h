@@ -1,6 +1,5 @@
 #pragma once
 #include "Ray.h"
-#include "SandTable/RayTracing/Accelerate/BoundingBox.h"
 SAND_TABLE_NAMESPACE_BEGIN
 
 struct HitRecord
@@ -23,7 +22,5 @@ class Hittable
 {
 public:
 	virtual bool Hit(const Ray& ray, double fMin, double fMax, HitRecord& hitRecord) = 0;
-	virtual bool CreateBoundingBox(double dStepBegin, double dStepEnd) = 0;
-	virtual const Ref<BoundingBox>& GetBoundingBox()const = 0;
 };
 SAND_TABLE_NAMESPACE_END
