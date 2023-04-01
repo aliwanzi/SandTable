@@ -61,7 +61,6 @@ bool MovingSphere::Hit(const Ray& ray, double fMin, double fMax, HitRecord& hitR
 
 bool MovingSphere::CreateBoundingBox(double dStepBegin, double dStepEnd)
 {
-	m_spBoundingBox = CreateRef<BoundingBox>();
 	m_spBoundingBox->Merge(Center(dStepBegin) - glm::dvec3(m_fRadius));
 	m_spBoundingBox->Merge(Center(dStepBegin) + glm::dvec3(m_fRadius));
 

@@ -6,7 +6,8 @@ Object::Object():
 	m_uiEntitID(0),
 	m_uiMaterialID(0),
 	m_bDirty(false),
-	m_spTransform(CreateRef<Transform>())
+	m_spTransform(CreateRef<Transform>()),
+	m_spBoundingBox(CreateRef<BoundingBox>())
 {
 }
 
@@ -14,7 +15,8 @@ Object::Object(uint32_t uiEntitID):
 	m_uiEntitID(uiEntitID),
 	m_uiMaterialID(0),
 	m_bDirty(false),
-	m_spTransform(CreateRef<Transform>())
+	m_spTransform(CreateRef<Transform>()),
+	m_spBoundingBox(CreateRef<BoundingBox>())
 {
 }
 

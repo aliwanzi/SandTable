@@ -20,7 +20,7 @@ class OrthoGraphicCameraController
 {
 public:
 	OrthoGraphicCameraController(unsigned int uiWidth, unsigned int uiHeight);
-	const std::shared_ptr<OrthoGraphicCamera>& GetCamera()const;
+	const Ref<OrthoGraphicCamera>& GetCamera()const;
 	void SetZoomLevel(float fZoomLevel);
 	float GetZoomLevel()const;
 	void OnUpdate(TimeStep timeStep);

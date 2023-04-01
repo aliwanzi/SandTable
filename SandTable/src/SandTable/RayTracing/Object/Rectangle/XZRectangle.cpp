@@ -25,16 +25,11 @@ void XZRectangle::SetYPos(double dYPos)
 
 bool XZRectangle::Hit(const Ray& ray, double fMin, double fMax, HitRecord& hitRecord)
 {
-    Ray transRay;
-    transRay.Origin =  m_spTransform->GetRotationInverse()*m_spTransform->GetTranslationInverse()
-        * glm::dvec4(ray.Origin, 1.0);
-    transRay.Direction = m_spTransform->GetRotationInverse() * glm::dvec4(ray.Direction, 1.0);
-
     auto center = m_spBoundingBox->GetCentroid();
-    auto root = (center.y - transRay.Origin.y) / transRay.Direction.y;
+    auto root = (center.y - ray.Origin.y) / ray.Direction.y;
     if (root < fMin || root > fMax)
         return false;
-    auto point = (transRay.Origin + root * transRay.Direction);
+    auto point = (ray.Origin + root * ray.Direction);
     if (!m_spBoundingBox->Contains(point))
     {
         return false;
@@ -42,11 +37,10 @@ bool XZRectangle::Hit(const Ray& ray, double fMin, double fMax, HitRecord& hitRe
 
     auto min = m_spBoundingBox->GetMin();
     auto uvw = (point - min) / m_spBoundingBox->GetDimension();
-    auto normal = m_spTransform->GetRotation() * glm::dvec4(0, 1, 0, 1);
 
     hitRecord.UV = glm::dvec2(uvw.x, uvw.z);
     hitRecord.HitDistance = root;
-    hitRecord.SetWorldNormal(ray, normal);
+    hitRecord.SetWorldNormal(ray, glm::dvec4(0, 1, 0, 1));
     hitRecord.WorldPosition = ray.Origin + root * ray.Direction;
     hitRecord.MaterialID = m_uiMaterialID;
     hitRecord.EntityID = m_uiEntitID;

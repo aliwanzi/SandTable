@@ -4,8 +4,8 @@
 SAND_TABLE_NAMESPACE_BEGIN
 
 BoundingBox::BoundingBox():
-	m_vec3Max(-Random::DoubleMax()),
-	m_vec3Min(Random::DoubleMax())
+	m_vec3Max(-Random::FloatMax()),
+	m_vec3Min(Random::FloatMax())
 {
 
 }
@@ -38,12 +38,14 @@ const glm::dvec3& BoundingBox::GetMax() const
 
 bool BoundingBox::Intersect(const Ray& ray, double& stepMin, double& stepMax) const
 {
+
 	glm::dvec3 min{ (m_vec3Min - ray.Origin) * (1.0 / ray.Direction) };
 	glm::dvec3 max{ (m_vec3Max - ray.Origin) * (1.0 / ray.Direction) };
 
-	stepMin = std::max(glm::compMax(glm::min(min, max)), 0.0);
-	stepMax = std::min(glm::compMin(glm::max(min, max)), Random::DoubleMax());
-	return stepMax >= stepMin;
+	stepMin = glm::max(glm::compMax(glm::min(min, max)), stepMin);
+	stepMax = glm::min(glm::compMin(glm::max(min, max)), stepMax);
+
+	return stepMax > stepMin;
 }
 
 bool BoundingBox::Contains(const glm::dvec3& point) const
@@ -59,7 +61,8 @@ glm::dvec3 BoundingBox::GetDimension() const
 
 glm::dvec3 BoundingBox::GetCentroid() const
 {
-	return (m_vec3Max + m_vec3Min) / 2.0;
+	auto center = (m_vec3Max + m_vec3Min) / 2.0;
+	return center;
 }
 
 double BoundingBox::GetArea() const
@@ -84,13 +87,8 @@ int BoundingBox::GetMaxExtent() const
 
 void BoundingBox::Merge(Ref<BoundingBox> spBoundingBox)
 {
-	for (int i = 0; i < 3; i++)
-	{
-		if (m_vec3Min[i] > spBoundingBox->GetMin()[i])
-			m_vec3Min[i] = spBoundingBox->GetMin()[i];
-		if (m_vec3Max[i] < spBoundingBox->GetMax()[i])
-			m_vec3Max[i] = spBoundingBox->GetMax()[i];
-	}
+	m_vec3Min = glm::min(m_vec3Min, spBoundingBox->GetMin());
+	m_vec3Max = glm::max(m_vec3Max, spBoundingBox->GetMax());
 }
 
 void BoundingBox::SurrondingBox(Ref<BoundingBox> spLeftBoundingBox, Ref<BoundingBox> spRightBoundingBox)
@@ -101,23 +99,15 @@ void BoundingBox::SurrondingBox(Ref<BoundingBox> spLeftBoundingBox, Ref<Bounding
 
 void BoundingBox::Merge(const glm::dvec3& p)
 {
-	for (int i = 0; i < 3; i++)
-	{
-		if (m_vec3Min[i] > p[i]) 
-			m_vec3Min[i] = p[i];
-		if (m_vec3Max[i] < p[i]) 
-			m_vec3Max[i] = p[i];
-	}
+	m_vec3Min = glm::min(m_vec3Min, p);
+	m_vec3Max = glm::max(m_vec3Max, p);
 }
 
 bool BoundingBox::Valid() const
 {
-	for (int i = 0; i < 3; i++)
-	{
-		if (m_vec3Min[i] > m_vec3Max[i]) 
-			return false;
-	}
-	return true;
+	return m_vec3Min.x > m_vec3Max.x ||
+		m_vec3Min.y > m_vec3Max.y ||
+		m_vec3Min.z > m_vec3Max.z;
 }
 
 SAND_TABLE_NAMESPACE_END

@@ -16,8 +16,8 @@ public:
 	void OnUpdate(const TimeStep& timeStep, Ref<RayTracingCamera>& spCamera);
 	void OnViewPortResize(unsigned int uiWidth, unsigned int uiHeight);
 
-	void SetObjectContainer(std::shared_ptr<ObjectContainer> spObjectContainer);
-	const std::shared_ptr<ObjectContainer>& GetObjectContainer()const;
+	void SetObjectContainer(Ref<ObjectContainer> spObjectContainer);
+	const Ref<ObjectContainer>& GetObjectContainer()const;
 
 	void AddMaterial(const Ref<Material>& spMaterial);
 	void ClearMaterial();
@@ -37,7 +37,7 @@ private:
 	void Render(Ref<RayTracingCamera>& spCamera);
 	void PostRender(Ref<RayTracingCamera>& spCamera);
 
-	glm::dvec3 TraceRay(const Ray& ray, const std::shared_ptr<Hittable>& spHittable, int depth);
+	glm::dvec3 TraceRay(const Ray& ray, const Ref<Hittable>& spHittable, int depth);
 
 private:
 	MapMaterial m_mapMaterial;

@@ -6,9 +6,10 @@ SAND_TABLE_NAMESPACE_BEGIN
 class Random
 {
 public:
-	static float Float();
 
-	static double DoubleMax();
+	static float Float();
+	static float FloatMax();
+	static float Float(float min, float max);
 
 	static int Uint(int min, int max);
 	static uint32_t Uint32();

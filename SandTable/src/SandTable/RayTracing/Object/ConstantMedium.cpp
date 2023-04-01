@@ -2,8 +2,8 @@
 #include "ConstantMedium.h"
 SAND_TABLE_NAMESPACE_BEGIN
 
-ConstantMedium::ConstantMedium(Ref<Box> spBox, double dDensity):
-	m_spBox(spBox),
+ConstantMedium::ConstantMedium(Ref<Object> spObject, double dDensity):
+	m_spObject(spObject),
 	m_dDensity(-1.0/dDensity)
 {
 
@@ -12,9 +12,9 @@ ConstantMedium::ConstantMedium(Ref<Box> spBox, double dDensity):
 bool ConstantMedium::Hit(const Ray& ray, double fMin, double fMax, HitRecord& hitRecord)
 {
 	HitRecord ht1, ht2;
-	if (!m_spBox->Hit(ray, -Random::DoubleMax(), Random::DoubleMax(), ht1))
+	if (!m_spObject->Hit(ray, -Random::FloatMax(), Random::FloatMax(), ht1))
 		return false;
-	if (!m_spBox->Hit(ray, ht1.HitDistance + 0.001, Random::DoubleMax(), ht2))
+	if (!m_spObject->Hit(ray, ht1.HitDistance + 0.001, Random::FloatMax(), ht2))
 		return false;
 
 	ht1.HitDistance = glm::max(ht1.HitDistance, fMin);
@@ -37,14 +37,14 @@ bool ConstantMedium::Hit(const Ray& ray, double fMin, double fMax, HitRecord& hi
 	hitRecord.WorldPosition = ray.Origin + hitRecord.HitDistance * ray.Direction;
 	hitRecord.WorldNormal = glm::dvec3(1, 0, 0);
 	hitRecord.FrontFace = true;
-	hitRecord.EntityID = m_spBox->GetEntityID();
-	hitRecord.MaterialID = m_spBox->GetMaterialID();
+	hitRecord.EntityID = m_spObject->GetEntityID();
+	hitRecord.MaterialID = m_spObject->GetMaterialID();
 	return true;
 }
 
 bool ConstantMedium::CreateBoundingBox(double dStepBegin, double dStepEnd)
 {
-	return m_spBox->CreateBoundingBox(dStepBegin, dStepEnd);
+	return m_spObject->CreateBoundingBox(dStepBegin, dStepEnd);
 }
 
 

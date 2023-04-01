@@ -6,15 +6,20 @@ SAND_TABLE_NAMESPACE_BEGIN
 class BoundingVolumeHierarchy:public Object
 {
 public:
-	BoundingVolumeHierarchy(std::shared_ptr<ObjectContainer> spObjectContainer, double dStepBegin, double dStepEnd);
-	BoundingVolumeHierarchy(std::vector<Ref<Object>>& vecObject, size_t start, size_t end, double dStepBegin, double dStepEnd);
-
+	virtual ~BoundingVolumeHierarchy() = default;
+	BoundingVolumeHierarchy();
+	BoundingVolumeHierarchy(Ref<ObjectContainer> spObjectContainer, uint32_t uiEntitID);
 	// Í¨¹ý Hittable ¼Ì³Ð
 	virtual bool Hit(const Ray& ray, double fMin, double fMax, HitRecord& hitRecord) override;
 
+	void SetMaterialID(uint32_t uiMaterialID) override;
+
 private:
+	void CreateBVHNode(std::vector<Ref<Object>>& vecObject);
+
 	virtual bool CreateBoundingBox(double dStepBegin, double dStepEnd) override;
 private:
+	Ref<ObjectContainer> m_spObjectContainer;
 	Ref<Object> m_spLeft;
 	Ref<Object> m_spRight;
 };

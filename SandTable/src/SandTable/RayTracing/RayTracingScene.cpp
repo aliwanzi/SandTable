@@ -51,12 +51,12 @@ void RayTracingScene::OnViewPortResize(unsigned int uiWidth, unsigned int uiHeig
 	}
 }
 
-void RayTracingScene::SetObjectContainer(std::shared_ptr<ObjectContainer> spObjectContainer)
+void RayTracingScene::SetObjectContainer(Ref<ObjectContainer> spObjectContainer)
 {
 	m_spObjectContainer = spObjectContainer;
 }
 
-const std::shared_ptr<ObjectContainer>& RayTracingScene::GetObjectContainer()const
+const Ref<ObjectContainer>& RayTracingScene::GetObjectContainer()const
 {
 	return m_spObjectContainer;
 }
@@ -206,15 +206,16 @@ void RayTracingScene::PostRender(Ref<RayTracingCamera>& spCamera)
 }
 
 
-glm::dvec3 RayTracingScene::TraceRay(const Ray& ray, const std::shared_ptr<Hittable>& spHittable, int depth)
+glm::dvec3 RayTracingScene::TraceRay(const Ray& ray, const Ref<Hittable>& spHittable, int depth)
 {
 	if (depth <= 0)
 	{
+		//LOG_DEV_ERROR("Tracing in 50depth");
 		return glm::dvec3(0.0);
 	}
 	
 	HitRecord rec;
-	if (!spHittable->Hit(ray, 0.001, Random::DoubleMax(), rec))
+	if (!spHittable->Hit(ray, 0.001, Random::FloatMax(), rec))
 	{
 		return m_vec3BackGroundColor;
 	}

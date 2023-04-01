@@ -36,21 +36,21 @@ bool Sphere::Hit(const Ray& ray, double fMin, double fMax, HitRecord& hitRecord)
 {
 	auto& origin = ray.Origin - m_vec3Position;
 
-	float fA = glm::dot(ray.Direction, ray.Direction);
-	float fB = 2.f * glm::dot(origin, ray.Direction);
-	float fC = glm::dot(origin, origin) - m_fRadius * m_fRadius;
+	double fA = glm::dot(ray.Direction, ray.Direction);
+	double fB = 2.0 * glm::dot(origin, ray.Direction);
+	double fC = glm::dot(origin, origin) - m_fRadius * m_fRadius;
 
 	// Find the nearest root that lies in the acceptable range.
-	float discriminant = fB * fB - 4.0 * fA * fC;
+	double discriminant = fB * fB - 4.0 * fA * fC;
 	if (discriminant < 0)
 	{
 		return false;
 	}
 
-	auto root = (-fB - sqrt(discriminant)) / (2. * fA);
+	auto root = (-fB - glm::sqrt(discriminant)) / (2. * fA);
 	if (root < fMin || fMax < root) 
 	{
-		root = (-fB + sqrt(discriminant)) / (2. * fA);
+		root = (-fB + glm::sqrt(discriminant)) / (2. * fA);
 		if (root < fMin || fMax < root)
 			return false;
 	}
@@ -66,7 +66,6 @@ bool Sphere::Hit(const Ray& ray, double fMin, double fMax, HitRecord& hitRecord)
 
 bool Sphere::CreateBoundingBox(double dStepBegin, double dStepEnd)
 {
-	m_spBoundingBox = CreateRef<BoundingBox>();
 	m_spBoundingBox->SetMin(m_vec3Position - glm::dvec3(m_fRadius));
 	m_spBoundingBox->SetMax(m_vec3Position + glm::dvec3(m_fRadius));
 	return true;
@@ -74,9 +73,10 @@ bool Sphere::CreateBoundingBox(double dStepBegin, double dStepEnd)
 
 void Sphere::CalculateSampleUV(const glm::vec3& SamplePoint, glm::dvec2& UV) const
 {
-	UV = glm::dvec2(glm::atan(SamplePoint.z, SamplePoint.x), glm::asin(SamplePoint.y));
-	UV *= (1 / (2 * glm::pi<double>()), 1 / glm::pi<double>());
-	UV += glm::dvec2(0.5);
+	auto theta = glm::acos(-SamplePoint.y);
+	auto phi = glm::atan(-SamplePoint.z, SamplePoint.x) + glm::pi<double>();
+
+	UV = glm::dvec2(phi / (2 * glm::pi<double>()), theta / glm::pi<double>());
 }
 
 SAND_TABLE_NAMESPACE_END

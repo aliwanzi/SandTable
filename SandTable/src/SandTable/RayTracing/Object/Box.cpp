@@ -42,7 +42,18 @@ Box::Box(const glm::dvec3& PointMin, const glm::dvec3& PointMax, uint32_t uiEnti
 
 bool Box::Hit(const Ray& ray, double fMin, double fMax, HitRecord& hitRecord)
 {
-	return m_spObjectContainer->Hit(ray, fMin, fMax, hitRecord);
+	Ray transRay;
+	transRay.Origin = m_spTransform->GetRotationInverse() * m_spTransform->GetTranslationInverse()
+		* glm::dvec4(ray.Origin, 1.0);
+	transRay.Direction = m_spTransform->GetRotationInverse() * glm::dvec4(ray.Direction, 1.0);
+
+	if (m_spObjectContainer->Hit(transRay, fMin, fMax, hitRecord))
+	{
+		hitRecord.WorldPosition = m_spTransform->GetTranslation() * m_spTransform->GetRotation() * glm::dvec4(hitRecord.WorldPosition, 1.0);
+		hitRecord.WorldNormal = m_spTransform->GetRotation() * glm::dvec4(hitRecord.WorldNormal, 1.0);
+		return true;
+	}
+	return false;
 }
 
 bool Box::CreateBoundingBox(double dStepBegin, double dStepEnd)
@@ -58,6 +69,7 @@ bool Box::CreateBoundingBox(double dStepBegin, double dStepEnd)
 	{
 		return false;
 	}
+	m_spBoundingBox->Merge(m_spObjectContainer->GetBoundingBox());
 	return true;
 }
 

@@ -44,6 +44,7 @@ bool ObjectContainer::CreateBoundingBox(double dStepBegin, double dStepEnd)
 		{
 			return false;
 		}
+		m_spBoundingBox->Merge(iter->GetBoundingBox());
 	}
 	m_bInitilize = true;
 	return true;
@@ -54,7 +55,7 @@ std::vector<Ref<Object>>& ObjectContainer::GetAllObject()
 	return m_vecObject;
 }
 
-void ObjectContainer::AddObject(std::shared_ptr<Object> spObject)
+void ObjectContainer::AddObject(Ref<Object> spObject)
 {
 	m_vecObject.emplace_back(spObject);
 }

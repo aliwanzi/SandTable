@@ -18,7 +18,7 @@ OrthoGraphicCameraController::OrthoGraphicCameraController(unsigned int uiWidth,
 	m_spOrthoGraphicCamera = CreateRef<OrthoGraphicCamera>(m_fZoomLevel, m_fAspectRatio);
 }
 
-const std::shared_ptr<OrthoGraphicCamera>& OrthoGraphicCameraController::GetCamera() const
+const Ref<OrthoGraphicCamera>& OrthoGraphicCameraController::GetCamera() const
 {
 	return m_spOrthoGraphicCamera;
 }

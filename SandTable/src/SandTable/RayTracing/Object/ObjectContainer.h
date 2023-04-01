@@ -13,7 +13,7 @@ public:
 	
 	std::vector<Ref<Object>>& GetAllObject();
 
-	void AddObject(std::shared_ptr<Object> spObject);
+	void AddObject(Ref<Object> spObject);
 	void Clear();
 private:
 	std::vector<Ref<Object>> m_vecObject;

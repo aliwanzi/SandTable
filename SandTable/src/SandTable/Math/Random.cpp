@@ -13,14 +13,19 @@ float Random::Float()
 	return static_cast<float>(m_sDistribution(m_sRandomEngine)) / static_cast<float>(std::numeric_limits<uint32_t>::max());
 }
 
-double Random::DoubleMax()
+float Random::FloatMax()
 {
 	return static_cast<float>(std::numeric_limits<uint64_t>::max());
 }
 
+float Random::Float(float min, float max)
+{
+	return min + Float() * (max - min);
+}
+
 int Random::Uint(int min, int max)
 {
-	return static_cast<int>(min + Float() * (max + 1));
+	return static_cast<int>(min + Float() * (max - min + 1));
 }
 
 uint32_t Random::Uint32()

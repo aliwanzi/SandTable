@@ -11,8 +11,8 @@ Isotropic::Isotropic(Ref<ColorTexture> spColorTexture, uint32_t uiMateriaID):
 
 bool Isotropic::Scatter(const Ray& rayIn, const HitRecord& hitRecord, glm::dvec3& attenuation, Ray& rayOut) const
 {
-	rayOut.Origin = rayIn.Origin;
-	rayOut.Direction = rayIn.Direction;
+	rayOut.Origin = hitRecord.WorldPosition;
+	rayOut.Direction = Random::UnitSphere();
 	attenuation = m_spColorTexture->GetColor(hitRecord.WorldPosition, hitRecord.UV);
 	return true;
 }
