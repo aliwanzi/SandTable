@@ -32,7 +32,7 @@ float Sphere::GetRadius() const
 	return m_fRadius;
 }
 
-bool Sphere::Hit(const Ray& ray, double fMin, double fMax, HitRecord& hitRecord)
+bool Sphere::Hit(const Ray& ray, double fMin, double fMax, HitRecord& hitRecord) const
 {
 	auto& origin = ray.Origin - m_vec3Position;
 

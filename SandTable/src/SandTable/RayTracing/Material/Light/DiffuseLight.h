@@ -9,7 +9,7 @@ public:
 	DiffuseLight(Ref<ColorTexture> spColorTexture, uint32_t uiMaterialID);
 	~DiffuseLight() = default;
 	// Í¨¹ý Material ¼Ì³Ð
-	virtual bool Scatter(const Ray& rayIn, const HitRecord& hitRecord, glm::dvec3& attenuation, Ray& rayOut,double& pdf) const override;
+	virtual bool Scatter(const Ray& rayIn, const HitRecord& hitRecord, ScatterRecord& scatterRecord) const override;
 	virtual glm::dvec3 Emitted(const HitRecord& hitRecord)const;
 private:
 	Ref<ColorTexture> m_spColorTexture;

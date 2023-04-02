@@ -10,7 +10,7 @@ public:
 	virtual ~Lambertian() = default;
 
 	// Í¨¹ý Material ¼Ì³Ð
-	virtual bool Scatter(const Ray& rayIn, const HitRecord& hitRecord, glm::dvec3& attenuation, Ray& rayOut, double& pdf) const override;
+	virtual bool Scatter(const Ray& rayIn, const HitRecord& hitRecord, ScatterRecord& scatterRecord) const override;
 	virtual double ScatterPDF(const Ray& rayIn, const HitRecord& hitRecord, Ray& rayOut) const override;
 
 	void SetAlbedo(const glm::dvec3& vec3Albedo);

@@ -6,6 +6,7 @@ RayTracingEditorLayer::RayTracingEditorLayer() :
 	m_spTimer(CreateRef<Timer>()),
 	m_fLastRenderTime(0.f),
 	m_spObjectContainer(CreateRef<ObjectContainer>()),
+	m_spObjectLights(CreateRef<ObjectContainer>()),
 	m_spRayTracingScene(CreateRef<RayTracingScene>()),
 	m_spRayTracingCamera(CreateRef<RayTracingCamera>(40.f, 0.1f, 100.f, 0, 1))
 {
@@ -487,7 +488,15 @@ void RayTracingEditorLayer::CreateCornellBoxScene()
 	spBox1->SetRotateY(-18);
 	m_spObjectContainer->AddObject(spBox1);
 
+	auto spLight0 = CreateRef<XZRectangle>(8);
+	spLight0->SetXZPoints(glm::dvec2(213, 227), glm::dvec2(343, 332));
+	spLight0->SetYPos(554);
+	m_spObjectLights->AddObject(spLight0);
+
+
+
 	m_spRayTracingScene->SetObjectContainer(m_spObjectContainer);
+	m_spRayTracingScene->SetObjectLights(m_spObjectLights);
 }
 
 void RayTracingEditorLayer::CreateCornellBoxSmokeScene()

@@ -23,7 +23,7 @@ void XZRectangle::SetYPos(double dYPos)
     m_bDirty = true;
 }
 
-bool XZRectangle::Hit(const Ray& ray, double fMin, double fMax, HitRecord& hitRecord)
+bool XZRectangle::Hit(const Ray& ray, double fMin, double fMax, HitRecord& hitRecord) const
 {
     auto center = m_spBoundingBox->GetCentroid();
     auto root = (center.y - ray.Origin.y) / ray.Direction.y;
@@ -53,6 +53,31 @@ bool XZRectangle::CreateBoundingBox(double dStepBegin, double dStepEnd)
     m_spBoundingBox = CreateRef<BoundingBox>(glm::dvec3(m_vec2PointMin.x, m_dYPos - 0.0001, m_vec2PointMin.y),
         glm::dvec3(m_vec2PointMax.x, m_dYPos + 0.00001, m_vec2PointMax.y));
     return true;
+}
+
+glm::dvec3 XZRectangle::SampleDirection(const glm::dvec3& vec3HitPoint) const
+{
+    auto onLight = glm::dvec3(Random::Float(m_vec2PointMin.x, m_vec2PointMax.x), m_dYPos, Random::Float(m_vec2PointMin.y, m_vec2PointMax.y));
+    return onLight - vec3HitPoint;
+}
+
+double XZRectangle::GetPDF(const glm::dvec3& vec3HitPoint, const glm::dvec3& direction) const
+{
+	HitRecord hitRecord;
+	if (!Hit(Ray(vec3HitPoint, direction), 0.001, Random::FloatMax(), hitRecord))
+	{
+		return 0;
+	}
+
+	auto area = (m_vec2PointMax.x - m_vec2PointMin.x) * (m_vec2PointMax.y - m_vec2PointMin.y);
+
+    auto distance = glm::length2(hitRecord.HitDistance * direction);
+    auto cosine = glm::abs(glm::dot(glm::normalize(direction), hitRecord.WorldNormal));
+	if (cosine < 0)
+	{
+		return 0;
+	}
+	return distance / (cosine * area);
 }
 
 

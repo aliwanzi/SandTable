@@ -2,17 +2,17 @@
 #include "DiffuseLight.h"
 
 SAND_TABLE_NAMESPACE_BEGIN
-DiffuseLight::DiffuseLight(Ref<ColorTexture> spColorTexture, uint32_t uiMaterialID):
-    Material(uiMaterialID),
-    m_spColorTexture(spColorTexture)
+DiffuseLight::DiffuseLight(Ref<ColorTexture> spColorTexture, uint32_t uiMaterialID) :
+	Material(uiMaterialID),
+	m_spColorTexture(spColorTexture)
 {
 }
-bool DiffuseLight::Scatter(const Ray& rayIn, const HitRecord& hitRecord, glm::dvec3& attenuation, Ray& rayOut, double& pdf) const
+bool DiffuseLight::Scatter(const Ray& rayIn, const HitRecord& hitRecord, ScatterRecord& scatterRecord) const
 {
-    return false;
+	return false;
 }
 glm::dvec3 DiffuseLight::Emitted(const HitRecord& hitRecord) const
 {
-    return hitRecord.FrontFace ? m_spColorTexture->GetColor(hitRecord.WorldPosition, hitRecord.UV) : glm::dvec3(0.0);
+	return hitRecord.FrontFace ? m_spColorTexture->GetColor(hitRecord.WorldPosition, hitRecord.UV) : glm::dvec3(0.0);
 }
 SAND_TABLE_NAMESPACE_END

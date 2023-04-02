@@ -2,14 +2,14 @@
 #include "Material.h"
 
 SAND_TABLE_NAMESPACE_BEGIN
-class Metal: public Material
+class Metal : public Material
 {
 public:
 	Metal(uint32_t uiMaterialID);
 	virtual ~Metal() = default;
 
 	// Í¨¹ý Material ¼Ì³Ð
-	virtual bool Scatter(const Ray& rayIn, const HitRecord& hitRecord, glm::dvec3& attenuation, Ray& rayOut, double& pdf) const override;
+	virtual bool Scatter(const Ray& rayIn, const HitRecord& hitRecord, ScatterRecord& scatterRecord) const override;
 
 	void SetAlbedo(const glm::dvec3& vec3Albedo);
 	const glm::dvec3& GetAlbedo() const;

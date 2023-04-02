@@ -11,7 +11,7 @@ public:
 	void SetXPos(double dXPos);
 
 	// Í¨¹ý Object ¼Ì³Ð
-	virtual bool Hit(const Ray& ray, double fMin, double fMax, HitRecord& hitRecord) override;
+	virtual bool Hit(const Ray& ray, double fMin, double fMax, HitRecord& hitRecord) const override;
 	virtual bool CreateBoundingBox(double dStepBegin, double dStepEnd) override;
 private:
 	glm::dvec2 m_vec2PointMin;

@@ -15,7 +15,7 @@ public:
 	float GetRadius() const;
 
 	// Í¨¹ý Hittable ¼Ì³Ð
-	virtual bool Hit(const Ray& ray, double fMin, double fMax, HitRecord& hitRecord) override;
+	virtual bool Hit(const Ray& ray, double fMin, double fMax, HitRecord& hitRecord) const override;
 
 	virtual bool CreateBoundingBox(double dStepBegin, double dStepEnd);
 private:

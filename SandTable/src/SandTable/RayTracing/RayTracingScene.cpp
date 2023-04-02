@@ -3,6 +3,9 @@
 #include "SandTable/Math/MathUtils.h"
 #include <stb_image_write.h>
 #include <execution>
+#include "SandTable/RayTracing/PDF/HittablePDF.h"
+#include "SandTable/RayTracing/PDF/CosinePDF.h"
+#include "SandTable/RayTracing/PDF/MixturePDF.h"
 
 SAND_TABLE_NAMESPACE_BEGIN
 
@@ -59,6 +62,16 @@ void RayTracingScene::SetObjectContainer(Ref<ObjectContainer> spObjectContainer)
 const Ref<ObjectContainer>& RayTracingScene::GetObjectContainer()const
 {
 	return m_spObjectContainer;
+}
+
+void RayTracingScene::SetObjectLights(Ref<ObjectContainer> spObjectLights)
+{
+	m_spObjectLights = spObjectLights;
+}
+
+const Ref<ObjectContainer>& RayTracingScene::GetObjectLights() const
+{
+	return m_spObjectLights;
 }
 
 void RayTracingScene::AddMaterial(const Ref<Material>& spMaterial)
@@ -133,6 +146,9 @@ void RayTracingScene::PreRender(Ref<RayTracingCamera>& spCamera)
 	{
 		ResetFrameIndex();
 	}
+
+	m_spObjectContainer->CreateBoundingBox(0.001, Random::FloatMax());
+	m_spObjectLights->CreateBoundingBox(0.001, Random::FloatMax());
 }
 
 void RayTracingScene::Render(Ref<RayTracingCamera>& spCamera)
@@ -210,7 +226,6 @@ glm::dvec3 RayTracingScene::TraceRay(const Ray& ray, const Ref<Hittable>& spHitt
 {
 	if (depth <= 0)
 	{
-		//LOG_DEV_ERROR("Tracing in 50depth");
 		return glm::dvec3(0.0);
 	}
 	
@@ -229,33 +244,24 @@ glm::dvec3 RayTracingScene::TraceRay(const Ray& ray, const Ref<Hittable>& spHitt
 
 	auto emmitted = material->second->Emitted(hitRecord);
 
-	Ray scattered;
-	double pdf;
-	glm::dvec3 attenuation;
-	if (!material->second->Scatter(ray, hitRecord, attenuation, scattered, pdf))
+	ScatterRecord scatterRecord;
+	if (!material->second->Scatter(ray, hitRecord, scatterRecord))
 	{
 		return emmitted;
 	}
-	
-	auto onLight = glm::dvec3(Random::Float(213, 343), 554, Random::Float(227, 332));
-	auto toLight = onLight - hitRecord.WorldPosition;
-	if (glm::dot(toLight, hitRecord.WorldNormal)<0)
+
+	auto spHittablePDF = CreateRef<HittablePDF>(m_spObjectLights, hitRecord.WorldPosition);
+	auto spCosinePDF = CreateRef<CosinePDF>(hitRecord.WorldNormal);
+	auto spMixturePDF = CreateRef<MixturePDF>(spHittablePDF, spCosinePDF);
+
+	Ray scattered(hitRecord.WorldPosition, spMixturePDF->SampleDirection(), ray.Step);
+	double pdf = spMixturePDF->GetPDF(scattered.Direction);
+	if (abs(pdf) < glm::epsilon<double>())
 	{
 		return emmitted;
 	}
-	auto distance = glm::length2(toLight);
-	toLight = glm::normalize(toLight);
-	double lightArea = (343 - 213) * (332 - 227);
-	auto lightCosine = glm::abs(toLight.y);
-	if (lightCosine < glm::epsilon<double>())
-		return emmitted;
 
-	pdf = distance / (lightCosine * lightArea);
-	scattered.Direction = toLight;
-
-
-
-	return emmitted + attenuation * material->second->ScatterPDF(ray, hitRecord, scattered) *
+	return emmitted + scatterRecord.Attenuation * material->second->ScatterPDF(ray, hitRecord, scattered) *
 		TraceRay(scattered, spHittable, depth - 1) / pdf;
 }
 

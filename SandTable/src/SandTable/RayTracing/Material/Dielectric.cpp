@@ -9,24 +9,24 @@ Dielectric::Dielectric(uint32_t uiMaterialID) :
 {
 }
 
-bool Dielectric::Scatter(const Ray& rayIn, const HitRecord& hitRecord, glm::dvec3& attenuation, Ray& rayOut, double& pdf) const
+bool Dielectric::Scatter(const Ray& rayIn, const HitRecord& hitRecord, ScatterRecord& scatterRecord) const
 {
-	attenuation = glm::vec3(1.f);
-	rayOut.Step = rayIn.Step;
+	scatterRecord.Attenuation = glm::vec3(1.f);
+	scatterRecord.SpecularRay.Step = rayIn.Step;
 	double fRatio = hitRecord.FrontFace ? (1.0 / m_fMetallic) : m_fMetallic;
 	auto unitDir = glm::normalize(rayIn.Direction);
 	auto fCosTheta = glm::min(glm::dot(-unitDir, hitRecord.WorldNormal), 1.0);
 	auto fSinTheta = sqrt(1.0 - fCosTheta * fCosTheta);
 	if (fSinTheta * fRatio > 1.0 || Reflectance(fCosTheta, fRatio) > Random::Float())
 	{
-		rayOut.Direction = glm::reflect(unitDir, hitRecord.WorldNormal);
+		scatterRecord.SpecularRay.Direction = glm::reflect(unitDir, hitRecord.WorldNormal);
 	}
 	else
 	{
-		rayOut.Direction = glm::refract(unitDir, hitRecord.WorldNormal, fRatio);
+		scatterRecord.SpecularRay.Direction = glm::refract(unitDir, hitRecord.WorldNormal, fRatio);
 	}
 
-	rayOut.Origin = hitRecord.WorldPosition;
+	scatterRecord.SpecularRay.Origin = hitRecord.WorldPosition;
 	return true;
 }
 

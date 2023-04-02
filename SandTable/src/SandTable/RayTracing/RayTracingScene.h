@@ -19,6 +19,9 @@ public:
 	void SetObjectContainer(Ref<ObjectContainer> spObjectContainer);
 	const Ref<ObjectContainer>& GetObjectContainer()const;
 
+	void SetObjectLights(Ref<ObjectContainer> spObjectLights);
+	const Ref<ObjectContainer>& GetObjectLights()const;
+
 	void AddMaterial(const Ref<Material>& spMaterial);
 	void ClearMaterial();
 	MapMaterial& GetMaterials();
@@ -42,6 +45,7 @@ private:
 private:
 	MapMaterial m_mapMaterial;
 	Ref<ObjectContainer> m_spObjectContainer;
+	Ref<ObjectContainer> m_spObjectLights;
 
 	bool m_bAccumulate;
 	bool m_bSaveImage;

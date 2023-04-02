@@ -28,7 +28,7 @@ const glm::dvec3& MovingSphere::GetMovePosition() const
 	return m_vec3MovePosition;
 }
 
-bool MovingSphere::Hit(const Ray& ray, double fMin, double fMax, HitRecord& hitRecord)
+bool MovingSphere::Hit(const Ray& ray, double fMin, double fMax, HitRecord& hitRecord) const
 {
 	auto& origin = ray.Origin - Center(ray.Step);
 

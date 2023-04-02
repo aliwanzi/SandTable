@@ -27,7 +27,7 @@ BoundingVolumeHierarchy::BoundingVolumeHierarchy():
 bool BoundingVolumeHierarchy::Hit(const Ray& ray, 
 	double fMin,
 	double fMax,
-	HitRecord& hitRecord)
+	HitRecord& hitRecord) const
 {
 	Ray transRay;
 	transRay.Origin = m_spTransform->GetRotationInverse() * m_spTransform->GetTranslationInverse()

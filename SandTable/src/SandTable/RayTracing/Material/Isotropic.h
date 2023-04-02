@@ -9,7 +9,7 @@ public:
 	Isotropic(Ref<ColorTexture> spColorTexture, uint32_t uiMateriaID);
 	virtual ~Isotropic() = default;
 	// Í¨¹ý Material ¼Ì³Ð
-	virtual bool Scatter(const Ray& rayIn, const HitRecord& hitRecord, glm::dvec3& attenuation, Ray& rayOut, double& pdf) const override;
+	virtual bool Scatter(const Ray& rayIn, const HitRecord& hitRecord, ScatterRecord& scatterRecord) const override;
 private:
 	Ref<ColorTexture> m_spColorTexture;
 };

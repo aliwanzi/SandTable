@@ -3,23 +3,12 @@
 
 SAND_TABLE_NAMESPACE_BEGIN
 
-ObjectContainer::ObjectContainer():
-	m_bInitilize(false)
+ObjectContainer::ObjectContainer()
 {
 }
 
-bool ObjectContainer::Hit(const Ray& ray, double fMin, double fMax, HitRecord& hitRecord)
+bool ObjectContainer::Hit(const Ray& ray, double fMin, double fMax, HitRecord& hitRecord) const
 {
-	if (!m_bInitilize)
-	{
-		if (!CreateBoundingBox(fMin, fMax))
-		{
-			LOG_DEV_ERROR("Create BoundingBox Failed");
-			return false;
-		}
-	}
-
-
 	HitRecord hitRecordTemp;
 	float fCloset = fMax;
 	bool bHitAnything(false);
@@ -46,8 +35,22 @@ bool ObjectContainer::CreateBoundingBox(double dStepBegin, double dStepEnd)
 		}
 		m_spBoundingBox->Merge(iter->GetBoundingBox());
 	}
-	m_bInitilize = true;
 	return true;
+}
+
+glm::dvec3 ObjectContainer::SampleDirection(const glm::dvec3& vec3HitPoint) const
+{
+	return m_vecObject[0]->SampleDirection(vec3HitPoint);
+}
+
+double ObjectContainer::GetPDF(const glm::dvec3& vec3HitPoint, const glm::dvec3& direction) const
+{
+	double dSumPDF(0.0);
+	for (const auto& object : m_vecObject)
+	{
+		dSumPDF += object->GetPDF(vec3HitPoint, direction);
+	}
+	return dSumPDF;
 }
 
 std::vector<Ref<Object>>& ObjectContainer::GetAllObject()

@@ -1,10 +1,10 @@
 #pragma once
 
 SAND_TABLE_NAMESPACE_BEGIN
-class ONB
+class OrthoNormalBasis
 {
 public:
-	ONB(const glm::dvec3& normal);
+	OrthoNormalBasis(const glm::dvec3& normal);
 	glm::dvec3 Local(const glm::dvec3& vector)const;
 
 	const glm::dvec3& GetU()const;

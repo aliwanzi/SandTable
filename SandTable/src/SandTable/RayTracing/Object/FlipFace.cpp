@@ -6,7 +6,7 @@ FlipFace::FlipFace(Ref<Object> spObject):m_spObject(spObject)
 {
 }
 
-bool FlipFace::Hit(const Ray& ray, double fMin, double fMax, HitRecord& hitRecord)
+bool FlipFace::Hit(const Ray& ray, double fMin, double fMax, HitRecord& hitRecord) const
 {
 	if (!m_spObject->Hit(ray, fMin, fMax, hitRecord))
 	{

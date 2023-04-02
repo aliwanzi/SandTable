@@ -47,6 +47,21 @@ const Ref<BoundingBox>& Object::GetBoundingBox()
 	return m_spBoundingBox;
 }
 
+glm::dvec3 Object::SampleDirection(const glm::dvec3& vec3HitPoint) const
+{
+	return glm::dvec3(1.0, 0.0, 0.0);
+}
+
+double Object::GetPDF(const glm::dvec3& vec3HitPoint, const glm::dvec3& direction) const
+{
+	return 0.0;
+}
+
+bool Object::Hit(const Ray& ray, double fMin, double fMax, HitRecord& hitRecord) const
+{
+	return false;
+}
+
 uint32_t Object::GetEntityID() const
 {
 	return m_uiEntitID;

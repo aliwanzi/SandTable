@@ -3,12 +3,19 @@
 #include "SandTable/RayTracing/Hittable.h"
 
 SAND_TABLE_NAMESPACE_BEGIN
+struct ScatterRecord
+{
+	Ray SpecularRay;
+	Ref<PDF> PDF = nullptr;
+	bool IsSpecular;
+	glm::dvec3 Attenuation;
+};
 
 class Material
 {
 public:
 	Material(uint32_t uiMaterialID);
-	virtual bool Scatter(const Ray& rayIn, const HitRecord& hitRecord, glm::dvec3& attenuation, Ray& rayOut, double& pdf) const;
+	virtual bool Scatter(const Ray& rayIn, const HitRecord& hitRecord, ScatterRecord& scatterRecord) const;
 	virtual double ScatterPDF(const Ray& rayIn, const HitRecord& hitRecord, Ray& rayOut) const;
 	virtual glm::dvec3 Emitted(const HitRecord& hitRecord)const;
 

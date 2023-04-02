@@ -10,7 +10,7 @@ Material::Material(uint32_t uiMaterialID) :
 }
 
 
-bool Material::Scatter(const Ray& rayIn, const HitRecord& hitRecord, glm::dvec3& attenuation, Ray& rayOut, double& pdf) const
+bool Material::Scatter(const Ray& rayIn, const HitRecord& hitRecord, ScatterRecord& scatterRecord) const
 {
 	return false;
 }

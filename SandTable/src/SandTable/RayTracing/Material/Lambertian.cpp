@@ -2,7 +2,7 @@
 #include "Lambertian.h"
 #include "SandTable/RayTracing/Hittable.h"
 #include "SandTable/RayTracing/Color/SolidColorTexture.h"
-#include "SandTable/RayTracing/PDF/ONB.h"
+#include "SandTable/RayTracing/PDF/CosinePDF.h"
 
 SAND_TABLE_NAMESPACE_BEGIN
 
@@ -12,17 +12,11 @@ Lambertian::Lambertian(uint32_t uiMaterialID) :
 {
 }
 
-bool Lambertian::Scatter(const Ray& rayIn, const HitRecord& hitRecord, glm::dvec3& attenuation, Ray& rayOut, double& pdf) const
+bool Lambertian::Scatter(const Ray& rayIn, const HitRecord& hitRecord, ScatterRecord& scatterRecord) const
 {
-	ONB onb(hitRecord.WorldNormal);
-	auto direction = onb.Local(Random::CosineDirection());
-
-	attenuation = m_spColorTexture->GetColor(hitRecord.WorldPosition, hitRecord.UV);
-	rayOut.Step = rayIn.Step;
-	rayOut.Origin = hitRecord.WorldPosition;
-	rayOut.Direction = glm::normalize(direction);
-
-	pdf = glm::dot(onb.GetW(), glm::normalize(rayOut.Direction)) / glm::pi<double>();
+	scatterRecord.Attenuation = m_spColorTexture->GetColor(hitRecord.WorldPosition, hitRecord.UV);
+	scatterRecord.PDF = CreateRef<CosinePDF>(hitRecord.WorldNormal);
+	scatterRecord.IsSpecular = false;
 	return true;
 }
 

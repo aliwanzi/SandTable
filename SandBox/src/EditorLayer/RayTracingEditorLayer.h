@@ -24,6 +24,8 @@ private:
 	ImVec2 m_vec2RenderViewPortSize;
 
 	Ref<ObjectContainer> m_spObjectContainer;
+	Ref<ObjectContainer> m_spObjectLights;
+
 	Ref<RayTracingScene> m_spRayTracingScene;
 	Ref<RayTracingCamera> m_spRayTracingCamera;
 

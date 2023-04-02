@@ -10,7 +10,7 @@ public:
 	BoundingVolumeHierarchy();
 	BoundingVolumeHierarchy(Ref<ObjectContainer> spObjectContainer, uint32_t uiEntitID);
 	// Í¨¹ý Hittable ¼Ì³Ð
-	virtual bool Hit(const Ray& ray, double fMin, double fMax, HitRecord& hitRecord) override;
+	virtual bool Hit(const Ray& ray, double fMin, double fMax, HitRecord& hitRecord) const override;
 
 	void SetMaterialID(uint32_t uiMaterialID) override;
 

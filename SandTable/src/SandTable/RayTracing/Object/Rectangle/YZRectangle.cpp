@@ -20,7 +20,7 @@ void YZRectangle::SetXPos(double dXPos)
     m_bDirty = true;
 }
 
-bool YZRectangle::Hit(const Ray& ray, double fMin, double fMax, HitRecord& hitRecord)
+bool YZRectangle::Hit(const Ray& ray, double fMin, double fMax, HitRecord& hitRecord) const
 {
     auto center = m_spBoundingBox->GetCentroid();
     auto root = (center.x - ray.Origin.x) / ray.Direction.x;

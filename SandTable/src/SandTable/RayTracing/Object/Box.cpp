@@ -40,7 +40,7 @@ Box::Box(const glm::dvec3& PointMin, const glm::dvec3& PointMax, uint32_t uiEnti
 }
 
 
-bool Box::Hit(const Ray& ray, double fMin, double fMax, HitRecord& hitRecord)
+bool Box::Hit(const Ray& ray, double fMin, double fMax, HitRecord& hitRecord) const
 {
 	Ray transRay;
 	transRay.Origin = m_spTransform->GetRotationInverse() * m_spTransform->GetTranslationInverse()

@@ -9,7 +9,7 @@ ConstantMedium::ConstantMedium(Ref<Object> spObject, double dDensity):
 
 }
 
-bool ConstantMedium::Hit(const Ray& ray, double fMin, double fMax, HitRecord& hitRecord)
+bool ConstantMedium::Hit(const Ray& ray, double fMin, double fMax, HitRecord& hitRecord) const
 {
 	HitRecord ht1, ht2;
 	if (!m_spObject->Hit(ray, -Random::FloatMax(), Random::FloatMax(), ht1))

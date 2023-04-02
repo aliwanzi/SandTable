@@ -1,5 +1,6 @@
 #pragma once
 #include "Ray.h"
+#include "PDF/PDF.h"
 SAND_TABLE_NAMESPACE_BEGIN
 
 struct HitRecord
@@ -11,7 +12,7 @@ struct HitRecord
 	uint32_t MaterialID;
 	glm::dvec2 UV;
 	bool FrontFace;
-	void SetWorldNormal(const Ray& ray, const glm::dvec3& vec3WorldNormal)
+	inline void SetWorldNormal(const Ray& ray, const glm::dvec3& vec3WorldNormal)
 	{
 		FrontFace = glm::dot(ray.Direction, vec3WorldNormal) < 0;
 		WorldNormal = FrontFace ? vec3WorldNormal : -vec3WorldNormal;
@@ -22,6 +23,6 @@ class Hittable
 {
 public:
 	virtual ~Hittable() = default;
-	virtual bool Hit(const Ray& ray, double fMin, double fMax, HitRecord& hitRecord) = 0;
+	virtual bool Hit(const Ray& ray, double fMin, double fMax, HitRecord& hitRecord) const = 0;
 };
 SAND_TABLE_NAMESPACE_END
