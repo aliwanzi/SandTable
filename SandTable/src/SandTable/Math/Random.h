@@ -19,6 +19,8 @@ public:
 
 	static glm::dvec3 UnitSphere();
 	static glm::dvec3 UnitDisk();
+
+	static glm::dvec3 CosineDirection();
 private:
 	static thread_local std::mt19937 m_sRandomEngine;
 	static std::uniform_int_distribution<std::mt19937::result_type> m_sDistribution;

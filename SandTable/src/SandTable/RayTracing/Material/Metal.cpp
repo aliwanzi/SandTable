@@ -10,7 +10,7 @@ Metal::Metal(uint32_t uiMaterialID) :
 {
 }
 
-bool Metal::Scatter(const Ray& rayIn, const HitRecord& hitRecord, glm::dvec3& attenuation, Ray& rayOut) const
+bool Metal::Scatter(const Ray& rayIn, const HitRecord& hitRecord, glm::dvec3& attenuation, Ray& rayOut, double& pdf) const
 {
 	attenuation = m_vec3Albedo;
 	rayOut.Step = rayIn.Step;

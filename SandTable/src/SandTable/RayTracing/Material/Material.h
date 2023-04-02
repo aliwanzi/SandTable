@@ -8,8 +8,9 @@ class Material
 {
 public:
 	Material(uint32_t uiMaterialID);
-	virtual bool Scatter(const Ray& rayIn, const HitRecord& hitRecord, glm::dvec3& attenuation, Ray& rayOut) const = 0;
-	virtual glm::dvec3 Emitted(const glm::dvec3& SamplePoint, const glm::dvec2& UV)const;
+	virtual bool Scatter(const Ray& rayIn, const HitRecord& hitRecord, glm::dvec3& attenuation, Ray& rayOut, double& pdf) const;
+	virtual double ScatterPDF(const Ray& rayIn, const HitRecord& hitRecord, Ray& rayOut) const;
+	virtual glm::dvec3 Emitted(const HitRecord& hitRecord)const;
 
 	uint32_t GetMaterialID() const;
 

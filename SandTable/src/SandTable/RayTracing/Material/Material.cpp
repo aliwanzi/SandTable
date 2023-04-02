@@ -10,7 +10,17 @@ Material::Material(uint32_t uiMaterialID) :
 }
 
 
-glm::dvec3 Material::Emitted(const glm::dvec3& SamplePoint, const glm::dvec2& UV) const
+bool Material::Scatter(const Ray& rayIn, const HitRecord& hitRecord, glm::dvec3& attenuation, Ray& rayOut, double& pdf) const
+{
+	return false;
+}
+
+double Material::ScatterPDF(const Ray& rayIn, const HitRecord& hitRecord, Ray& rayOut) const
+{
+	return 0;
+}
+
+glm::dvec3 Material::Emitted(const HitRecord& hitRecord) const
 {
 	return glm::dvec3(0.0);
 }

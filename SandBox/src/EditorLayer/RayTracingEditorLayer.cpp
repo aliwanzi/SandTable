@@ -11,7 +11,7 @@ RayTracingEditorLayer::RayTracingEditorLayer() :
 {
 	m_spRayTracingCamera->SetPosition(glm::dvec3(2.5, 1.5, 7));
 	m_spRayTracingCamera->SetForwardDirection(glm::dvec3(-0.38, -0.1, -1.0));
-	CreateFinalScene();
+	CreateCornellBoxScene();
 }
 
 void RayTracingEditorLayer::OnAttach()
@@ -453,8 +453,9 @@ void RayTracingEditorLayer::CreateCornellBoxScene()
 	auto spXZRectangle0 = CreateRef<XZRectangle>(2);
 	spXZRectangle0->SetXZPoints(glm::dvec2(213, 227), glm::dvec2(343, 332));
 	spXZRectangle0->SetYPos(554);
-	spXZRectangle0->SetMaterialID(3);
-	m_spObjectContainer->AddObject(spXZRectangle0);
+	auto spFlipFace = CreateRef<FlipFace>(spXZRectangle0);
+	spFlipFace->SetMaterialID(3);
+	m_spObjectContainer->AddObject(spFlipFace);
 
 	auto spXZRectangle1 = CreateRef<XZRectangle>(3);
 	spXZRectangle1->SetXZPoints(glm::dvec2(0), glm::dvec2(555));

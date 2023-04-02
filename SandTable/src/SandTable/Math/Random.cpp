@@ -65,6 +65,19 @@ glm::dvec3 Random::UnitDisk()
 	}
 }
 
+glm::dvec3 Random::CosineDirection()
+{
+	auto r1 = Float();
+	auto r2 = Float();
+
+	auto phi = 2 * r1 * glm::pi<double>();
+	auto x = glm::cos(phi) * glm::sqrt(r2);
+	auto y = glm::sin(phi) * glm::sqrt(r2);
+	auto z = glm::sqrt(1 - r2);
+
+	return glm::dvec3(x, y, z);
+}
+
 
 
 SAND_TABLE_NAMESPACE_END

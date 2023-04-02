@@ -21,6 +21,7 @@ struct HitRecord
 class Hittable
 {
 public:
+	virtual ~Hittable() = default;
 	virtual bool Hit(const Ray& ray, double fMin, double fMax, HitRecord& hitRecord) = 0;
 };
 SAND_TABLE_NAMESPACE_END

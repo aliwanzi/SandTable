@@ -10,7 +10,8 @@ public:
 	virtual ~Lambertian() = default;
 
 	// Í¨¹ý Material ¼Ì³Ð
-	virtual bool Scatter(const Ray& rayIn, const HitRecord& hitRecord, glm::dvec3& attenuation, Ray& rayOut) const override;
+	virtual bool Scatter(const Ray& rayIn, const HitRecord& hitRecord, glm::dvec3& attenuation, Ray& rayOut, double& pdf) const override;
+	virtual double ScatterPDF(const Ray& rayIn, const HitRecord& hitRecord, Ray& rayOut) const override;
 
 	void SetAlbedo(const glm::dvec3& vec3Albedo);
 	const glm::dvec3& GetAlbedo() const;
@@ -18,7 +19,6 @@ public:
 	void SetColorTexture(Ref<ColorTexture> spColorTexture);
 private:
 	Ref<ColorTexture> m_spColorTexture;
-	glm::dvec3 m_vec3Albedo;
 };
 
 SAND_TABLE_NAMESPACE_END

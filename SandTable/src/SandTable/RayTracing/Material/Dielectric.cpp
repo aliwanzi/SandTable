@@ -9,7 +9,7 @@ Dielectric::Dielectric(uint32_t uiMaterialID) :
 {
 }
 
-bool Dielectric::Scatter(const Ray& rayIn, const HitRecord& hitRecord, glm::dvec3& attenuation, Ray& rayOut) const
+bool Dielectric::Scatter(const Ray& rayIn, const HitRecord& hitRecord, glm::dvec3& attenuation, Ray& rayOut, double& pdf) const
 {
 	attenuation = glm::vec3(1.f);
 	rayOut.Step = rayIn.Step;

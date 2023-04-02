@@ -1,43 +1,46 @@
 #include "pch.h"
 #include "Lambertian.h"
 #include "SandTable/RayTracing/Hittable.h"
-#include "SandTable/RayTracing/Color/ColorTexture.h"
+#include "SandTable/RayTracing/Color/SolidColorTexture.h"
+#include "SandTable/RayTracing/PDF/ONB.h"
 
 SAND_TABLE_NAMESPACE_BEGIN
 
 Lambertian::Lambertian(uint32_t uiMaterialID) :
 	Material(uiMaterialID),
-	m_vec3Albedo(0.f),
 	m_spColorTexture(nullptr)
 {
 }
 
-bool Lambertian::Scatter(const Ray& rayIn, const HitRecord& hitRecord, glm::dvec3& attenuation, Ray& rayOut) const
+bool Lambertian::Scatter(const Ray& rayIn, const HitRecord& hitRecord, glm::dvec3& attenuation, Ray& rayOut, double& pdf) const
 {
-	if (m_spColorTexture != nullptr)
-	{
-		attenuation = m_spColorTexture->GetColor(hitRecord.WorldPosition, hitRecord.UV);
-	}
-	else
-	{
-		attenuation = m_vec3Albedo;
-	}
+	ONB onb(hitRecord.WorldNormal);
+	auto direction = onb.Local(Random::CosineDirection());
 
+	attenuation = m_spColorTexture->GetColor(hitRecord.WorldPosition, hitRecord.UV);
 	rayOut.Step = rayIn.Step;
 	rayOut.Origin = hitRecord.WorldPosition;
-	rayOut.Direction = hitRecord.WorldNormal + Random::UnitSphere();
+	rayOut.Direction = glm::normalize(direction);
+
+	pdf = glm::dot(onb.GetW(), glm::normalize(rayOut.Direction)) / glm::pi<double>();
 	return true;
+}
+
+double Lambertian::ScatterPDF(const Ray& rayIn, const HitRecord& hitRecord,Ray& rayOut) const
+{
+	auto consine = glm::dot(glm::normalize(hitRecord.WorldNormal), glm::normalize(rayOut.Direction));
+	return consine < 0 ? 0 : consine / glm::pi<double>();
 }
 
 void Lambertian::SetAlbedo(const glm::dvec3& vec3Albedo)
 {
 	m_bDirty = true;
-	m_vec3Albedo = vec3Albedo;
+	m_spColorTexture = CreateRef<SolidColorTexture>(vec3Albedo);
 }
 
 const glm::dvec3& Lambertian::GetAlbedo() const
 {
-	return m_vec3Albedo;
+	return m_spColorTexture->GetColor(glm::dvec3(0.f), glm::dvec2(0.0));
 }
 
 void Lambertian::SetColorTexture(Ref<ColorTexture> spColorTexture)

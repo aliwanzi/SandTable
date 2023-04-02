@@ -9,7 +9,7 @@ public:
 	virtual ~Metal() = default;
 
 	// Í¨¹ý Material ¼Ì³Ð
-	virtual bool Scatter(const Ray& rayIn, const HitRecord& hitRecord, glm::dvec3& attenuation, Ray& rayOut) const override;
+	virtual bool Scatter(const Ray& rayIn, const HitRecord& hitRecord, glm::dvec3& attenuation, Ray& rayOut, double& pdf) const override;
 
 	void SetAlbedo(const glm::dvec3& vec3Albedo);
 	const glm::dvec3& GetAlbedo() const;

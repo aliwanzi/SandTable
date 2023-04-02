@@ -1,7 +1,6 @@
 #pragma once
 
 SAND_TABLE_NAMESPACE_BEGIN
-class BoundingBox;
 class Transform
 {
 public:

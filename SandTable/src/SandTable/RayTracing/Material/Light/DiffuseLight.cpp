@@ -7,12 +7,12 @@ DiffuseLight::DiffuseLight(Ref<ColorTexture> spColorTexture, uint32_t uiMaterial
     m_spColorTexture(spColorTexture)
 {
 }
-bool DiffuseLight::Scatter(const Ray& rayIn, const HitRecord& hitRecord, glm::dvec3& attenuation, Ray& rayOut) const
+bool DiffuseLight::Scatter(const Ray& rayIn, const HitRecord& hitRecord, glm::dvec3& attenuation, Ray& rayOut, double& pdf) const
 {
     return false;
 }
-glm::dvec3 DiffuseLight::Emitted(const glm::dvec3& SamplePoint, const glm::dvec2& UV) const
+glm::dvec3 DiffuseLight::Emitted(const HitRecord& hitRecord) const
 {
-    return m_spColorTexture->GetColor(SamplePoint, UV);
+    return hitRecord.FrontFace ? m_spColorTexture->GetColor(hitRecord.WorldPosition, hitRecord.UV) : glm::dvec3(0.0);
 }
 SAND_TABLE_NAMESPACE_END

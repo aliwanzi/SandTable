@@ -214,29 +214,49 @@ glm::dvec3 RayTracingScene::TraceRay(const Ray& ray, const Ref<Hittable>& spHitt
 		return glm::dvec3(0.0);
 	}
 	
-	HitRecord rec;
-	if (!spHittable->Hit(ray, 0.001, Random::FloatMax(), rec))
+	HitRecord hitRecord;
+	if (!spHittable->Hit(ray, 0.001, Random::FloatMax(), hitRecord))
 	{
 		return m_vec3BackGroundColor;
 	}
 
-	auto material = m_mapMaterial.find(rec.MaterialID);
+	auto material = m_mapMaterial.find(hitRecord.MaterialID);
 	if (material == m_mapMaterial.end())
 	{
 		LOG_DEV_ERROR("Can't find material in TraceRay");
 		return glm::dvec3(0.0);
 	}
 
-	auto emmitted = material->second->Emitted(rec.WorldPosition, rec.UV);
+	auto emmitted = material->second->Emitted(hitRecord);
 
 	Ray scattered;
+	double pdf;
 	glm::dvec3 attenuation;
-	if (!material->second->Scatter(ray, rec, attenuation, scattered))
+	if (!material->second->Scatter(ray, hitRecord, attenuation, scattered, pdf))
 	{
 		return emmitted;
 	}
+	
+	auto onLight = glm::dvec3(Random::Float(213, 343), 554, Random::Float(227, 332));
+	auto toLight = onLight - hitRecord.WorldPosition;
+	if (glm::dot(toLight, hitRecord.WorldNormal)<0)
+	{
+		return emmitted;
+	}
+	auto distance = glm::length2(toLight);
+	toLight = glm::normalize(toLight);
+	double lightArea = (343 - 213) * (332 - 227);
+	auto lightCosine = glm::abs(toLight.y);
+	if (lightCosine < glm::epsilon<double>())
+		return emmitted;
 
-	return emmitted + attenuation * TraceRay(scattered, spHittable, depth - 1);
+	pdf = distance / (lightCosine * lightArea);
+	scattered.Direction = toLight;
+
+
+
+	return emmitted + attenuation * material->second->ScatterPDF(ray, hitRecord, scattered) *
+		TraceRay(scattered, spHittable, depth - 1) / pdf;
 }
 
 SAND_TABLE_NAMESPACE_END

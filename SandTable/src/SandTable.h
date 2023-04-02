@@ -41,6 +41,7 @@
 #include "SandTable/RayTracing/Object/Rectangle/XYRectangle.h"
 #include "SandTable/RayTracing/Object/Rectangle/XZRectangle.h"
 #include "SandTable/RayTracing/Object/Rectangle/YZRectangle.h"
+#include "SandTable/RayTracing/Object/FlipFace.h"
 #include "SandTable/RayTracing/Object/Box.h"
 #include "SandTable/RayTracing/Object/ConstantMedium.h"
 #include "SandTable/RayTracing/Object/Accelerate/BoundingVolumeHierarchy.h"

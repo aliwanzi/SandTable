@@ -9,7 +9,7 @@ Isotropic::Isotropic(Ref<ColorTexture> spColorTexture, uint32_t uiMateriaID):
 {
 }
 
-bool Isotropic::Scatter(const Ray& rayIn, const HitRecord& hitRecord, glm::dvec3& attenuation, Ray& rayOut) const
+bool Isotropic::Scatter(const Ray& rayIn, const HitRecord& hitRecord, glm::dvec3& attenuation, Ray& rayOut, double& pdf) const
 {
 	rayOut.Origin = hitRecord.WorldPosition;
 	rayOut.Direction = Random::UnitSphere();
