@@ -439,6 +439,14 @@ void RayTracingEditorLayer::CreateCornellBoxScene()
 	auto spDiffuseLight = CreateRef<DiffuseLight>(spColorTexture, 3);
 	m_spRayTracingScene->AddMaterial(spDiffuseLight);
 
+	auto spMetal = CreateRef<Metal>(4);
+	spMetal->SetAlbedo(glm::dvec3(0.8, 0.85, 0.88));
+	m_spRayTracingScene->AddMaterial(spMetal);
+
+	auto spDielectric = CreateRef<Dielectric>(5);
+	spDielectric->SetMetallic(1.5);
+	m_spRayTracingScene->AddMaterial(spDielectric);
+
 	auto spYZRectangle0 = CreateRef<YZRectangle>(0);
 	spYZRectangle0->SetYZPoints(glm::dvec2(0), glm::dvec2(555));
 	spYZRectangle0->SetXPos(555);
@@ -482,18 +490,21 @@ void RayTracingEditorLayer::CreateCornellBoxScene()
 	spBox0->SetRotateY(15);
 	m_spObjectContainer->AddObject(spBox0);
 
-	auto spBox1 = CreateRef<Box>(glm::dvec3(0), glm::dvec3(165), 7);
-	spBox1->SetMaterialID(1);
-	spBox1->SetTranslate(glm::dvec3(130, 0, 130));
-	spBox1->SetRotateY(-18);
-	m_spObjectContainer->AddObject(spBox1);
+	auto spSphere = CreateRef<Sphere>(7);
+	spSphere->SetPosition(glm::dvec3(190.f, 90.f, 190.f));
+	spSphere->SetRadius(90.f);
+	spSphere->SetMaterialID(5);
+	m_spObjectContainer->AddObject(spSphere);
 
 	auto spLight0 = CreateRef<XZRectangle>(8);
 	spLight0->SetXZPoints(glm::dvec2(213, 227), glm::dvec2(343, 332));
 	spLight0->SetYPos(554);
 	m_spObjectLights->AddObject(spLight0);
 
-
+	auto spLight1 = CreateRef<Sphere>(9);
+	spLight1->SetPosition(glm::dvec3(190.f, 90.f, 190.f));
+	spLight1->SetRadius(90.f);
+	m_spObjectLights->AddObject(spLight1);
 
 	m_spRayTracingScene->SetObjectContainer(m_spObjectContainer);
 	m_spRayTracingScene->SetObjectLights(m_spObjectLights);
@@ -596,6 +607,10 @@ void RayTracingEditorLayer::CreateFinalScene()
 	spXZRectangle2->SetXZPoints(glm::dvec2(123,147), glm::dvec2(423,412));
 	spXZRectangle2->SetYPos(554);
 	spXZRectangle2->SetMaterialID(0);
+	auto spFlipFace = CreateRef<FlipFace>(spXZRectangle2);
+	spFlipFace->SetMaterialID(0);
+	m_spObjectContainer->AddObject(spFlipFace);
+
 	m_spObjectContainer->AddObject(spXZRectangle2);
 
 	auto spLambertian = CreateRef<Lambertian>(1);
@@ -728,6 +743,17 @@ void RayTracingEditorLayer::CreateFinalScene()
 	spBoundingVolumeHierarchy1->SetMaterialID(9);
 	m_spObjectContainer->AddObject(spBoundingVolumeHierarchy1);
 
+	auto spLight0 = CreateRef<XZRectangle>(8);
+	spLight0->SetXZPoints(glm::dvec2(123, 147), glm::dvec2(423, 412));
+	spLight0->SetYPos(554);
+	m_spObjectLights->AddObject(spLight0);
+
+	//auto spLight1 = CreateRef<Sphere>(9);
+	//spLight1->SetPosition(glm::dvec3(190.f, 90.f, 190.f));
+	//spLight1->SetRadius(90.f);
+	//m_spObjectLights->AddObject(spLight1);
+
 	m_spRayTracingScene->SetObjectContainer(m_spObjectContainer);
+	m_spRayTracingScene->SetObjectLights(m_spObjectLights);
 }
 

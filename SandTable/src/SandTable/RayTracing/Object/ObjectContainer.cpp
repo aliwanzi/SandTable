@@ -40,7 +40,9 @@ bool ObjectContainer::CreateBoundingBox(double dStepBegin, double dStepEnd)
 
 glm::dvec3 ObjectContainer::SampleDirection(const glm::dvec3& vec3HitPoint) const
 {
-	return m_vecObject[0]->SampleDirection(vec3HitPoint);
+	auto objectSize = static_cast<int>(m_vecObject.size());
+	int object = glm::clamp(Random::Uint(0, objectSize - 1), 0, objectSize - 1);
+	return m_vecObject[object]->SampleDirection(vec3HitPoint);
 }
 
 double ObjectContainer::GetPDF(const glm::dvec3& vec3HitPoint, const glm::dvec3& direction) const
@@ -50,7 +52,7 @@ double ObjectContainer::GetPDF(const glm::dvec3& vec3HitPoint, const glm::dvec3&
 	{
 		dSumPDF += object->GetPDF(vec3HitPoint, direction);
 	}
-	return dSumPDF;
+	return dSumPDF / (m_vecObject.size());
 }
 
 std::vector<Ref<Object>>& ObjectContainer::GetAllObject()

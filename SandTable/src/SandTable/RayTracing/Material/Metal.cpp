@@ -12,12 +12,15 @@ Metal::Metal(uint32_t uiMaterialID) :
 
 bool Metal::Scatter(const Ray& rayIn, const HitRecord& hitRecord, ScatterRecord& scatterRecord) const
 {
+	scatterRecord.SpecularRay = CreateRef<Ray>();
 	scatterRecord.Attenuation = m_vec3Albedo;
-	scatterRecord.SpecularRay.Step = rayIn.Step;
-	scatterRecord.SpecularRay.Origin = hitRecord.WorldPosition;
-	scatterRecord.SpecularRay.Direction = glm::reflect(rayIn.Direction, hitRecord.WorldNormal + m_fRoughness * Random::UnitSphere());
+	scatterRecord.SpecularRay->Step = rayIn.Step;
+	scatterRecord.SpecularRay->Origin = hitRecord.WorldPosition;
+	
+	auto reflected = glm::reflect(glm::normalize(rayIn.Direction), hitRecord.WorldNormal);
+	scatterRecord.SpecularRay->Direction = reflected + m_fRoughness * Random::UnitSphere();
 
-	return glm::dot(scatterRecord.SpecularRay.Direction, hitRecord.WorldNormal) > 0;
+	return true;
 }
 
 void Metal::SetAlbedo(const glm::dvec3& vec3Albedo)

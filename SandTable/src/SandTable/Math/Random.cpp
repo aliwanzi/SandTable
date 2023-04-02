@@ -78,7 +78,19 @@ glm::dvec3 Random::CosineDirection()
 	return glm::dvec3(x, y, z);
 }
 
+glm::dvec3 Random::RandomSampleSphere(double radius, double distance)
+{
+	auto r1 = Float();
+	auto r2 = Float();
 
+	auto z = 1 + r2 * (glm::sqrt(1 - radius * radius / distance) - 1);
+
+	auto phi = 2 * glm::pi<double>() * r1;
+	auto x = glm::cos(phi) * glm::sqrt(1 - z * z);
+	auto y = glm::sin(phi) * glm::sqrt(1 - z * z);
+
+	return glm::dvec3(x, y, z);
+}
 
 SAND_TABLE_NAMESPACE_END
 

@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "Sphere.h"
+#include "SandTable/RayTracing/PDF/OrthoNormalBasis .h"
 
 SAND_TABLE_NAMESPACE_BEGIN
 
@@ -69,6 +70,26 @@ bool Sphere::CreateBoundingBox(double dStepBegin, double dStepEnd)
 	m_spBoundingBox->SetMin(m_vec3Position - glm::dvec3(m_fRadius));
 	m_spBoundingBox->SetMax(m_vec3Position + glm::dvec3(m_fRadius));
 	return true;
+}
+
+glm::dvec3 Sphere::SampleDirection(const glm::dvec3& vec3HitPoint) const
+{
+	auto distance = m_vec3Position - vec3HitPoint;
+
+	auto spONB = CreateRef<OrthoNormalBasis>(distance);
+	return spONB->Local(Random::RandomSampleSphere(m_fRadius, glm::length2(distance)));
+}
+
+double Sphere::GetPDF(const glm::dvec3& vec3HitPoint, const glm::dvec3& direction) const
+{
+	HitRecord hitRecord;
+	if (!Hit(Ray(vec3HitPoint, direction), 0.001, Random::FloatMax(), hitRecord))
+	{
+		return 0;
+	}
+
+	auto cosMax = glm::sqrt(1 - m_fRadius * m_fRadius / glm::length2(m_vec3Position - vec3HitPoint));
+	return 1 / (2 * glm::pi<double>() * (1 - cosMax));
 }
 
 void Sphere::CalculateSampleUV(const glm::vec3& SamplePoint, glm::dvec2& UV) const

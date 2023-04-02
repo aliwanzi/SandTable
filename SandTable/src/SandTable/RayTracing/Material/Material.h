@@ -5,9 +5,8 @@
 SAND_TABLE_NAMESPACE_BEGIN
 struct ScatterRecord
 {
-	Ray SpecularRay;
+	Ref<Ray> SpecularRay = nullptr;
 	Ref<PDF> PDF = nullptr;
-	bool IsSpecular;
 	glm::dvec3 Attenuation;
 };
 

@@ -11,10 +11,12 @@ Isotropic::Isotropic(Ref<ColorTexture> spColorTexture, uint32_t uiMateriaID):
 
 bool Isotropic::Scatter(const Ray& rayIn, const HitRecord& hitRecord, ScatterRecord& scatterRecord) const
 {
-	scatterRecord.SpecularRay.Origin = hitRecord.WorldPosition;
-	scatterRecord.SpecularRay.Direction = Random::UnitSphere();
+#if 0
+	scatterRecord.SpecularRay->Origin = hitRecord.WorldPosition;
+	scatterRecord.SpecularRay->Direction = Random::UnitSphere();
 	scatterRecord.Attenuation = m_spColorTexture->GetColor(hitRecord.WorldPosition, hitRecord.UV);
-	return true;
+#endif;
+	return false;
 }
 
 SAND_TABLE_NAMESPACE_END

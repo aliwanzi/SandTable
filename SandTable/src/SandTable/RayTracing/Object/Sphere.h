@@ -2,6 +2,7 @@
 #include "Object.h"
 
 SAND_TABLE_NAMESPACE_BEGIN
+class OrthoNormalBasis;
 class Sphere :public Object
 {
 public:
@@ -18,6 +19,10 @@ public:
 	virtual bool Hit(const Ray& ray, double fMin, double fMax, HitRecord& hitRecord) const override;
 
 	virtual bool CreateBoundingBox(double dStepBegin, double dStepEnd);
+
+	virtual glm::dvec3 SampleDirection(const glm::dvec3& vec3HitPoint) const override;
+	virtual double GetPDF(const glm::dvec3& vec3HitPoint, const glm::dvec3& direction)const override;
+
 private:
 	void CalculateSampleUV(const glm::vec3& SamplePoint, glm::dvec2& UV) const;
 

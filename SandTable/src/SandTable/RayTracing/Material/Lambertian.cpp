@@ -16,7 +16,6 @@ bool Lambertian::Scatter(const Ray& rayIn, const HitRecord& hitRecord, ScatterRe
 {
 	scatterRecord.Attenuation = m_spColorTexture->GetColor(hitRecord.WorldPosition, hitRecord.UV);
 	scatterRecord.PDF = CreateRef<CosinePDF>(hitRecord.WorldNormal);
-	scatterRecord.IsSpecular = false;
 	return true;
 }
 

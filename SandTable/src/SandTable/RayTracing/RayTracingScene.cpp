@@ -250,9 +250,13 @@ glm::dvec3 RayTracingScene::TraceRay(const Ray& ray, const Ref<Hittable>& spHitt
 		return emmitted;
 	}
 
+	if (scatterRecord.SpecularRay != nullptr)
+	{
+		return scatterRecord.Attenuation * TraceRay(*scatterRecord.SpecularRay, spHittable, depth - 1);
+	}
+
 	auto spHittablePDF = CreateRef<HittablePDF>(m_spObjectLights, hitRecord.WorldPosition);
-	auto spCosinePDF = CreateRef<CosinePDF>(hitRecord.WorldNormal);
-	auto spMixturePDF = CreateRef<MixturePDF>(spHittablePDF, spCosinePDF);
+	auto spMixturePDF = CreateRef<MixturePDF>(spHittablePDF, scatterRecord.PDF);
 
 	Ray scattered(hitRecord.WorldPosition, spMixturePDF->SampleDirection(), ray.Step);
 	double pdf = spMixturePDF->GetPDF(scattered.Direction);
