@@ -94,10 +94,14 @@ double Sphere::GetPDF(const glm::dvec3& vec3HitPoint, const glm::dvec3& directio
 
 void Sphere::CalculateSampleUV(const glm::vec3& SamplePoint, glm::dvec2& UV) const
 {
-	auto theta = glm::acos(-SamplePoint.y);
-	auto phi = glm::atan(-SamplePoint.z, SamplePoint.x) + glm::pi<double>();
+	auto phi = glm::atan(SamplePoint.z, SamplePoint.x);
+	auto theta = glm::asin(SamplePoint.y);
 
-	UV = glm::dvec2(phi / (2 * glm::pi<double>()), theta / glm::pi<double>());
+	phi *= 1 / (2 * glm::pi<double>());
+	theta *= 1 / glm::pi<double>();
+
+	UV.x = 1 - (phi + 0.5);
+	UV.y = theta + 0.5;
 }
 
 SAND_TABLE_NAMESPACE_END
