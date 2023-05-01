@@ -3,6 +3,7 @@
 #include "Rectangle/XYRectangle.h"
 #include "Rectangle/XZRectangle.h"
 #include "Rectangle/YZRectangle.h"
+#include "Triangle.h"
 
 SAND_TABLE_NAMESPACE_BEGIN
 
@@ -37,6 +38,8 @@ Box::Box(const glm::dvec3& PointMin, const glm::dvec3& PointMax, uint32_t uiEnti
 	m_spObjectContainer->AddObject(spXZRectangle1);
 	m_spObjectContainer->AddObject(spYZRectangle0);
 	m_spObjectContainer->AddObject(spYZRectangle1);
+
+	Triangle triangle;
 }
 
 

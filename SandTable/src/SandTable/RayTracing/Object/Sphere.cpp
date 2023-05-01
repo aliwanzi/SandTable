@@ -1,6 +1,6 @@
 #include "pch.h"
 #include "Sphere.h"
-#include "SandTable/RayTracing/PDF/OrthoNormalBasis .h"
+#include "SandTable/RayTracing/PDF/OrthoNormalBasis.h"
 
 SAND_TABLE_NAMESPACE_BEGIN
 

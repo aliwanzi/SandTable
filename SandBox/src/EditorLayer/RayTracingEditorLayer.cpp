@@ -420,8 +420,8 @@ void RayTracingEditorLayer::CreateSampleLightScene()
 
 void RayTracingEditorLayer::CreateCornellBoxScene()
 {
-	m_spRayTracingCamera->SetPosition(glm::vec3(278, 278, -600));
-	m_spRayTracingCamera->SetForwardDirection(glm::vec3(278, 278, 0) - glm::vec3(278, 278, -800));
+	m_spRayTracingCamera->SetPosition(glm::vec3(278, 278, -750));
+	m_spRayTracingCamera->SetForwardDirection(glm::vec3(278, 278, 0) - glm::vec3(278, 278, -750));
 
 	auto spRed = CreateRef<Lambertian>(0);
 	spRed->SetAlbedo(glm::dvec3(0.65,0.05,0.05));

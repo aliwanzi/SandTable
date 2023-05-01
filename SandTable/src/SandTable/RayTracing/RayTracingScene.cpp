@@ -18,6 +18,7 @@ RayTracingScene::RayTracingScene() :
 	m_vec3BackGroundColor(glm::dvec3(0.0)),
 	m_bSaveImage(false)
 {
+
 }
 
 void RayTracingScene::OnUpdate(const TimeStep& timeStep, Ref<RayTracingCamera>& spCamera)

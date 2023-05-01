@@ -1,6 +1,6 @@
 #include "pch.h"
 #include "CosinePDF.h"
-#include "OrthoNormalBasis .h"
+#include "OrthoNormalBasis.h"
 
 SAND_TABLE_NAMESPACE_BEGIN
 CosinePDF::CosinePDF(const glm::dvec3& normal) :

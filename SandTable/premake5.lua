@@ -37,7 +37,8 @@ project "SandTable"
 		"%{IncludeDir.yaml_cpp}",
 		"%{IncludeDir.ImGuizmo}",
 		"%{IncludeDir.Box2D}",
-		"%{IncludeDir.filewatch}"
+		"%{IncludeDir.filewatch}",
+		"%{IncludeDir.OpenMesh}"
 	}
 
 	links
@@ -50,6 +51,8 @@ project "SandTable"
 		"Box2D",
 
 		"%{Library.mono}",
+		"%{Library.OpenMeshCore}",
+		"%{Library.OpenMeshTools}",
 	}
 
 	filter "files:vendor/ImGuizmo/**.cpp"
@@ -63,7 +66,8 @@ project "SandTable"
 			"SAND_TABLE_ENABLE_ASSERTS",
 			"SAND_TABLE_PLATFORM_WINDOWS",
 			"SAND_TABLE_BUILD_DLL",
-			"SAND_TABLE_RENDER_OPENGL"
+			"SAND_TABLE_RENDER_OPENGL",
+			"_USE_MATH_DEFINES"
 		}
 
 	filter "configurations:Debug"

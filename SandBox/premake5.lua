@@ -31,7 +31,9 @@ project "SandBox"
 
 	postbuildcommands
 	{
-		"{COPY} %{Binary.mono}  %{cfg.targetdir}"
+		"{COPY} %{Binary.mono}  %{cfg.targetdir}",
+		"{COPY} %{Binary.OpenMeshCore}  %{cfg.targetdir}",
+		"{COPY} %{Binary.OpenMeshTools}  %{cfg.targetdir}",
 	}
 
 	filter "system:windows"
